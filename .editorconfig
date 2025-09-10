@@ -1,0 +1,109 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+# All files
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+max_line_length = 100
+
+# Python files
+[*.py]
+indent_style = space
+indent_size = 4
+max_line_length = 100
+
+# YAML files
+[*.{yml,yaml}]
+indent_style = space
+indent_size = 2
+max_line_length = 100
+
+# JSON files
+[*.json]
+indent_style = space
+indent_size = 2
+max_line_length = 100
+
+# JavaScript/TypeScript files
+[*.{js,ts,jsx,tsx}]
+indent_style = space
+indent_size = 2
+max_line_length = 100
+
+# HTML files
+[*.{html,htm}]
+indent_style = space
+indent_size = 2
+max_line_length = 100
+
+# CSS/SCSS files
+[*.{css,scss,sass}]
+indent_style = space
+indent_size = 2
+max_line_length = 100
+
+# Markdown files
+[*.md]
+indent_style = space
+indent_size = 2
+max_line_length = 100
+trim_trailing_whitespace = false
+
+# Makefile
+[{Makefile,*.mk}]
+indent_style = tab
+indent_size = 4
+
+# Shell scripts
+[*.{sh,bash}]
+indent_style = space
+indent_size = 2
+max_line_length = 100
+
+# PowerShell scripts
+[*.ps1]
+indent_style = space
+indent_size = 4
+max_line_length = 100
+
+# Batch files
+[*.{bat,cmd}]
+indent_style = space
+indent_size = 4
+max_line_length = 100
+
+# Configuration files
+[*.{ini,cfg,conf}]
+indent_style = space
+indent_size = 4
+max_line_length = 100
+
+# Docker files
+[{Dockerfile,*.dockerfile}]
+indent_style = space
+indent_size = 2
+max_line_length = 100
+
+# SQL files
+[*.sql]
+indent_style = space
+indent_size = 2
+max_line_length = 100
+
+# XML files
+[*.xml]
+indent_style = space
+indent_size = 2
+max_line_length = 100
+
+# TOML files
+[*.toml]
+indent_style = space
+indent_size = 4
+max_line_length = 100
+
