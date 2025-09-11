@@ -57,8 +57,5 @@ def evaluate_rules(request: DecisionRequest) -> DecisionResponse:
     unique_actions = actions
 
     return DecisionResponse(
-        decision=final_decision,
-        reasons=unique_reasons,
-        actions=unique_actions,
-        meta=meta
+        decision=final_decision, reasons=unique_reasons, actions=unique_actions, meta=meta
     )

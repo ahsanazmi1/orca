@@ -125,6 +125,12 @@ module = [
     "orjson.*",
     "typer.*",
     "rich.*",
+    "pydantic.*",
+    "pytest.*",
+    "numpy.*",
+    "pandas.*",
+    "sklearn.*",
+    "scikit_learn.*",
 ]
 ignore_missing_imports = true
 

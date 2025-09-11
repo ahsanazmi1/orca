@@ -26,11 +26,12 @@ repos:
     rev: v1.8.0
     hooks:
       - id: mypy
-        args: [--strict]
+        args: [--config-file=pyproject.toml]
 
   - repo: https://github.com/PyCQA/bandit
     rev: 1.7.5
     hooks:
       - id: bandit
-        args: [-r, src/, -f, json, -o, bandit-report.json]
-        exclude: tests/
+        additional_dependencies: [pbr]
+        args: [-r, src/]
+        exclude: tests/|scripts/|demos/

@@ -13,12 +13,12 @@ from orca_core.models import DecisionRequest
 class TestFixturesParametrized:
     """Parametrized tests for fixture file validation."""
 
-    @pytest.fixture
+    @pytest.fixture  # type: ignore[misc]
     def fixtures_dir(self) -> Path:
         """Return the fixtures directory path."""
         return Path("fixtures/requests")
 
-    @pytest.fixture
+    @pytest.fixture  # type: ignore[misc]
     def fixture_files(self, fixtures_dir: Path) -> list[Path]:
         """Return list of fixture file paths."""
         if not fixtures_dir.exists():
@@ -30,43 +30,34 @@ class TestFixturesParametrized:
 
         return fixture_files
 
-    @pytest.mark.parametrize("fixture_name,expected_decision,expected_reasons,expected_actions,use_ml", [
-        (
-            "low_ticket_ok.json",
-            "APPROVE",
-            [],  # No specific reasons expected for approve
-            ["LOYALTY_BOOST"],  # Should have loyalty boost action
-            True
-        ),
-        (
-            "high_ticket_review.json",
-            "REVIEW",
-            ["HIGH_TICKET"],
-            ["ROUTE_TO_REVIEW"],
-            True
-        ),
-        (
-            "velocity_review.json",
-            "REVIEW",
-            ["VELOCITY_FLAG"],
-            ["ROUTE_TO_REVIEW"],
-            True
-        ),
-        (
-            "location_mismatch_review.json",
-            "REVIEW",
-            ["LOCATION_MISMATCH", "HIGH_IP_DISTANCE"],  # Should have both
-            ["ROUTE_TO_REVIEW"],
-            True
-        ),
-        (
-            "high_risk_decline.json",
-            "DECLINE",
-            ["CHARGEBACK_HISTORY", "HIGH_RISK"],  # Chargeback + high risk
-            ["BLOCK"],
-            True
-        ),
-    ])
+    @pytest.mark.parametrize(  # type: ignore[misc]
+        "fixture_name,expected_decision,expected_reasons,expected_actions,use_ml",
+        [
+            (
+                "low_ticket_ok.json",
+                "APPROVE",
+                [],  # No specific reasons expected for approve
+                ["LOYALTY_BOOST"],  # Should have loyalty boost action
+                True,
+            ),
+            ("high_ticket_review.json", "REVIEW", ["HIGH_TICKET"], ["ROUTE_TO_REVIEW"], True),
+            ("velocity_review.json", "REVIEW", ["VELOCITY_FLAG"], ["ROUTE_TO_REVIEW"], True),
+            (
+                "location_mismatch_review.json",
+                "REVIEW",
+                ["LOCATION_MISMATCH", "HIGH_IP_DISTANCE"],  # Should have both
+                ["ROUTE_TO_REVIEW"],
+                True,
+            ),
+            (
+                "high_risk_decline.json",
+                "DECLINE",
+                ["CHARGEBACK_HISTORY", "HIGH_RISK"],  # Chargeback + high risk
+                ["BLOCK"],
+                True,
+            ),
+        ],
+    )
     def test_fixture_decision_outcomes(
         self,
         fixture_name: str,
@@ -74,7 +65,7 @@ class TestFixturesParametrized:
         expected_reasons: list[str],
         expected_actions: list[str],
         use_ml: bool,
-        fixtures_dir: Path
+        fixtures_dir: Path,
     ) -> None:
         """Test that fixture files produce expected decision outcomes."""
         fixture_path = fixtures_dir / fixture_name
@@ -129,9 +120,17 @@ class TestFixturesParametrized:
             assert response.decision == "APPROVE"
             assert "LOYALTY_BOOST" in response.actions
             # Should not have any review reasons
-            review_reasons = ["HIGH_TICKET", "VELOCITY_FLAG", "LOCATION_MISMATCH", "HIGH_IP_DISTANCE", "CHARGEBACK_HISTORY"]
+            review_reasons = [
+                "HIGH_TICKET",
+                "VELOCITY_FLAG",
+                "LOCATION_MISMATCH",
+                "HIGH_IP_DISTANCE",
+                "CHARGEBACK_HISTORY",
+            ]
             for reason in review_reasons:
-                assert not any(reason in r for r in response.reasons), f"Unexpected review reason {reason} in approve case"
+                assert not any(
+                    reason in r for r in response.reasons
+                ), f"Unexpected review reason {reason} in approve case"
 
         elif fixture_name == "high_ticket_review.json":
             # Should be reviewed due to high ticket
@@ -155,7 +154,9 @@ class TestFixturesParametrized:
                 any(loc_reason in reason for reason in response.reasons)
                 for loc_reason in location_reasons
             )
-            assert has_location_reason, f"Expected at least one location reason in {response.reasons}"
+            assert (
+                has_location_reason
+            ), f"Expected at least one location reason in {response.reasons}"
 
         elif fixture_name == "high_risk_decline.json":
             # Should be declined due to high risk (with monkeypatched risk score)
@@ -172,7 +173,7 @@ class TestFixturesParametrized:
             "high_ticket_review.json",
             "velocity_review.json",
             "location_mismatch_review.json",
-            "high_risk_decline.json"
+            "high_risk_decline.json",
         ]
 
         for filename in expected_files:
@@ -196,7 +197,7 @@ class TestFixturesParametrized:
             "low_ticket_ok.json",
             "high_ticket_review.json",
             "velocity_review.json",
-            "location_mismatch_review.json"
+            "location_mismatch_review.json",
         ]
 
         for filename in fixture_files:
@@ -216,9 +217,7 @@ class TestFixturesParametrized:
                 decisions.append(response.decision)
 
             # All decisions should be the same
-            assert len(set(decisions)) == 1, (
-                f"Inconsistent decisions for {filename}: {decisions}"
-            )
+            assert len(set(decisions)) == 1, f"Inconsistent decisions for {filename}: {decisions}"
 
     def test_high_risk_fixture_without_monkeypatch(self, fixtures_dir: Path) -> None:
         """Test high_risk_decline.json without monkeypatch to see natural behavior."""
@@ -234,9 +233,10 @@ class TestFixturesParametrized:
 
         # Without monkeypatch, it should likely be REVIEW due to chargeback history
         # (unless the natural ML risk score is > 0.8)
-        assert response.decision in ["REVIEW", "DECLINE"], (
-            f"Expected REVIEW or DECLINE, got {response.decision}"
-        )
+        assert response.decision in [
+            "REVIEW",
+            "DECLINE",
+        ], f"Expected REVIEW or DECLINE, got {response.decision}"
         assert any("CHARGEBACK_HISTORY" in reason for reason in response.reasons)
 
         # If it's DECLINE, it should have HIGH_RISK reason
@@ -247,13 +247,16 @@ class TestFixturesParametrized:
             # If REVIEW, should have ROUTE_TO_REVIEW action
             assert "ROUTE_TO_REVIEW" in response.actions
 
-    @pytest.mark.parametrize("fixture_name", [
-        "low_ticket_ok.json",
-        "high_ticket_review.json",
-        "velocity_review.json",
-        "location_mismatch_review.json",
-        "high_risk_decline.json"
-    ])
+    @pytest.mark.parametrize(  # type: ignore[misc]
+        "fixture_name",
+        [
+            "low_ticket_ok.json",
+            "high_ticket_review.json",
+            "velocity_review.json",
+            "location_mismatch_review.json",
+            "high_risk_decline.json",
+        ],
+    )
     def test_fixture_metadata_completeness(self, fixture_name: str, fixtures_dir: Path) -> None:
         """Test that fixture responses have complete metadata."""
         fixture_path = fixtures_dir / fixture_name

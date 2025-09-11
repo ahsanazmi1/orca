@@ -61,7 +61,9 @@ cart_total = st.sidebar.number_input(
 currency = st.sidebar.selectbox(
     "Currency",
     ["USD", "EUR", "GBP", "CAD", "AUD"],
-    index=0 if not preset_data else ["USD", "EUR", "GBP", "CAD", "AUD"].index(preset_data.get("currency", "USD"))
+    index=0
+    if not preset_data
+    else ["USD", "EUR", "GBP", "CAD", "AUD"].index(preset_data.get("currency", "USD")),
 )
 
 # Features section
@@ -79,7 +81,7 @@ velocity_24h = st.sidebar.number_input(
 high_ip_distance = st.sidebar.checkbox(
     "High IP Distance",
     value=features.get("high_ip_distance", False),
-    help="Transaction originates from high-risk IP distance"
+    help="Transaction originates from high-risk IP distance",
 )
 
 # Context section
@@ -90,13 +92,21 @@ context = preset_data.get("context", {}) if preset_data else {}
 location_ip_country = st.sidebar.selectbox(
     "IP Country",
     ["US", "CA", "GB", "DE", "FR", "AU", "JP", "Other"],
-    index=0 if not context else ["US", "CA", "GB", "DE", "FR", "AU", "JP", "Other"].index(context.get("location_ip_country", "US"))
+    index=0
+    if not context
+    else ["US", "CA", "GB", "DE", "FR", "AU", "JP", "Other"].index(
+        context.get("location_ip_country", "US")
+    ),
 )
 
 billing_country = st.sidebar.selectbox(
     "Billing Country",
     ["US", "CA", "GB", "DE", "FR", "AU", "JP", "Other"],
-    index=0 if not context else ["US", "CA", "GB", "DE", "FR", "AU", "JP", "Other"].index(context.get("billing_country", "US"))
+    index=0
+    if not context
+    else ["US", "CA", "GB", "DE", "FR", "AU", "JP", "Other"].index(
+        context.get("billing_country", "US")
+    ),
 )
 
 # Customer information
@@ -104,7 +114,9 @@ customer = context.get("customer", {}) if context else {}
 loyalty_tier = st.sidebar.selectbox(
     "Loyalty Tier",
     ["NONE", "SILVER", "GOLD", "PLATINUM"],
-    index=0 if not customer else ["NONE", "SILVER", "GOLD", "PLATINUM"].index(customer.get("loyalty_tier", "NONE"))
+    index=0
+    if not customer
+    else ["NONE", "SILVER", "GOLD", "PLATINUM"].index(customer.get("loyalty_tier", "NONE")),
 )
 
 chargebacks_12m = st.sidebar.number_input(
@@ -112,7 +124,7 @@ chargebacks_12m = st.sidebar.number_input(
     min_value=0,
     max_value=10,
     value=customer.get("chargebacks_12m", 0),
-    help="Number of chargebacks in last 12 months"
+    help="Number of chargebacks in last 12 months",
 )
 
 # Decision buttons
@@ -123,23 +135,19 @@ col_btn1, col_btn2 = st.sidebar.columns(2)
 with col_btn1:
     rules_only_clicked = st.button("Decide (Rules only)", help="Evaluate using rules only, no ML")
 with col_btn2:
-    rules_ml_clicked = st.button("Decide (Rules + ML)", help="Evaluate using rules and ML risk prediction")
+    rules_ml_clicked = st.button(
+        "Decide (Rules + ML)", help="Evaluate using rules and ML risk prediction"
+    )
 
 # Build request data
 request_data: dict[str, Any] = {
     "cart_total": cart_total,
     "currency": currency,
-    "features": {
-        "velocity_24h": velocity_24h,
-        "high_ip_distance": high_ip_distance
-    },
+    "features": {"velocity_24h": velocity_24h, "high_ip_distance": high_ip_distance},
     "context": {
         "location_ip_country": location_ip_country,
         "billing_country": billing_country,
-        "customer": {
-            "loyalty_tier": loyalty_tier,
-            "chargebacks_12m": chargebacks_12m
-        }
+        "customer": {"loyalty_tier": loyalty_tier, "chargebacks_12m": chargebacks_12m},
     },
 }
 
@@ -183,9 +191,11 @@ with col2:
                 "Field": ["Decision", "Risk Score", "Rules Evaluated"],
                 "Value": [
                     response.decision,
-                    f"{response.meta.get('risk_score', 'N/A'):.3f}" if use_ml else "N/A (Rules only)",
-                    ", ".join(response.meta.get("rules_evaluated", [])) or "None"
-                ]
+                    f"{response.meta.get('risk_score', 'N/A'):.3f}"
+                    if use_ml
+                    else "N/A (Rules only)",
+                    ", ".join(response.meta.get("rules_evaluated", [])) or "None",
+                ],
             }
             st.table(summary_data)
 
@@ -207,7 +217,7 @@ with col2:
                 "Output Format",
                 ["JSON Output", "Plain-English Explanation"],
                 horizontal=True,
-                help="Choose how to display the decision response"
+                help="Choose how to display the decision response",
             )
 
             if output_tab == "JSON Output":
@@ -235,7 +245,7 @@ with col2:
                         {explanation.replace(chr(10), '<br>')}
                     </div>
                     """,
-                    unsafe_allow_html=True
+                    unsafe_allow_html=True,
                 )
 
         except Exception as e:

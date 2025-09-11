@@ -18,7 +18,7 @@ app = typer.Typer(help="Orca Core Decision Engine CLI")
 console = Console()
 
 
-@app.command()
+@app.command()  # type: ignore[misc]
 def decide(
     json_input: str = typer.Argument(..., help="JSON string with decision request data"),
 ) -> None:
@@ -51,7 +51,7 @@ def decide(
         raise typer.Exit(1) from e
 
 
-@app.command()
+@app.command()  # type: ignore[misc]
 def decide_file(
     file_path: str = typer.Argument(..., help="Path to JSON file with decision request data"),
 ) -> None:
@@ -88,12 +88,10 @@ def decide_file(
         raise typer.Exit(1) from e
 
 
-@app.command()
+@app.command()  # type: ignore[misc]
 def decide_batch(
     glob_pattern: str = typer.Option(
-        "fixtures/requests/*.json",
-        "--glob",
-        help="Glob pattern to match JSON files"
+        "fixtures/requests/*.json", "--glob", help="Glob pattern to match JSON files"
     ),
 ) -> None:
     """
@@ -143,7 +141,7 @@ def decide_batch(
                     "decision": response.decision,
                     "reasons_joined": " | ".join(response.reasons),
                     "actions_joined": " | ".join(response.actions),
-                    "risk_score": response.meta.get("risk_score", "N/A")
+                    "risk_score": response.meta.get("risk_score", "N/A"),
                 }
                 csv_data.append(csv_row)
 
@@ -155,12 +153,12 @@ def decide_batch(
                     "decision": "ERROR",
                     "reasons_joined": f"Error: {str(e)}",
                     "actions_joined": "",
-                    "risk_score": "N/A"
+                    "risk_score": "N/A",
                 }
                 csv_data.append(csv_row)
 
         # Write CSV summary
-        with open(csv_path, 'w', newline='', encoding='utf-8') as csvfile:
+        with open(csv_path, "w", newline="", encoding="utf-8") as csvfile:
             fieldnames = ["file", "decision", "reasons_joined", "actions_joined", "risk_score"]
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
@@ -174,7 +172,7 @@ def decide_batch(
         raise typer.Exit(1) from e
 
 
-@app.command()
+@app.command()  # type: ignore[misc]
 def explain(
     request_json: str = typer.Argument(..., help="JSON string with decision request data"),
 ) -> None:

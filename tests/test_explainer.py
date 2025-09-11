@@ -14,7 +14,7 @@ class TestDecisionExplainer:
             decision="REVIEW",
             reasons=["HIGH_TICKET: Cart total $750.00 exceeds $500.00 threshold"],
             actions=["ROUTE_TO_REVIEW"],
-            meta={"risk_score": 0.15}
+            meta={"risk_score": 0.15},
         )
 
         explanation = explain_decision(response)
@@ -29,7 +29,7 @@ class TestDecisionExplainer:
             decision="REVIEW",
             reasons=["VELOCITY_FLAG: 24h velocity 4.0 exceeds 3.0 threshold"],
             actions=["ROUTE_TO_REVIEW"],
-            meta={"risk_score": 0.15}
+            meta={"risk_score": 0.15},
         )
 
         explanation = explain_decision(response)
@@ -44,7 +44,7 @@ class TestDecisionExplainer:
             decision="REVIEW",
             reasons=["LOCATION_MISMATCH: IP country 'GB' differs from billing country 'US'"],
             actions=["ROUTE_TO_REVIEW"],
-            meta={"risk_score": 0.15}
+            meta={"risk_score": 0.15},
         )
 
         explanation = explain_decision(response)
@@ -58,7 +58,7 @@ class TestDecisionExplainer:
             decision="REVIEW",
             reasons=["HIGH_IP_DISTANCE: Transaction originates from high-risk IP distance"],
             actions=["ROUTE_TO_REVIEW"],
-            meta={"risk_score": 0.15}
+            meta={"risk_score": 0.15},
         )
 
         explanation = explain_decision(response)
@@ -72,7 +72,7 @@ class TestDecisionExplainer:
             decision="REVIEW",
             reasons=["CHARGEBACK_HISTORY: Customer has 1 chargeback(s) in last 12 months"],
             actions=["ROUTE_TO_REVIEW"],
-            meta={"risk_score": 0.15}
+            meta={"risk_score": 0.15},
         )
 
         explanation = explain_decision(response)
@@ -86,7 +86,7 @@ class TestDecisionExplainer:
             decision="APPROVE",
             reasons=["LOYALTY_BOOST: Customer has GOLD loyalty tier"],
             actions=["LOYALTY_BOOST"],
-            meta={"risk_score": 0.15}
+            meta={"risk_score": 0.15},
         )
 
         explanation = explain_decision(response)
@@ -100,7 +100,7 @@ class TestDecisionExplainer:
             decision="DECLINE",
             reasons=["HIGH_RISK: ML risk score 0.950 exceeds 0.800 threshold"],
             actions=["BLOCK"],
-            meta={"risk_score": 0.95}
+            meta={"risk_score": 0.95},
         )
 
         explanation = explain_decision(response)
@@ -115,10 +115,10 @@ class TestDecisionExplainer:
             reasons=[
                 "LOCATION_MISMATCH: IP country 'GB' differs from billing country 'US'",
                 "HIGH_IP_DISTANCE: Transaction originates from high-risk IP distance",
-                "LOYALTY_BOOST: Customer has GOLD loyalty tier"
+                "LOYALTY_BOOST: Customer has GOLD loyalty tier",
             ],
             actions=["ROUTE_TO_REVIEW", "LOYALTY_BOOST"],
-            meta={"risk_score": 0.15}
+            meta={"risk_score": 0.15},
         )
 
         explanation = explain_decision(response)
@@ -132,10 +132,7 @@ class TestDecisionExplainer:
     def test_no_reasons_default_explanation(self) -> None:
         """Test default explanation when no reasons are provided."""
         response = DecisionResponse(
-            decision="APPROVE",
-            reasons=[],
-            actions=["Process payment"],
-            meta={"risk_score": 0.15}
+            decision="APPROVE", reasons=[], actions=["Process payment"], meta={"risk_score": 0.15}
         )
 
         explanation = explain_decision(response)
@@ -146,10 +143,7 @@ class TestDecisionExplainer:
     def test_no_reasons_non_approve_explanation(self) -> None:
         """Test default explanation for non-approve decisions with no reasons."""
         response = DecisionResponse(
-            decision="REVIEW",
-            reasons=[],
-            actions=["ROUTE_TO_REVIEW"],
-            meta={"risk_score": 0.15}
+            decision="REVIEW", reasons=[], actions=["ROUTE_TO_REVIEW"], meta={"risk_score": 0.15}
         )
 
         explanation = explain_decision(response)
@@ -163,7 +157,7 @@ class TestDecisionExplainer:
             decision="REVIEW",
             reasons=["UNKNOWN_RULE: Some unknown rule was triggered"],
             actions=["ROUTE_TO_REVIEW"],
-            meta={"risk_score": 0.15}
+            meta={"risk_score": 0.15},
         )
 
         explanation = explain_decision(response)
@@ -177,7 +171,7 @@ class TestDecisionExplainer:
             decision="REVIEW",
             reasons=["HIGH_TICKET: Cart total $750.00 exceeds $500.00 threshold"],
             actions=["ROUTE_TO_REVIEW"],
-            meta={"risk_score": 0.15}
+            meta={"risk_score": 0.15},
         )
 
         explanation = explain_decision(response)
@@ -191,7 +185,7 @@ class TestDecisionExplainer:
         test_cases = [
             ("APPROVE", []),
             ("REVIEW", ["HIGH_TICKET: Test reason"]),
-            ("DECLINE", ["HIGH_RISK: Test reason"])
+            ("DECLINE", ["HIGH_RISK: Test reason"]),
         ]
 
         for decision, reasons in test_cases:
@@ -199,7 +193,7 @@ class TestDecisionExplainer:
                 decision=decision,
                 reasons=reasons,
                 actions=["Test action"],
-                meta={"risk_score": 0.15}
+                meta={"risk_score": 0.15},
             )
 
             explanation = explain_decision(response)
@@ -211,7 +205,7 @@ class TestDecisionExplainer:
             decision="REVIEW",
             reasons=["HIGH_TICKET: Cart total $750.00 exceeds $500.00 threshold"],
             actions=["ROUTE_TO_REVIEW"],
-            meta={"risk_score": 0.15}
+            meta={"risk_score": 0.15},
         )
 
         explanation = explain_decision(response)
@@ -231,10 +225,10 @@ class TestDecisionExplainer:
             decision="REVIEW",
             reasons=[
                 "HIGH_TICKET: Cart total $750.00 exceeds $500.00 threshold",
-                "VELOCITY_FLAG: 24h velocity 4.0 exceeds 3.0 threshold"
+                "VELOCITY_FLAG: 24h velocity 4.0 exceeds 3.0 threshold",
             ],
             actions=["ROUTE_TO_REVIEW"],
-            meta={"risk_score": 0.15}
+            meta={"risk_score": 0.15},
         )
 
         explanation = explain_decision(response)
@@ -253,7 +247,7 @@ class TestDecisionExplainer:
             decision="REVIEW",
             reasons=["HIGH_TICKET", "VELOCITY_FLAG"],
             actions=["ROUTE_TO_REVIEW"],
-            meta={"risk_score": 0.15}
+            meta={"risk_score": 0.15},
         )
 
         explanation = explain_decision(response)
@@ -265,10 +259,7 @@ class TestDecisionExplainer:
     def test_high_risk_decline_explanation(self) -> None:
         """Test explanation for HIGH_RISK DECLINE decision."""
         response = DecisionResponse(
-            decision="DECLINE",
-            reasons=["HIGH_RISK"],
-            actions=["BLOCK"],
-            meta={"risk_score": 0.95}
+            decision="DECLINE", reasons=["HIGH_RISK"], actions=["BLOCK"], meta={"risk_score": 0.95}
         )
 
         explanation = explain_decision(response)
@@ -279,10 +270,7 @@ class TestDecisionExplainer:
     def test_empty_reasons_approve_explanation(self) -> None:
         """Test explanation for APPROVE decision with empty reasons."""
         response = DecisionResponse(
-            decision="APPROVE",
-            reasons=[],
-            actions=["Process payment"],
-            meta={"risk_score": 0.15}
+            decision="APPROVE", reasons=[], actions=["Process payment"], meta={"risk_score": 0.15}
         )
 
         explanation = explain_decision(response)

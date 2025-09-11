@@ -129,9 +129,7 @@ class HighIpDistanceRule(Rule):
         high_ip_distance = request.features.get("high_ip_distance", False)
 
         if high_ip_distance:
-            reasons = [
-                "HIGH_IP_DISTANCE: Transaction originates from high-risk IP distance"
-            ]
+            reasons = ["HIGH_IP_DISTANCE: Transaction originates from high-risk IP distance"]
             actions = ["ROUTE_TO_REVIEW"]
             return RuleResult(decision_hint="REVIEW", reasons=reasons, actions=actions)
 
@@ -193,9 +191,7 @@ class LoyaltyBoostRule(Rule):
         loyalty_tier = customer.get("loyalty_tier")
 
         if loyalty_tier in {"GOLD", "PLATINUM"}:
-            reasons = [
-                f"LOYALTY_BOOST: Customer has {loyalty_tier} loyalty tier"
-            ]
+            reasons = [f"LOYALTY_BOOST: Customer has {loyalty_tier} loyalty tier"]
             actions = ["LOYALTY_BOOST"]
             # Note: This rule doesn't change decision_hint, only adds actions
             return RuleResult(decision_hint=None, reasons=reasons, actions=actions)

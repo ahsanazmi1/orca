@@ -9,13 +9,7 @@ class TestFeatureExtraction:
 
     def test_extract_features_basic_numeric_features(self) -> None:
         """Test copying of basic numeric features."""
-        raw = {
-            "features": {
-                "velocity_24h": 3.5,
-                "customer_age": 25,
-                "transaction_count": 10.0
-            }
-        }
+        raw = {"features": {"velocity_24h": 3.5, "customer_age": 25, "transaction_count": 10.0}}
 
         features = extract_features(raw)
 
@@ -26,11 +20,7 @@ class TestFeatureExtraction:
     def test_extract_features_boolean_features(self) -> None:
         """Test conversion of boolean features to 0/1."""
         raw = {
-            "features": {
-                "high_ip_distance": True,
-                "is_mobile": False,
-                "has_previous_orders": True
-            }
+            "features": {"high_ip_distance": True, "is_mobile": False, "has_previous_orders": True}
         }
 
         features = extract_features(raw)
@@ -44,10 +34,10 @@ class TestFeatureExtraction:
         raw = {
             "features": {
                 "velocity_24h": 2.5,  # float
-                "is_weekend": True,    # boolean
+                "is_weekend": True,  # boolean
                 "invalid_feature": "string",  # string (should be ignored)
                 "null_feature": None,  # null (should be ignored)
-                "list_feature": [1, 2, 3]  # list (should be ignored)
+                "list_feature": [1, 2, 3],  # list (should be ignored)
             }
         }
 
@@ -101,32 +91,17 @@ class TestFeatureExtraction:
     def test_ip_country_mismatch_derivation(self) -> None:
         """Test derivation of ip_country_mismatch feature."""
         # Mismatch case
-        raw_mismatch = {
-            "context": {
-                "location_ip_country": "GB",
-                "billing_country": "US"
-            }
-        }
+        raw_mismatch = {"context": {"location_ip_country": "GB", "billing_country": "US"}}
         features_mismatch = extract_features(raw_mismatch)
         assert features_mismatch["ip_country_mismatch"] == 1.0
 
         # Match case
-        raw_match = {
-            "context": {
-                "location_ip_country": "US",
-                "billing_country": "US"
-            }
-        }
+        raw_match = {"context": {"location_ip_country": "US", "billing_country": "US"}}
         features_match = extract_features(raw_match)
         assert features_match["ip_country_mismatch"] == 0.0
 
         # Empty strings
-        raw_empty = {
-            "context": {
-                "location_ip_country": "",
-                "billing_country": ""
-            }
-        }
+        raw_empty = {"context": {"location_ip_country": "", "billing_country": ""}}
         features_empty = extract_features(raw_empty)
         assert features_empty["ip_country_mismatch"] == 0.0
 
@@ -148,47 +123,24 @@ class TestFeatureExtraction:
         assert features_missing_fields["ip_country_mismatch"] == 0.0
 
         # Non-string country values
-        raw_non_string = {
-            "context": {
-                "location_ip_country": 123,
-                "billing_country": "US"
-            }
-        }
+        raw_non_string = {"context": {"location_ip_country": 123, "billing_country": "US"}}
         features_non_string = extract_features(raw_non_string)
         assert features_non_string["ip_country_mismatch"] == 0.0
 
     def test_has_chargebacks_derivation(self) -> None:
         """Test derivation of has_chargebacks feature."""
         # Has chargebacks
-        raw_with_chargebacks = {
-            "context": {
-                "customer": {
-                    "chargebacks_12m": 2
-                }
-            }
-        }
+        raw_with_chargebacks = {"context": {"customer": {"chargebacks_12m": 2}}}
         features_with = extract_features(raw_with_chargebacks)
         assert features_with["has_chargebacks"] == 1.0
 
         # No chargebacks
-        raw_no_chargebacks = {
-            "context": {
-                "customer": {
-                    "chargebacks_12m": 0
-                }
-            }
-        }
+        raw_no_chargebacks = {"context": {"customer": {"chargebacks_12m": 0}}}
         features_no = extract_features(raw_no_chargebacks)
         assert features_no["has_chargebacks"] == 0.0
 
         # Float chargebacks
-        raw_float_chargebacks = {
-            "context": {
-                "customer": {
-                    "chargebacks_12m": 1.5
-                }
-            }
-        }
+        raw_float_chargebacks = {"context": {"customer": {"chargebacks_12m": 1.5}}}
         features_float = extract_features(raw_float_chargebacks)
         assert features_float["has_chargebacks"] == 1.0
 
@@ -210,18 +162,14 @@ class TestFeatureExtraction:
         assert features_invalid_customer["has_chargebacks"] == 0.0
 
         # Missing chargebacks field
-        raw_missing_chargebacks: dict[str, dict[str, dict[str, str]]] = {"context": {"customer": {}}}
+        raw_missing_chargebacks: dict[str, dict[str, dict[str, str]]] = {
+            "context": {"customer": {}}
+        }
         features_missing_chargebacks = extract_features(raw_missing_chargebacks)
         assert features_missing_chargebacks["has_chargebacks"] == 0.0
 
         # Non-numeric chargebacks
-        raw_string_chargebacks = {
-            "context": {
-                "customer": {
-                    "chargebacks_12m": "invalid"
-                }
-            }
-        }
+        raw_string_chargebacks = {"context": {"customer": {"chargebacks_12m": "invalid"}}}
         features_string_chargebacks = extract_features(raw_string_chargebacks)
         assert features_string_chargebacks["has_chargebacks"] == 0.0
 
@@ -229,19 +177,12 @@ class TestFeatureExtraction:
         """Test complete feature extraction with all derivations."""
         raw = {
             "cart_total": 750.0,
-            "features": {
-                "velocity_24h": 3.5,
-                "high_ip_distance": True,
-                "customer_age": 25
-            },
+            "features": {"velocity_24h": 3.5, "high_ip_distance": True, "customer_age": 25},
             "context": {
                 "location_ip_country": "GB",
                 "billing_country": "US",
-                "customer": {
-                    "loyalty_tier": "GOLD",
-                    "chargebacks_12m": 2
-                }
-            }
+                "customer": {"loyalty_tier": "GOLD", "chargebacks_12m": 2},
+            },
         }
 
         features = extract_features(raw)
@@ -276,8 +217,8 @@ class TestFeatureExtraction:
             "context": {
                 "location_ip_country": "US",
                 "billing_country": "US",
-                "customer": {"chargebacks_12m": 0}
-            }
+                "customer": {"chargebacks_12m": 0},
+            },
         }
 
         features = extract_features(raw)
@@ -290,10 +231,7 @@ class TestFeatureExtraction:
 
     def test_invalid_features_section(self) -> None:
         """Test feature extraction when features section is not a dict."""
-        raw = {
-            "features": "not_a_dict",
-            "cart_total": 100.0
-        }
+        raw = {"features": "not_a_dict", "cart_total": 100.0}
 
         features = extract_features(raw)
 
@@ -307,15 +245,12 @@ class TestFeatureExtraction:
         """Test edge cases with zero values."""
         raw = {
             "cart_total": 0.0,
-            "features": {
-                "velocity_24h": 0.0,
-                "high_ip_distance": False
-            },
+            "features": {"velocity_24h": 0.0, "high_ip_distance": False},
             "context": {
                 "location_ip_country": "US",
                 "billing_country": "US",
-                "customer": {"chargebacks_12m": 0}
-            }
+                "customer": {"chargebacks_12m": 0},
+            },
         }
 
         features = extract_features(raw)
@@ -330,14 +265,12 @@ class TestFeatureExtraction:
         """Test handling of negative values."""
         raw = {
             "cart_total": -100.0,  # Negative cart total
-            "features": {
-                "velocity_24h": -1.0  # Negative velocity
-            },
+            "features": {"velocity_24h": -1.0},  # Negative velocity
             "context": {
                 "location_ip_country": "US",
                 "billing_country": "US",
-                "customer": {"chargebacks_12m": -1}  # Negative chargebacks
-            }
+                "customer": {"chargebacks_12m": -1},  # Negative chargebacks
+            },
         }
 
         features = extract_features(raw)

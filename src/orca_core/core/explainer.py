@@ -57,9 +57,13 @@ def explain_decision(response: DecisionResponse) -> str:
     # If no reasons were found or processed, use default explanation
     if not explanation_sentences:
         if response.decision == "APPROVE":
-            explanation_sentences.append("The decision engine approved the transaction because no risk rules were triggered.")
+            explanation_sentences.append(
+                "The decision engine approved the transaction because no risk rules were triggered."
+            )
         else:
-            explanation_sentences.append("The decision engine processed the transaction based on configured rules.")
+            explanation_sentences.append(
+                "The decision engine processed the transaction based on configured rules."
+            )
 
     # Join all explanation sentences
     explanation = " ".join(explanation_sentences)

@@ -160,4 +160,3 @@ echo "   2. Run the doctor to verify installation: make doctor"
 echo "   3. Initialize the project: make init"
 echo ""
 echo "🎉 Orca development environment is ready!"
-
