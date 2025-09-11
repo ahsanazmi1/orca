@@ -1,10 +1,11 @@
 """High ticket rule for Orca Core decision engine."""
 
+
 from ..models import DecisionRequest
-from .base import BaseRule
+from .base import Rule, RuleResult
 
 
-class HighTicketRule(BaseRule):
+class HighTicketRule(Rule):
     """Rule that flags high-value transactions for review."""
 
     def __init__(self, threshold: float = 500.0):
@@ -16,7 +17,7 @@ class HighTicketRule(BaseRule):
         """
         self.threshold = threshold
 
-    def apply(self, request: DecisionRequest) -> tuple[str, list[str], list[str]] | None:
+    def apply(self, request: DecisionRequest) -> RuleResult | None:
         """
         Apply the high ticket rule.
 
@@ -24,15 +25,14 @@ class HighTicketRule(BaseRule):
             request: The decision request to evaluate
 
         Returns:
-            Tuple of (decision_hint, reasons, actions) if cart_total > threshold,
-            None otherwise
+            RuleResult if cart_total > threshold, None otherwise
         """
         if request.cart_total > self.threshold:
             reasons = [
                 f"HIGH_TICKET: Cart total ${request.cart_total:.2f} exceeds ${self.threshold:.2f} threshold"
             ]
             actions = ["ROUTE_TO_REVIEW"]
-            return ("REVIEW", reasons, actions)
+            return RuleResult(decision_hint="REVIEW", reasons=reasons, actions=actions)
 
         return None
 

@@ -1,11 +1,12 @@
 """High risk rule for Orca Core decision engine."""
 
+
 from ..core.ml_hooks import predict_risk
 from ..models import DecisionRequest
-from .base import BaseRule
+from .base import Rule, RuleResult
 
 
-class HighRiskRule(BaseRule):
+class HighRiskRule(Rule):
     """Rule that uses ML prediction to flag high-risk transactions."""
 
     def __init__(self, threshold: float = 0.80):
@@ -17,7 +18,7 @@ class HighRiskRule(BaseRule):
         """
         self.threshold = threshold
 
-    def apply(self, request: DecisionRequest) -> tuple[str, list[str], list[str]] | None:
+    def apply(self, request: DecisionRequest) -> RuleResult | None:
         """
         Apply the high risk rule using ML prediction.
 
@@ -25,8 +26,7 @@ class HighRiskRule(BaseRule):
             request: The decision request to evaluate
 
         Returns:
-            Tuple of (decision_hint, reasons, actions) if risk > threshold,
-            None otherwise
+            RuleResult if risk > threshold, None otherwise
         """
         # Get risk prediction from ML model
         risk_score = predict_risk(request.features)
@@ -36,7 +36,7 @@ class HighRiskRule(BaseRule):
                 f"HIGH_RISK: ML risk score {risk_score:.3f} exceeds {self.threshold:.3f} threshold"
             ]
             actions = ["BLOCK"]
-            return ("DECLINE", reasons, actions)
+            return RuleResult(decision_hint="DECLINE", reasons=reasons, actions=actions)
 
         return None
 

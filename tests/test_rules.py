@@ -15,10 +15,9 @@ class TestHighTicketRule:
         result = rule.apply(request)
 
         assert result is not None
-        decision_hint, reasons, actions = result
-        assert decision_hint == "REVIEW"
-        assert "HIGH_TICKET" in reasons[0]
-        assert "ROUTE_TO_REVIEW" in actions
+        assert result.decision_hint == "REVIEW"
+        assert "HIGH_TICKET" in result.reasons[0]
+        assert "ROUTE_TO_REVIEW" in result.actions
 
     def test_high_ticket_rule_not_triggered(self) -> None:
         """Test high ticket rule when cart total is below threshold."""
@@ -55,10 +54,9 @@ class TestVelocityRule:
         result = rule.apply(request)
 
         assert result is not None
-        decision_hint, reasons, actions = result
-        assert decision_hint == "REVIEW"
-        assert "VELOCITY_FLAG" in reasons[0]
-        assert "ROUTE_TO_REVIEW" in actions
+        assert result.decision_hint == "REVIEW"
+        assert "VELOCITY_FLAG" in result.reasons[0]
+        assert "ROUTE_TO_REVIEW" in result.actions
 
     def test_velocity_rule_not_triggered(self) -> None:
         """Test velocity rule when velocity is below threshold."""

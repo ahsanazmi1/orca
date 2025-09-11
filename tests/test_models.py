@@ -67,5 +67,6 @@ class TestDecisionResponse:
 
     def test_missing_decision(self) -> None:
         """Test validation for missing decision."""
-        with pytest.raises(ValidationError):
+        with pytest.raises(ValidationError) as exc_info:
             DecisionResponse()
+        assert "decision" in str(exc_info.value)

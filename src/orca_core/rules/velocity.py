@@ -1,10 +1,11 @@
 """Velocity rule for Orca Core decision engine."""
 
+
 from ..models import DecisionRequest
-from .base import BaseRule
+from .base import Rule, RuleResult
 
 
-class VelocityRule(BaseRule):
+class VelocityRule(Rule):
     """Rule that flags high-velocity transactions for review."""
 
     def __init__(self, threshold: float = 3.0):
@@ -16,7 +17,7 @@ class VelocityRule(BaseRule):
         """
         self.threshold = threshold
 
-    def apply(self, request: DecisionRequest) -> tuple[str, list[str], list[str]] | None:
+    def apply(self, request: DecisionRequest) -> RuleResult | None:
         """
         Apply the velocity rule.
 
@@ -24,8 +25,7 @@ class VelocityRule(BaseRule):
             request: The decision request to evaluate
 
         Returns:
-            Tuple of (decision_hint, reasons, actions) if velocity > threshold,
-            None otherwise
+            RuleResult if velocity > threshold, None otherwise
         """
         velocity_24h = request.features.get("velocity_24h", 0.0)
 
@@ -34,7 +34,7 @@ class VelocityRule(BaseRule):
                 f"VELOCITY_FLAG: 24h velocity {velocity_24h} exceeds {self.threshold} threshold"
             ]
             actions = ["ROUTE_TO_REVIEW"]
-            return ("REVIEW", reasons, actions)
+            return RuleResult(decision_hint="REVIEW", reasons=reasons, actions=actions)
 
         return None
 

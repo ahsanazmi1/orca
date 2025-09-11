@@ -44,16 +44,22 @@ make init
 
 ```bash
 # Evaluate a decision with high cart total
-uv run python -m orca_core.cli '{"cart_total": 750.0, "currency": "USD", "features": {"velocity_24h": 4.0}}'
+uv run python -m orca_core.cli decide '{"cart_total": 750.0, "currency": "USD", "features": {"velocity_24h": 4.0}}'
 
 # Example output
 {"actions":["ROUTE_TO_REVIEW","ROUTE_TO_REVIEW"],"decision":"REVIEW","meta":{"risk_score":0.15,"rules_evaluated":["HIGH_TICKET","VELOCITY"]},"reasons":["HIGH_TICKET: Cart total $750.00 exceeds $500.00 threshold","VELOCITY_FLAG: 24h velocity 4.0 exceeds 3.0 threshold"]}
 
 # Evaluate a low-risk decision
-uv run python -m orca_core.cli '{"cart_total": 250.0, "currency": "USD", "features": {"velocity_24h": 1.0}}'
+uv run python -m orca_core.cli decide '{"cart_total": 250.0, "currency": "USD", "features": {"velocity_24h": 1.0}}'
 
 # Example output
 {"actions":["Process payment","Send confirmation"],"decision":"APPROVE","meta":{"approved_amount":250.0,"risk_score":0.15,"rules_evaluated":[]},"reasons":["Cart total $250.00 within approved threshold"]}
+
+# Get plain-English explanation
+uv run python -m orca_core.cli explain '{"cart_total": 750, "features": {"velocity_24h": 4}}'
+
+# Example output
+The cart total was unusually high, so the transaction was flagged for review. This customer made multiple purchases in a short time, which triggered a velocity check. Final decision: REVIEW.
 ```
 
 #### Python API
@@ -88,6 +94,27 @@ The demo includes:
 - **Risk Score Display**: Color-coded risk metrics (🟢 Low, 🟡 Medium, 🔴 High)
 - **Two-column Layout**: Input controls on left, JSON results on right
 - **Real-time Updates**: Instant decision evaluation as you change inputs
+- **Plain-English Explanations**: Toggle between JSON output and human-readable explanations
+
+#### Explain Decisions
+
+Get natural-language explanations for decision responses:
+
+```bash
+# Explain a high-ticket, high-velocity decision
+uv run python -m orca_core.cli explain '{"cart_total": 750, "features": {"velocity_24h": 4}}'
+
+# Example output
+The cart total was unusually high, so the transaction was flagged for review. This customer made multiple purchases in a short time, which triggered a velocity check. Final decision: REVIEW.
+```
+
+The explain command is perfect for:
+- **Customer Support**: Provide clear explanations to merchants
+- **Debugging**: Understand why specific decisions were made
+- **Documentation**: Generate human-readable decision logs
+- **Compliance**: Create audit trails with plain-English reasoning
+
+**Streamlit Demo Integration**: The web interface now includes a "Plain-English Explanation" tab that automatically converts technical decision responses into merchant-friendly explanations, making it easy for non-technical users to understand decision logic.
 
 ## Phase 1 Scope
 
@@ -170,12 +197,15 @@ orca-core/
 │   ├── models.py               # Pydantic models
 │   ├── engine.py               # Decision engine
 │   ├── cli.py                  # CLI interface
-│   ├── core/                   # ML hooks
+│   ├── core/                   # Core modules
 │   │   ├── __init__.py
-│   │   └── ml_hooks.py         # ML prediction functions
+│   │   ├── ml_hooks.py         # ML prediction functions
+│   │   ├── explainer.py        # Decision explanation module
+│   │   └── feature_extraction.py # Feature extraction utilities
 │   └── rules/                  # Rules system
 │       ├── __init__.py
 │       ├── base.py             # Base rule class
+│       ├── builtins.py         # Built-in rules
 │       ├── high_ticket.py      # High ticket rule
 │       ├── velocity.py         # Velocity rule
 │       ├── high_risk.py        # High risk rule
@@ -185,9 +215,14 @@ orca-core/
 │   ├── test_engine.py          # Engine tests
 │   ├── test_rules.py           # Rules tests
 │   ├── test_ml_hooks.py        # ML tests
+│   ├── test_explainer.py       # Explainer tests
+│   ├── test_feature_extraction.py # Feature extraction tests
+│   ├── test_fixtures_param.py  # Parametrized fixture tests
 │   ├── test_high_risk_rule.py  # High risk rule tests
 │   └── test_golden.py          # Golden/snapshot tests
 ├── demos/                      # Streamlit demo
+├── fixtures/                   # Test fixtures
+│   └── requests/               # Sample decision requests
 ├── scripts/                    # Development scripts
 └── .github/workflows/          # CI/CD pipeline
 ```
@@ -277,15 +312,21 @@ Evaluates all configured rules against the provided request and returns a decisi
 
 ML hook for risk prediction. Returns risk score between 0.0 and 1.0 (0.0 = low risk, 1.0 = high risk).
 
+#### explain_decision(response: DecisionResponse) -> str
+
+Converts a decision response into a plain-English explanation. Maps technical reason codes to human-readable sentences and always includes a final decision summary.
+
 ## Testing
 
 ### Test Suite
 
-- **43 tests** with **84% coverage**
+- **90 tests** with **67% coverage**
 - **Golden tests** for API contract stability
 - **Unit tests** for all components
 - **Integration tests** for rule combinations
 - **Mock tests** for ML scenarios
+- **Parametrized tests** for fixture validation
+- **Explainer tests** for natural language output
 
 ### Running Tests
 

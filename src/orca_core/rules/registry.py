@@ -1,17 +1,78 @@
 """Rules registry and orchestrator for Orca Core decision engine."""
 
+
 from ..models import DecisionRequest, DecisionResponse
-from .base import BaseRule
+from .base import Rule
+
+
+def rules() -> list[Rule]:
+    """
+    Return an ordered list of rule instances.
+
+    Returns:
+        Ordered list of rule instances for deterministic evaluation
+    """
+    from .builtins import (
+        ChargebackHistoryRule,
+        HighIpDistanceRule,
+        HighTicketRule,
+        LocationMismatchRule,
+        LoyaltyBoostRule,
+        VelocityRule,
+    )
+
+    return [
+        HighTicketRule(threshold=500.0),
+        VelocityRule(threshold=3.0),
+        LocationMismatchRule(),
+        HighIpDistanceRule(),
+        ChargebackHistoryRule(),
+        LoyaltyBoostRule(),
+    ]
+
+
+def run_rules(request: DecisionRequest) -> tuple[str, list[str], list[str], list[str]]:
+    """
+    Run all rules against a request and aggregate results.
+
+    Args:
+        request: The decision request to evaluate
+
+    Returns:
+        Tuple of (decision_hint, reasons, actions, rules_evaluated)
+        - decision_hint: "REVIEW" if any rule hints REVIEW, None otherwise
+        - reasons: List of all reason strings from triggered rules
+        - actions: List of all action strings from triggered rules
+        - rules_evaluated: List of rule names that were triggered
+    """
+    all_reasons: list[str] = []
+    all_actions: list[str] = []
+    rules_evaluated: list[str] = []
+    decision_hint: str | None = None
+
+    # Apply all rules in order
+    for rule in rules():
+        result = rule.apply(request)
+        if result:
+            all_reasons.extend(result.reasons)
+            all_actions.extend(result.actions)
+            rules_evaluated.append(rule.name)
+
+            # If any rule hints REVIEW, set decision_hint to REVIEW
+            if result.decision_hint == "REVIEW":
+                decision_hint = "REVIEW"
+
+    return decision_hint or "APPROVE", all_reasons, all_actions, rules_evaluated
 
 
 class RuleRegistry:
     """Registry and orchestrator for decision rules."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the rules registry."""
-        self.rules: list[BaseRule] = []
+        self.rules: list[Rule] = []
 
-    def register(self, rule: BaseRule) -> None:
+    def register(self, rule: Rule) -> None:
         """
         Register a rule with the registry.
 
@@ -32,7 +93,7 @@ class RuleRegistry:
         """
         all_reasons: list[str] = []
         all_actions: list[str] = []
-        meta = {"rules_evaluated": []}
+        meta: dict[str, list[str] | float] = {"rules_evaluated": []}
 
         # Track the highest decision level
         decision_level = 0  # 0=APPROVE, 1=REVIEW, 2=DECLINE
@@ -42,16 +103,16 @@ class RuleRegistry:
         for rule in self.rules:
             result = rule.apply(request)
             if result:
-                decision_hint, reasons, actions = result
-                all_reasons.extend(reasons)
-                all_actions.extend(actions)
-                meta["rules_evaluated"].append(rule.name)
+                all_reasons.extend(result.reasons)
+                all_actions.extend(result.actions)
+                if isinstance(meta["rules_evaluated"], list):
+                    meta["rules_evaluated"].append(rule.name)
 
                 # Update decision level based on hint
-                if decision_hint == "REVIEW" and decision_level < 1:
+                if result.decision_hint == "REVIEW" and decision_level < 1:
                     decision_level = 1
                     final_decision = "REVIEW"
-                elif decision_hint == "DECLINE" and decision_level < 2:
+                elif result.decision_hint == "DECLINE" and decision_level < 2:
                     decision_level = 2
                     final_decision = "DECLINE"
 

@@ -11,7 +11,7 @@ import sys
 
 
 class DevDoctor:
-    def __init__(self):
+    def __init__(self) -> None:
         self.required_tools = {
             "git": "Git version control",
             "gh": "GitHub CLI",
@@ -34,7 +34,7 @@ class DevDoctor:
         }
 
         self.results: dict[str, tuple[bool, str]] = {}
-        self.failed_required = []
+        self.failed_required: list[str] = []
 
     def run_command(self, cmd: list[str]) -> tuple[bool, str]:
         """Run a command and return (success, output)."""
@@ -155,7 +155,7 @@ class DevDoctor:
 
         return False, f"{package} not found"
 
-    def run_checks(self):
+    def run_checks(self) -> None:
         """Run all tool checks."""
         print("🔍 Dev Doctor - Checking development environment...\n")
 
@@ -223,7 +223,7 @@ class DevDoctor:
                 print(f"    Version: {output}")
             print()
 
-    def print_summary(self):
+    def print_summary(self) -> int:
         """Print summary and exit with appropriate code."""
         print("📊 SUMMARY:")
         print("-" * 50)
@@ -249,7 +249,7 @@ class DevDoctor:
             return 0
 
 
-def main():
+def main() -> None:
     """Main entry point."""
     doctor = DevDoctor()
     doctor.run_checks()

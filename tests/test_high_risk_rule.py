@@ -20,10 +20,9 @@ class TestHighRiskRule:
             result = rule.apply(request)
 
             assert result is not None
-            decision_hint, reasons, actions = result
-            assert decision_hint == "DECLINE"
-            assert "HIGH_RISK" in reasons[0]
-            assert "BLOCK" in actions
+            assert result.decision_hint == "DECLINE"
+            assert "HIGH_RISK" in result.reasons[0]
+            assert "BLOCK" in result.actions
 
     def test_high_risk_rule_not_triggered(self) -> None:
         """Test high risk rule when risk score is below threshold."""
@@ -48,9 +47,8 @@ class TestHighRiskRule:
             result = rule.apply(request)
 
             assert result is not None
-            decision_hint, reasons, actions = result
-            assert decision_hint == "DECLINE"
-            assert "HIGH_RISK" in reasons[0]
+            assert result.decision_hint == "DECLINE"
+            assert "HIGH_RISK" in result.reasons[0]
 
     def test_high_risk_rule_name(self) -> None:
         """Test high risk rule name property."""
