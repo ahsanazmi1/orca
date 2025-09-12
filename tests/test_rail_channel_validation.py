@@ -44,26 +44,24 @@ class TestRailChannelValidation:
         assert "Input should be 'online' or 'pos'" in str(exc_info.value)
 
     def test_missing_rail_field(self):
-        """Test that missing rail field fails validation."""
-        with pytest.raises(ValidationError) as exc_info:
-            DecisionRequest(
-                cart_total=100.0,
-                channel="online",
-                # Missing rail field
-            )
-        assert "rail" in str(exc_info.value)
-        assert "Field required" in str(exc_info.value)
+        """Test that missing rail field uses default value."""
+        # With backward compatibility, missing rail field should use default "Card"
+        request = DecisionRequest(
+            cart_total=100.0,
+            channel="online",
+            # Missing rail field - should default to "Card"
+        )
+        assert request.rail == "Card"
 
     def test_missing_channel_field(self):
-        """Test that missing channel field fails validation."""
-        with pytest.raises(ValidationError) as exc_info:
-            DecisionRequest(
-                cart_total=100.0,
-                rail="Card",
-                # Missing channel field
-            )
-        assert "channel" in str(exc_info.value)
-        assert "Field required" in str(exc_info.value)
+        """Test that missing channel field uses default value."""
+        # With backward compatibility, missing channel field should use default "online"
+        request = DecisionRequest(
+            cart_total=100.0,
+            rail="Card",
+            # Missing channel field - should default to "online"
+        )
+        assert request.channel == "online"
 
     def test_response_rail_field(self):
         """Test that DecisionResponse can include rail field."""

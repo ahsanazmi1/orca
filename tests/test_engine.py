@@ -72,7 +72,7 @@ class TestDecisionEngine:
         response = evaluate_rules(request)
 
         assert response.decision == "REVIEW"
-        assert "HIGH_TICKET" in response.reasons[0]
+        assert "high_ticket" in response.reasons[0]
         assert "HIGH_TICKET" in response.meta["rules_evaluated"]
 
     def test_currency_handling(self) -> None:
@@ -90,9 +90,11 @@ class TestDecisionEngine:
         response = evaluate_rules(request)
 
         assert response.decision == "REVIEW"
-        assert "VELOCITY_FLAG" in response.reasons[0]
-        assert "ROUTE_TO_REVIEW" in response.actions
+        assert "velocity_flag" in response.reasons[0]
+        assert "block_transaction" in response.actions  # CARD_VELOCITY rule
+        assert "ROUTE_TO_REVIEW" in response.actions  # VELOCITY rule
         assert "VELOCITY" in response.meta["rules_evaluated"]
+        assert "CARD_VELOCITY" in response.meta["rules_evaluated"]
 
     def test_multiple_rules_triggered(self) -> None:
         """Test when both high ticket and velocity rules trigger."""
@@ -100,12 +102,16 @@ class TestDecisionEngine:
         response = evaluate_rules(request)
 
         assert response.decision == "REVIEW"
-        assert len(response.reasons) == 2
-        assert any("HIGH_TICKET" in reason for reason in response.reasons)
-        assert any("VELOCITY_FLAG" in reason for reason in response.reasons)
-        assert len(response.actions) == 2
-        assert all(action == "ROUTE_TO_REVIEW" for action in response.actions)
-        assert len(response.meta["rules_evaluated"]) == 2
+        # With new schema, we get canonical codes + human explanations
+        assert len(response.reasons) >= 2  # At least canonical codes
+        assert any(
+            "HIGH_TICKET" in reason for reason in response.reasons
+        )  # Human explanation from HIGH_TICKET rule
+        assert any("velocity_flag" in reason for reason in response.reasons)
+        assert len(response.actions) >= 2  # Multiple rules trigger multiple actions
+        assert "block_transaction" in response.actions  # CARD_VELOCITY rule
+        assert "ROUTE_TO_REVIEW" in response.actions  # VELOCITY rule
+        assert len(response.meta["rules_evaluated"]) >= 2  # Multiple rules evaluated
 
     def test_high_risk_rule_triggered(self) -> None:
         """Test when high risk rule triggers with monkeypatched prediction."""
