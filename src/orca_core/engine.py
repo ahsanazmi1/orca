@@ -5,7 +5,7 @@ from datetime import datetime
 
 from .core.ml_hooks import predict_risk
 from .explanations import generate_human_explanation
-from .models import DecisionRequest, DecisionResponse
+from .models import DecisionMeta, DecisionRequest, DecisionResponse
 from .rules.registry import run_rules
 
 
@@ -75,7 +75,32 @@ def evaluate_rules(request: DecisionRequest) -> DecisionResponse:
 
     # Start with APPROVE
     final_decision = "APPROVE"
-    meta = {"risk_score": risk_score, "rules_evaluated": rules_evaluated}
+
+    # Generate transaction metadata
+    transaction_id = f"txn_{uuid.uuid4().hex[:16]}"
+    timestamp = datetime.now()
+
+    # Create structured metadata
+    meta_structured = DecisionMeta(
+        timestamp=timestamp,
+        transaction_id=transaction_id,
+        rail=request.rail,
+        channel=request.channel,
+        cart_total=request.cart_total,
+        risk_score=risk_score,
+        rules_evaluated=rules_evaluated,
+    )
+
+    # Create legacy meta dict for backward compatibility
+    meta = {
+        "risk_score": risk_score,
+        "rules_evaluated": rules_evaluated,
+        "timestamp": timestamp,
+        "transaction_id": transaction_id,
+        "rail": request.rail,
+        "channel": request.channel,
+        "cart_total": request.cart_total,
+    }
 
     # If any rule hints REVIEW, set decision to REVIEW
     if decision_hint == "REVIEW":
@@ -86,6 +111,7 @@ def evaluate_rules(request: DecisionRequest) -> DecisionResponse:
         final_decision = "DECLINE"
         reasons.append(f"HIGH_RISK: ML risk score {risk_score:.3f} exceeds 0.800 threshold")
         actions.append("BLOCK")
+        meta_structured.rules_evaluated.append("HIGH_RISK")
         if isinstance(meta["rules_evaluated"], list):
             meta["rules_evaluated"].append("HIGH_RISK")
 
@@ -94,16 +120,13 @@ def evaluate_rules(request: DecisionRequest) -> DecisionResponse:
         reasons.append(f"Cart total ${request.cart_total:.2f} within approved threshold")
         actions.append("Process payment")
         actions.append("Send confirmation")
+        meta_structured.approved_amount = request.cart_total
         meta["approved_amount"] = request.cart_total
 
     # Remove duplicate reasons while preserving order, but keep duplicate actions
     unique_reasons = list(dict.fromkeys(reasons))
     # For actions, we want to preserve duplicates for backward compatibility with tests
     unique_actions = actions
-
-    # Generate Week 2 enhanced fields
-    transaction_id = f"txn_{uuid.uuid4().hex[:16]}"
-    timestamp = datetime.now()
 
     # Determine routing hint based on decision and context
     routing_hint = determine_routing_hint(final_decision, request, meta)
@@ -116,23 +139,29 @@ def evaluate_rules(request: DecisionRequest) -> DecisionResponse:
 
     # Extract signals triggered from rules_evaluated
     signals_triggered: list[str] = []
-    rules_evaluated = meta.get("rules_evaluated", [])
-    if isinstance(rules_evaluated, list):
-        signals_triggered.extend(str(item) for item in rules_evaluated)
+    for item in meta_structured.rules_evaluated:
+        signals_triggered.append(str(item))
     if risk_score > 0.80:
         signals_triggered.append("HIGH_RISK")
 
+    # Map REVIEW to ROUTE for the new status field
+    status = "ROUTE" if final_decision == "REVIEW" else final_decision
+
     return DecisionResponse(
+        # Legacy fields for backward compatibility
         decision=final_decision,
         reasons=unique_reasons,
         actions=unique_actions,
         meta=meta,
-        # Week 2 enhanced fields
-        status=(final_decision if final_decision in ["APPROVE", "DECLINE", "ROUTE"] else None),
+        # New Week 4 fields
+        status=status,
+        meta_structured=meta_structured,
+        # Enhanced fields
         signals_triggered=signals_triggered,
         explanation=explanation,
         explanation_human=explanation_human,
         routing_hint=routing_hint,
+        # Backward compatibility fields (deprecated)
         transaction_id=transaction_id,
         cart_total=request.cart_total,
         timestamp=timestamp,

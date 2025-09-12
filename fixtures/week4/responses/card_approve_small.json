@@ -1,0 +1,32 @@
+{
+  "status": "APPROVE",
+  "reasons": [
+    "LOYALTY_BOOST: Customer has GOLD loyalty tier"
+  ],
+  "actions": [
+    "LOYALTY_BOOST"
+  ],
+  "meta": {
+    "timestamp": "2025-09-11 21:41:34.764631",
+    "transaction_id": "txn_26d702e90d654221",
+    "rail": "Card",
+    "channel": "online",
+    "cart_total": 150.0,
+    "risk_score": 0.15,
+    "rules_evaluated": [
+      "LOYALTY_BOOST"
+    ],
+    "approved_amount": null
+  },
+  "decision": "APPROVE",
+  "signals_triggered": [
+    "LOYALTY_BOOST"
+  ],
+  "explanation": "Transaction approved for $150.00. Cart total within approved limits.",
+  "explanation_human": "Approved: Customer loyalty tier benefits applied.",
+  "routing_hint": "PROCESS_NORMALLY",
+  "transaction_id": "txn_26d702e90d654221",
+  "cart_total": 150.0,
+  "timestamp": "2025-09-11 21:41:34.764631",
+  "rail": "Card"
+}

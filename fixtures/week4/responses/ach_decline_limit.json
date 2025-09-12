@@ -1,0 +1,40 @@
+{
+  "status": "ROUTE",
+  "reasons": [
+    "ach_limit_exceeded",
+    "ach_online_verification",
+    "HIGH_TICKET: Cart total $2500.00 exceeds $500.00 threshold"
+  ],
+  "actions": [
+    "fallback_card",
+    "micro_deposit_verification",
+    "ROUTE_TO_REVIEW"
+  ],
+  "meta": {
+    "timestamp": "2025-09-11 21:41:34.781212",
+    "transaction_id": "txn_476ba0785d034174",
+    "rail": "ACH",
+    "channel": "online",
+    "cart_total": 2500.0,
+    "risk_score": 0.15,
+    "rules_evaluated": [
+      "ACH_LIMIT",
+      "ACH_CHANNEL",
+      "HIGH_TICKET"
+    ],
+    "approved_amount": null
+  },
+  "decision": "REVIEW",
+  "signals_triggered": [
+    "ACH_LIMIT",
+    "ACH_CHANNEL",
+    "HIGH_TICKET"
+  ],
+  "explanation": "Transaction decision: REVIEW",
+  "explanation_human": "Under review: ACH transaction approaching limit. Please try a smaller amount or use a different payment method. Additionally: under review: additional verification required for online ach transaction.; under review: high-value card transaction requires additional verification. please check your email for next steps.",
+  "routing_hint": "PROCESS_NORMALLY",
+  "transaction_id": "txn_476ba0785d034174",
+  "cart_total": 2500.0,
+  "timestamp": "2025-09-11 21:41:34.781212",
+  "rail": "ACH"
+}

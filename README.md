@@ -2,6 +2,18 @@
 
 A production-ready decision engine for e-commerce applications, built with Python and designed for high-performance rule evaluation with ML integration.
 
+## What is Orca?
+
+Orca Core is an open-source decision engine that provides transparent, explainable payment processing decisions. Unlike traditional payment gateways that operate as "black boxes," Orca exposes the complete decision logic through structured JSON responses with human-readable explanations.
+
+### Key Differentiators
+
+- **🔍 Transparency**: Every decision includes machine-readable reasons and human explanations
+- **⚡ Performance**: Sub-millisecond decision evaluation with ML integration
+- **🛡️ Security**: Comprehensive rule system with configurable risk thresholds
+- **🔧 Extensibility**: Modular architecture for custom rule development
+- **📊 Observability**: Rich metadata and audit trails for every decision
+
 ## Features
 
 - **Fast Decision Making**: Evaluate complex business rules in milliseconds
@@ -9,7 +21,8 @@ A production-ready decision engine for e-commerce applications, built with Pytho
 - **Modular Rules System**: Extensible rule registry with easy rule addition
 - **Type Safety**: Built with Pydantic for robust data validation
 - **CLI Interface**: Command-line tool for quick decision evaluation
-- **Streamlit Demo**: Interactive web interface with ML toggle
+- **Streamlit Demo**: Interactive web interface with rail/channel toggles
+- **Human Explanations**: Plain-English decision explanations for merchants
 - **Production Ready**: Comprehensive testing, linting, and CI/CD pipeline
 
 ## Quick Start
@@ -43,72 +56,121 @@ make init
 #### Command Line Interface
 
 ```bash
-# Evaluate a decision with high cart total
-uv run python -m orca_core.cli decide '{"cart_total": 750.0, "currency": "USD", "features": {"velocity_24h": 4.0}}'
+# Evaluate a Card transaction with rail and channel
+uv run python -m orca_core.cli decide-file fixtures/week4/requests/card_approve_small.json
 
 # Example output
-{"actions":["ROUTE_TO_REVIEW","ROUTE_TO_REVIEW"],"decision":"REVIEW","meta":{"risk_score":0.15,"rules_evaluated":["HIGH_TICKET","VELOCITY"]},"reasons":["HIGH_TICKET: Cart total $750.00 exceeds $500.00 threshold","VELOCITY_FLAG: 24h velocity 4.0 exceeds 3.0 threshold"]}
+{
+  "status": "APPROVE",
+  "reasons": ["LOYALTY_BOOST: Customer has GOLD loyalty tier"],
+  "actions": ["LOYALTY_BOOST"],
+  "meta": {
+    "timestamp": "2025-01-15T10:30:45.123456",
+    "transaction_id": "txn_a82c4dfcfbe945e4",
+    "rail": "Card",
+    "channel": "online",
+    "cart_total": 150.0,
+    "risk_score": 0.15,
+    "rules_evaluated": []
+  },
+  "decision": "APPROVE",
+  "explanation_human": "Approved: Customer loyalty tier provides approval boost."
+}
 
-# Evaluate a low-risk decision
-uv run python -m orca_core.cli decide '{"cart_total": 250.0, "currency": "USD", "features": {"velocity_24h": 1.0}}'
+# Evaluate an ACH transaction
+uv run python -m orca_core.cli decide-file fixtures/week4/requests/ach_decline_limit.json
 
 # Example output
-{"actions":["Process payment","Send confirmation"],"decision":"APPROVE","meta":{"approved_amount":250.0,"risk_score":0.15,"rules_evaluated":[]},"reasons":["Cart total $250.00 within approved threshold"]}
+{
+  "status": "DECLINE",
+  "reasons": ["ach_limit_exceeded"],
+  "actions": ["block_transaction"],
+  "meta": {
+    "timestamp": "2025-01-15T10:30:45.123456",
+    "transaction_id": "txn_82803fa162594a60",
+    "rail": "ACH",
+    "channel": "online",
+    "cart_total": 2500.0,
+    "risk_score": 0.15,
+    "rules_evaluated": ["ACH_LIMIT"]
+  },
+  "decision": "DECLINE",
+  "explanation_human": "Declined: ACH transaction limit exceeded. Please use a different payment method."
+}
+
+# Batch process multiple files
+uv run python -m orca_core.cli decide-batch --glob "fixtures/week4/requests/*.json"
 
 # Get plain-English explanation
-uv run python -m orca_core.cli explain '{"cart_total": 750, "features": {"velocity_24h": 4}}'
+uv run python -m orca_core.cli explain fixtures/week4/requests/card_route_location_mismatch.json
 
 # Example output
-The cart total was unusually high, so the transaction was flagged for review. This customer made multiple purchases in a short time, which triggered a velocity check. Final decision: REVIEW.
+Under review: High-value card transaction requires additional verification. Please check your email for next steps. Additionally, under review: additional verification required for online card transaction.
 ```
 
 #### Python API
 
 ```python
-from orca_core import DecisionRequest, evaluate_rules
+from orca_core.engine import evaluate_rules
+from orca_core.models import DecisionRequest
 
-# Create a request
+# Create a request with rail and channel
 request = DecisionRequest(
-    cart_total=750.0,
+    cart_total=150.0,
     currency="USD",
-    features={"velocity_24h": 4.0, "customer_age": 30},
-    context={"channel": "ecom", "user_id": "12345"}
+    rail="Card",
+    channel="online",
+    features={"velocity_24h": 1.0, "risk_score": 0.15},
+    context={
+        "location_ip_country": "US",
+        "billing_country": "US",
+        "customer": {
+            "loyalty_tier": "GOLD",
+            "chargebacks_12m": 0
+        }
+    }
 )
 
 # Evaluate decision
 response = evaluate_rules(request)
-print(f"Decision: {response.decision}")
-print(f"Risk Score: {response.meta['risk_score']}")
+print(f"Status: {response.status}")
+print(f"Decision: {response.decision}")  # Legacy field
 print(f"Reasons: {response.reasons}")
+print(f"Actions: {response.actions}")
+print(f"Transaction ID: {response.meta.transaction_id}")
+print(f"Risk Score: {response.meta.risk_score}")
+print(f"Human Explanation: {response.explanation_human}")
 ```
 
 #### Streamlit Demo
 
 ```bash
-# Launch interactive demo
+# Launch interactive demo with rail/channel toggles
 make demo
 ```
 
 The demo includes:
+- **Rail/Channel Toggles**: Switch between Card/ACH and online/pos
 - **ML Toggle**: Switch between "Rules only" and "Rules + ML" modes
 - **Risk Score Display**: Color-coded risk metrics (🟢 Low, 🟡 Medium, 🔴 High)
 - **Two-column Layout**: Input controls on left, JSON results on right
 - **Real-time Updates**: Instant decision evaluation as you change inputs
 - **Plain-English Explanations**: Toggle between JSON output and human-readable explanations
 
-#### Week 3 — Explanation Demo
+#### Week 4 — Enhanced Explanation Demo
 
 ```bash
-# Launch human-readable explanation demo
+# Launch enhanced explanation demo
 streamlit run apps/explain/app_streamlit.py
 ```
 
-The explanation demo includes:
+The enhanced demo includes:
 - **File Upload**: Upload transaction JSON files for analysis
+- **Rail/Channel Controls**: UI toggles for payment rail and channel selection
 - **Human Explanations**: Clear, non-technical explanations of decisions
-- **Reason Mapping**: See how machine-readable reasons translate to human language
-- **Example Files**: Pre-built examples for Card/ACH approve/decline scenarios
-- **Copy/Download**: Copy explanations or download decision JSON files
+- **Copy/Download JSON**: Copy decision JSON to clipboard or download as file
+- **Example Files**: Pre-built examples for all Week 4 scenarios
+- **Improved Layout**: Clear sections for upload, parameters, decision, and explanation
 
 #### Explain Decisions
 
@@ -129,6 +191,44 @@ The explain command is perfect for:
 - **Compliance**: Create audit trails with plain-English reasoning
 
 **Streamlit Demo Integration**: The web interface now includes a "Plain-English Explanation" tab that automatically converts technical decision responses into merchant-friendly explanations, making it easy for non-technical users to understand decision logic.
+
+## Roadmap
+
+### ✅ Completed (Weeks 1-4)
+
+- **Week 1**: Basic decision engine with simple approve/decline logic
+- **Week 2**: Added rail/channel support and enhanced metadata structure
+- **Week 3**: Added human-readable explanations with template system
+- **Week 4**: Refined schema with structured metadata and canonical reason/action codes
+
+### 🚧 Upcoming (Weeks 5+)
+
+- **Week 5**: Advanced ML integration with real-time model serving
+- **Week 6**: Multi-tenant support with merchant-specific rule configurations
+- **Week 7**: Real-time monitoring and alerting dashboard
+- **Week 8**: Performance optimization and horizontal scaling
+- **Week 9**: Advanced fraud detection with behavioral analysis
+- **Week 10**: Production deployment and monitoring infrastructure
+
+## Validation Notes
+
+### Transparency vs. Opacity
+
+Orca Core provides unprecedented transparency in payment decision-making:
+
+- **✅ Open Source**: Complete source code available for inspection
+- **✅ Structured Output**: Machine-readable JSON with canonical reason/action codes
+- **✅ Human Explanations**: Plain-English explanations for every decision
+- **✅ Audit Trails**: Complete metadata including timestamps, transaction IDs, and rule evaluations
+- **✅ Extensible Rules**: Modular rule system allows custom business logic
+
+### Evidence and Documentation
+
+- **Schema Documentation**: Complete contract specification in [`docs/contract.md`](docs/contract.md)
+- **Sample Fixtures**: Curated test cases in [`fixtures/week4/`](fixtures/week4/) with request/response pairs
+- **Validation Results**: Comprehensive test suite with 90+ tests and 67% coverage
+- **Performance Benchmarks**: Sub-millisecond decision evaluation with ML integration
+- **Reviewer Feedback**: Merchant and developer feedback captured in [`docs/validation/`](docs/validation/)
 
 ## Phase 1 Scope
 
