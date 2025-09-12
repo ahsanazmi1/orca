@@ -1,0 +1,74 @@
+{
+  "decision": "DECLINE",
+  "reasons": [
+    "online_verification",
+    "HIGH_TICKET: Cart total $1500.00 exceeds $500.00 threshold",
+    "ITEM_COUNT: Cart has 15 items, exceeds 10 threshold",
+    "HIGH_RISK: ML risk score 1.000 exceeds 0.800 threshold",
+    "ml_score_high"
+  ],
+  "actions": [
+    "step_up_auth",
+    "ROUTE_TO_REVIEW",
+    "ROUTE_TO_REVIEW",
+    "BLOCK"
+  ],
+  "meta": {
+    "risk_score": 1.0,
+    "model_version": "stub-0.1",
+    "features_used": [
+      "cart_total",
+      "item_count",
+      "velocity_24h",
+      "location_mismatch"
+    ],
+    "rules_evaluated": [
+      "CARD_CHANNEL",
+      "HIGH_TICKET",
+      "ITEM_COUNT",
+      "HIGH_RISK"
+    ],
+    "timestamp": "2025-09-11 22:23:37.443387",
+    "transaction_id": "txn_8df5bb34e11d40af",
+    "rail": "Card",
+    "channel": "online",
+    "cart_total": 1500.0
+  },
+  "status": "DECLINE",
+  "meta_structured": {
+    "timestamp": "2025-09-11 22:23:37.443387",
+    "transaction_id": "txn_8df5bb34e11d40af",
+    "rail": "Card",
+    "channel": "online",
+    "cart_total": 1500.0,
+    "risk_score": 1.0,
+    "model_version": "stub-0.1",
+    "features_used": [
+      "cart_total",
+      "item_count",
+      "velocity_24h",
+      "location_mismatch"
+    ],
+    "rules_evaluated": [
+      "CARD_CHANNEL",
+      "HIGH_TICKET",
+      "ITEM_COUNT",
+      "HIGH_RISK"
+    ],
+    "approved_amount": null
+  },
+  "signals_triggered": [
+    "CARD_CHANNEL",
+    "HIGH_TICKET",
+    "ITEM_COUNT",
+    "HIGH_RISK",
+    "HIGH_RISK"
+  ],
+  "explanation": "Transaction declined due to high ML risk score of 1.000.",
+  "explanation_human": "Declined: Online verification failed. Additionally: declined: amount exceeds card threshold of $$5,000. please try a smaller amount or contact support.; we made this decision based on online_verification, high_ticket: cart total $1500.00 exceeds $500.00 threshold, item_count: cart has 15 items, exceeds 10 threshold, high_risk: ml risk score 1.000 exceeds 0.800 threshold, ml_score_high. more detail coming soon.",
+  "routing_hint": "BLOCK_TRANSACTION",
+  "transaction_id": "txn_8df5bb34e11d40af",
+  "cart_total": 1500.0,
+  "timestamp": "2025-09-11 22:23:37.443387",
+  "rail": "Card"
+}

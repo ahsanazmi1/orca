@@ -1,5 +1,8 @@
 """ML hooks for Orca Core decision engine."""
 
+from ..ml.stub_model import get_features_used, get_model_version
+from ..ml.stub_model import predict_risk as stub_predict_risk
+
 
 def predict_risk(features: dict[str, float]) -> float:
     """
@@ -11,8 +14,14 @@ def predict_risk(features: dict[str, float]) -> float:
     Returns:
         Risk score between 0.0 and 1.0 (0.0 = low risk, 1.0 = high risk)
     """
-    # TODO: Implement actual ML model prediction
-    # For now, return a fixed value of 0.15, but allow override for testing
-    if "risk_score" in features:
-        return features["risk_score"]
-    return 0.15
+    return stub_predict_risk(features)
+
+
+def get_ml_metadata() -> tuple[str, list[str]]:
+    """
+    Get ML model metadata.
+
+    Returns:
+        Tuple of (model_version, features_used)
+    """
+    return get_model_version(), get_features_used()

@@ -1,0 +1,62 @@
+{
+  "decision": "REVIEW",
+  "reasons": [
+    "online_verification",
+    "HIGH_TICKET: Cart total $2500.00 exceeds $500.00 threshold"
+  ],
+  "actions": [
+    "step_up_auth",
+    "ROUTE_TO_REVIEW"
+  ],
+  "meta": {
+    "risk_score": 0.62,
+    "model_version": "stub-0.1",
+    "features_used": [
+      "cart_total",
+      "item_count",
+      "velocity_24h",
+      "location_mismatch"
+    ],
+    "rules_evaluated": [
+      "CARD_CHANNEL",
+      "HIGH_TICKET"
+    ],
+    "timestamp": "2025-09-11 22:23:37.445388",
+    "transaction_id": "txn_a5134c829a2e4a34",
+    "rail": "Card",
+    "channel": "online",
+    "cart_total": 2500.0
+  },
+  "status": "ROUTE",
+  "meta_structured": {
+    "timestamp": "2025-09-11 22:23:37.445388",
+    "transaction_id": "txn_a5134c829a2e4a34",
+    "rail": "Card",
+    "channel": "online",
+    "cart_total": 2500.0,
+    "risk_score": 0.62,
+    "model_version": "stub-0.1",
+    "features_used": [
+      "cart_total",
+      "item_count",
+      "velocity_24h",
+      "location_mismatch"
+    ],
+    "rules_evaluated": [
+      "CARD_CHANNEL",
+      "HIGH_TICKET"
+    ],
+    "approved_amount": null
+  },
+  "signals_triggered": [
+    "CARD_CHANNEL",
+    "HIGH_TICKET"
+  ],
+  "explanation": "Transaction decision: REVIEW",
+  "explanation_human": "Under review: Additional verification required for online card transaction. Additionally, under review: high-value card transaction requires additional verification. please check your email for next steps.",
+  "routing_hint": "PROCESS_NORMALLY",
+  "transaction_id": "txn_a5134c829a2e4a34",
+  "cart_total": 2500.0,
+  "timestamp": "2025-09-11 22:23:37.445388",
+  "rail": "Card"
+}

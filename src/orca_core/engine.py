@@ -3,8 +3,9 @@
 import uuid
 from datetime import datetime
 
-from .core.ml_hooks import predict_risk
+from .core.ml_hooks import get_ml_metadata, predict_risk
 from .explanations import generate_human_explanation
+from .ml.features import extract_features
 from .models import DecisionMeta, DecisionRequest, DecisionResponse
 from .rules.registry import run_rules
 
@@ -51,7 +52,7 @@ def generate_explanation(
         return f"Transaction decision: {decision}"
 
 
-def evaluate_rules(request: DecisionRequest) -> DecisionResponse:
+def evaluate_rules(request: DecisionRequest, use_ml: bool = True) -> DecisionResponse:
     """
     Evaluate decision rules against the request using the new rules system.
 
@@ -63,12 +64,21 @@ def evaluate_rules(request: DecisionRequest) -> DecisionResponse:
 
     Args:
         request: The decision request to evaluate
+        use_ml: Whether to use ML scoring (default: True)
 
     Returns:
         Decision response with decision, reasons, and actions
     """
-    # Get risk prediction
-    risk_score = predict_risk(request.features)
+    # Extract features and get risk prediction
+    if use_ml:
+        features = extract_features(request)
+        risk_score = predict_risk(features)
+        model_version, features_used = get_ml_metadata()
+    else:
+        features = {}
+        risk_score = 0.0
+        model_version = "none"
+        features_used = []
 
     # Run deterministic rules
     decision_hint, reasons, actions, rules_evaluated = run_rules(request)
@@ -88,12 +98,16 @@ def evaluate_rules(request: DecisionRequest) -> DecisionResponse:
         channel=request.channel,
         cart_total=request.cart_total,
         risk_score=risk_score,
+        model_version=model_version,
+        features_used=features_used,
         rules_evaluated=rules_evaluated,
     )
 
     # Create legacy meta dict for backward compatibility
     meta = {
         "risk_score": risk_score,
+        "model_version": model_version,
+        "features_used": features_used,
         "rules_evaluated": rules_evaluated,
         "timestamp": timestamp,
         "transaction_id": transaction_id,
@@ -110,6 +124,7 @@ def evaluate_rules(request: DecisionRequest) -> DecisionResponse:
     if risk_score > 0.80:
         final_decision = "DECLINE"
         reasons.append(f"HIGH_RISK: ML risk score {risk_score:.3f} exceeds 0.800 threshold")
+        reasons.append("ml_score_high")
         actions.append("BLOCK")
         meta_structured.rules_evaluated.append("HIGH_RISK")
         if isinstance(meta["rules_evaluated"], list):

@@ -138,4 +138,4 @@ class TestDecisionEngine:
         response = evaluate_rules(request)
 
         assert "risk_score" in response.meta
-        assert response.meta["risk_score"] == 0.15  # Default value
+        assert 0.0 <= response.meta["risk_score"] <= 1.0  # Valid risk score range

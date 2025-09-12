@@ -106,6 +106,29 @@ uv run python -m orca_core.cli explain fixtures/week4/requests/card_route_locati
 
 # Example output
 Under review: High-value card transaction requires additional verification. Please check your email for next steps. Additionally, under review: additional verification required for online card transaction.
+
+# ML Scoring (Stub)
+# Enable ML scoring (default)
+uv run python -m orca_core.cli decide '{"cart_total": 1500, "context": {"velocity_24h": 6, "item_count": 12}}' --use-ml
+
+# Disable ML scoring
+uv run python -m orca_core.cli decide '{"cart_total": 1500, "context": {"velocity_24h": 6, "item_count": 12}}' --no-ml
+
+# Example ML output with high risk score
+{
+  "status": "DECLINE",
+  "reasons": ["HIGH_RISK: ML risk score 1.000 exceeds 0.800 threshold", "ml_score_high"],
+  "actions": ["BLOCK"],
+  "meta": {
+    "risk_score": 1.0,
+    "model_version": "stub-0.1",
+    "features_used": ["cart_total", "item_count", "velocity_24h", "location_mismatch"],
+    "timestamp": "2025-01-15T10:30:45.123456",
+    "transaction_id": "txn_a82c4dfcfbe945e4"
+  },
+  "decision": "DECLINE",
+  "explanation_human": "Declined: High ML risk score detected."
+}
 ```
 
 #### Python API
@@ -131,15 +154,21 @@ request = DecisionRequest(
     }
 )
 
-# Evaluate decision
-response = evaluate_rules(request)
+# Evaluate decision with ML scoring (default)
+response = evaluate_rules(request, use_ml=True)
 print(f"Status: {response.status}")
 print(f"Decision: {response.decision}")  # Legacy field
 print(f"Reasons: {response.reasons}")
 print(f"Actions: {response.actions}")
 print(f"Transaction ID: {response.meta.transaction_id}")
 print(f"Risk Score: {response.meta.risk_score}")
+print(f"Model Version: {response.meta.model_version}")
+print(f"Features Used: {response.meta.features_used}")
 print(f"Human Explanation: {response.explanation_human}")
+
+# Evaluate decision without ML scoring
+response_no_ml = evaluate_rules(request, use_ml=False)
+print(f"Risk Score (no ML): {response_no_ml.meta.risk_score}")  # Will be 0.0
 ```
 
 #### Streamlit Demo
