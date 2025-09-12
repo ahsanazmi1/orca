@@ -1,0 +1,9 @@
+{
+    "status": "APPROVE",
+    "signals_triggered": [
+        "LOYALTY_BOOST",
+        "LOW_RISK_SCORE"
+    ],
+    "explanation": "Transaction approved due to customer's GOLD loyalty tier and low risk score of 0.15",
+    "routing_hint": "PROCESS_NORMALLY"
+}

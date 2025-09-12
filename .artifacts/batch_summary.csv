@@ -1,6 +1,2 @@
 file,decision,reasons_joined,actions_joined,risk_score
-fixtures/requests\high_risk_decline.json,REVIEW,CHARGEBACK_HISTORY: Customer has 1 chargeback(s) in last 12 months,ROUTE_TO_REVIEW,0.15
-fixtures/requests\high_ticket_review.json,REVIEW,HIGH_TICKET: Cart total $750.00 exceeds $500.00 threshold,ROUTE_TO_REVIEW,0.15
-fixtures/requests\location_mismatch_review.json,REVIEW,LOCATION_MISMATCH: IP country 'GB' differs from billing country 'US' | HIGH_IP_DISTANCE: Transaction originates from high-risk IP distance | LOYALTY_BOOST: Customer has GOLD loyalty tier,ROUTE_TO_REVIEW | ROUTE_TO_REVIEW | LOYALTY_BOOST,0.15
-fixtures/requests\low_ticket_ok.json,APPROVE,LOYALTY_BOOST: Customer has GOLD loyalty tier,LOYALTY_BOOST,0.15
-fixtures/requests\velocity_review.json,REVIEW,VELOCITY_FLAG: 24h velocity 4.0 exceeds 3.0 threshold,ROUTE_TO_REVIEW,0.15
+sample.json,APPROVE,Cart total $350.00 within approved threshold,Process payment | Send confirmation,0.15

@@ -1,0 +1,29 @@
+{
+    "approve_example": {
+        "status": "APPROVE",
+        "signals_triggered": [
+            "LOYALTY_BOOST",
+            "LOW_RISK_SCORE"
+        ],
+        "explanation": "Transaction approved due to customer's GOLD loyalty tier and low risk score of 0.15",
+        "routing_hint": "PROCESS_NORMALLY"
+    },
+    "decline_example": {
+        "status": "DECLINE",
+        "signals_triggered": [
+            "HIGH_RISK_SCORE",
+            "VELOCITY_ALERT"
+        ],
+        "explanation": "Transaction declined due to high ML risk score (0.85) exceeding threshold and suspicious velocity pattern",
+        "routing_hint": "BLOCK_TRANSACTION"
+    },
+    "route_example": {
+        "status": "ROUTE",
+        "signals_triggered": [
+            "HIGH_TICKET",
+            "VELOCITY_FLAG"
+        ],
+        "explanation": "Transaction flagged for manual review due to high cart total ($750) and elevated velocity (4 purchases in 24h)",
+        "routing_hint": "ROUTE_TO_MANUAL_REVIEW"
+    }
+}

@@ -1,0 +1,33 @@
+{
+    "id": "pi_3OjK8m2eZvKYlo2C0s8xYzQv",
+    "object": "payment_intent",
+    "amount": 125000,
+    "currency": "usd",
+    "status": "requires_action",
+    "client_secret": "pi_3OjK8m2eZvKYlo2C0s8xYzQv_secret_abc123def456",
+    "charges": {
+        "object": "list",
+        "data": []
+    },
+    "payment_method": {
+        "id": "pm_1OjK8n2eZvKYlo2C123456789",
+        "type": "card",
+        "card": {
+            "brand": "visa",
+            "last4": "1234",
+            "funding": "credit"
+        }
+    },
+    "outcome": {
+        "network_status": "pending",
+        "reason": "manual_review_required",
+        "risk_level": "elevated",
+        "risk_score": 45,
+        "seller_message": "This payment requires additional verification.",
+        "type": "manual_review"
+    },
+    "metadata": {
+        "order_id": "order_12345",
+        "customer_tier": "gold"
+    }
+}
