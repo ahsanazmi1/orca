@@ -3,6 +3,7 @@
 import csv
 import glob
 import json
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -20,17 +21,37 @@ console = Console()
 
 @app.command()  # type: ignore[misc]
 def decide(
-    json_input: str = typer.Argument(..., help="JSON string with decision request data"),
+    json_input: str = typer.Argument(
+        None, help="JSON string with decision request data (or '-' for stdin)"
+    ),
+    rail: str = typer.Option(None, "--rail", help="Override rail type (Card or ACH)"),
+    channel: str = typer.Option(None, "--channel", help="Override channel (online or pos)"),
 ) -> None:
     """
     Evaluate a decision request and return the response.
 
-    Example:
+    Examples:
         orca-core decide '{"cart_total": 750.0, "currency": "USD"}'
+        orca-core decide -  # Read from stdin
+        echo '{"cart_total": 750.0}' | orca-core decide -
     """
     try:
+        # Handle stdin input
+        if json_input == "-" or json_input is None:
+            json_input = sys.stdin.read().strip()
+
+        if not json_input:
+            console.print("[red]No JSON input provided[/red]")
+            raise typer.Exit(1)
+
         # Parse JSON input
         data: dict[str, Any] = orjson.loads(json_input)
+
+        # Apply rail and channel overrides if provided
+        if rail:
+            data["rail"] = rail
+        if channel:
+            data["channel"] = channel
 
         # Create request model
         request = DecisionRequest(**data)
@@ -54,6 +75,8 @@ def decide(
 @app.command()  # type: ignore[misc]
 def decide_file(
     file_path: str = typer.Argument(..., help="Path to JSON file with decision request data"),
+    rail: str = typer.Option(None, "--rail", help="Override rail type (Card or ACH)"),
+    channel: str = typer.Option(None, "--channel", help="Override channel (online or pos)"),
 ) -> None:
     """
     Evaluate a decision request from a JSON file and return the response.
@@ -65,6 +88,12 @@ def decide_file(
         # Read and parse JSON file
         with open(file_path) as f:
             data: dict[str, Any] = json.load(f)
+
+        # Apply rail and channel overrides if provided
+        if rail:
+            data["rail"] = rail
+        if channel:
+            data["channel"] = channel
 
         # Create request model
         request = DecisionRequest(**data)

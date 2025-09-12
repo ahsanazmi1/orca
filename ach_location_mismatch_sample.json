@@ -1,0 +1,18 @@
+{
+    "cart_total": 1500.0,
+    "currency": "USD",
+    "rail": "ACH",
+    "channel": "online",
+    "features": {
+        "velocity_24h": 1.0
+    },
+    "context": {
+        "location_mismatch": true,
+        "location_ip_country": "CN",
+        "billing_country": "US",
+        "customer": {
+            "loyalty_tier": "SILVER",
+            "chargebacks_12m": 0
+        }
+    }
+}

@@ -1,0 +1,17 @@
+{
+    "cart_total": 2200.0,
+    "currency": "USD",
+    "rail": "Card",
+    "channel": "online",
+    "features": {
+        "velocity_24h": 4.0
+    },
+    "context": {
+        "location_ip_country": "US",
+        "billing_country": "US",
+        "customer": {
+            "loyalty_tier": "BRONZE",
+            "chargebacks_12m": 1
+        }
+    }
+}

@@ -202,3 +202,44 @@ class LoyaltyBoostRule(Rule):
     def name(self) -> str:
         """Return the name of this rule."""
         return "LOYALTY_BOOST"
+
+
+class ItemCountRule(Rule):
+    """Rule that flags transactions with high item counts for review."""
+
+    def __init__(self, threshold: int = 10):
+        """
+        Initialize the item count rule.
+
+        Args:
+            threshold: The item count threshold above which to flag for review
+        """
+        self.threshold = threshold
+
+    def apply(self, request: DecisionRequest) -> RuleResult | None:
+        """
+        Apply the item count rule.
+
+        Args:
+            request: The decision request to evaluate
+
+        Returns:
+            RuleResult if item count > threshold, None otherwise
+        """
+        item_count = request.context.get("item_count", 1)
+
+        if item_count > self.threshold:
+            return RuleResult(
+                decision_hint="REVIEW",
+                reasons=[
+                    f"ITEM_COUNT: Cart has {item_count} items, exceeds {self.threshold} threshold"
+                ],
+                actions=["ROUTE_TO_REVIEW"],
+            )
+
+        return None
+
+    @property
+    def name(self) -> str:
+        """Return the name of this rule."""
+        return "ITEM_COUNT"

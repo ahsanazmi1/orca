@@ -96,6 +96,20 @@ The demo includes:
 - **Real-time Updates**: Instant decision evaluation as you change inputs
 - **Plain-English Explanations**: Toggle between JSON output and human-readable explanations
 
+#### Week 3 — Explanation Demo
+
+```bash
+# Launch human-readable explanation demo
+streamlit run apps/explain/app_streamlit.py
+```
+
+The explanation demo includes:
+- **File Upload**: Upload transaction JSON files for analysis
+- **Human Explanations**: Clear, non-technical explanations of decisions
+- **Reason Mapping**: See how machine-readable reasons translate to human language
+- **Example Files**: Pre-built examples for Card/ACH approve/decline scenarios
+- **Copy/Download**: Copy explanations or download decision JSON files
+
 #### Explain Decisions
 
 Get natural-language explanations for decision responses:

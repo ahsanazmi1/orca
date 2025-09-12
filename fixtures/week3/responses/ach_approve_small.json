@@ -1,0 +1,31 @@
+{
+  "actions": [
+    "ach_pos_processing",
+    "Process payment",
+    "Send confirmation"
+  ],
+  "cart_total": 500.0,
+  "decision": "APPROVE",
+  "explanation": "Transaction approved for $500.00. Cart total within approved limits.",
+  "explanation_human": "Approved: Customer loyalty tier benefits applied.",
+  "meta": {
+    "approved_amount": 500.0,
+    "risk_score": 0.15,
+    "rules_evaluated": [
+      "ACH_CHANNEL",
+      "LOYALTY_BOOST"
+    ]
+  },
+  "rail": "ACH",
+  "reasons": [
+    "LOYALTY_BOOST: Customer has GOLD loyalty tier"
+  ],
+  "routing_hint": "PROCESS_NORMALLY",
+  "signals_triggered": [
+    "ACH_CHANNEL",
+    "LOYALTY_BOOST"
+  ],
+  "status": "APPROVE",
+  "timestamp": "2025-09-11T21:12:00.000000",
+  "transaction_id": "txn_sample_ach_approve"
+}

@@ -1,0 +1,17 @@
+{
+    "cart_total": 500.0,
+    "currency": "USD",
+    "rail": "ACH",
+    "channel": "pos",
+    "features": {
+        "velocity_24h": 1.0
+    },
+    "context": {
+        "location_ip_country": "US",
+        "billing_country": "US",
+        "customer": {
+            "loyalty_tier": "GOLD",
+            "chargebacks_12m": 0
+        }
+    }
+}

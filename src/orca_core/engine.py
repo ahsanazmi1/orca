@@ -1,9 +1,54 @@
 """Decision engine for Orca Core."""
 
+import uuid
+from datetime import datetime
 
 from .core.ml_hooks import predict_risk
+from .explanations import generate_human_explanation
 from .models import DecisionRequest, DecisionResponse
 from .rules.registry import run_rules
+
+
+def determine_routing_hint(decision: str, request: DecisionRequest, meta: dict) -> str:
+    """Determine routing hint based on decision and context."""
+    # Check for payment method in context
+    payment_method = request.context.get("payment_method", "unknown")
+
+    # Handle case where payment_method might be a dict
+    if isinstance(payment_method, dict):
+        payment_method = payment_method.get("type", "unknown")
+
+    # Convert to string and lowercase for comparison
+    payment_method_str = str(payment_method).lower()
+
+    if decision == "DECLINE":
+        return "BLOCK_TRANSACTION"
+    elif decision == "ROUTE":
+        return "ROUTE_TO_MANUAL_REVIEW"
+    elif payment_method_str in ["visa", "mastercard", "amex"]:
+        return "ROUTE_TO_VISA_NETWORK"
+    elif payment_method_str in ["ach", "bank_transfer"]:
+        return "ROUTE_TO_ACH_NETWORK"
+    else:
+        return "PROCESS_NORMALLY"
+
+
+def generate_explanation(
+    decision: str, reasons: list[str], request: DecisionRequest, meta: dict
+) -> str:
+    """Generate human-readable explanation of the decision."""
+    if decision == "APPROVE":
+        return f"Transaction approved for ${request.cart_total:.2f}. Cart total within approved limits."
+    elif decision == "DECLINE":
+        risk_score = meta.get("risk_score", 0.0)
+        if risk_score > 0.80:
+            return f"Transaction declined due to high ML risk score of {risk_score:.3f}."
+        else:
+            return f"Transaction declined due to: {', '.join(reasons[:2])}."
+    elif decision == "ROUTE":
+        return f"Transaction flagged for manual review due to: {', '.join(reasons[:2])}."
+    else:
+        return f"Transaction decision: {decision}"
 
 
 def evaluate_rules(request: DecisionRequest) -> DecisionResponse:
@@ -56,6 +101,40 @@ def evaluate_rules(request: DecisionRequest) -> DecisionResponse:
     # For actions, we want to preserve duplicates for backward compatibility with tests
     unique_actions = actions
 
+    # Generate Week 2 enhanced fields
+    transaction_id = f"txn_{uuid.uuid4().hex[:16]}"
+    timestamp = datetime.now()
+
+    # Determine routing hint based on decision and context
+    routing_hint = determine_routing_hint(final_decision, request, meta)
+
+    # Generate explanation
+    explanation = generate_explanation(final_decision, unique_reasons, request, meta)
+
+    # Generate human-readable explanation using templates
+    explanation_human = generate_human_explanation(unique_reasons, final_decision, request.context)
+
+    # Extract signals triggered from rules_evaluated
+    signals_triggered: list[str] = []
+    rules_evaluated = meta.get("rules_evaluated", [])
+    if isinstance(rules_evaluated, list):
+        signals_triggered.extend(str(item) for item in rules_evaluated)
+    if risk_score > 0.80:
+        signals_triggered.append("HIGH_RISK")
+
     return DecisionResponse(
-        decision=final_decision, reasons=unique_reasons, actions=unique_actions, meta=meta
+        decision=final_decision,
+        reasons=unique_reasons,
+        actions=unique_actions,
+        meta=meta,
+        # Week 2 enhanced fields
+        status=(final_decision if final_decision in ["APPROVE", "DECLINE", "ROUTE"] else None),
+        signals_triggered=signals_triggered,
+        explanation=explanation,
+        explanation_human=explanation_human,
+        routing_hint=routing_hint,
+        transaction_id=transaction_id,
+        cart_total=request.cart_total,
+        timestamp=timestamp,
+        rail=request.rail,
     )

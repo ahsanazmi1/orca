@@ -1,0 +1,17 @@
+{
+    "cart_total": 2000.0,
+    "currency": "USD",
+    "features": {
+        "velocity_24h": 4.5,
+        "risk_score": 0.85
+    },
+    "context": {
+        "channel": "ecom",
+        "location_ip_country": "CN",
+        "billing_country": "US",
+        "customer": {
+            "loyalty_tier": "BRONZE",
+            "chargebacks_12m": 1
+        }
+    }
+}

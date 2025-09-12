@@ -12,18 +12,38 @@ def rules() -> list[Rule]:
     Returns:
         Ordered list of rule instances for deterministic evaluation
     """
+    from .ach_rules import (
+        ACHChannelRule,
+        ACHLimitRule,
+        ACHLocationMismatchRule,
+    )
     from .builtins import (
         ChargebackHistoryRule,
         HighIpDistanceRule,
         HighTicketRule,
+        ItemCountRule,
         LocationMismatchRule,
         LoyaltyBoostRule,
         VelocityRule,
     )
+    from .card_rules import (
+        CardChannelRule,
+        CardHighTicketRule,
+        CardVelocityRule,
+    )
 
     return [
+        # Rail-specific rules (evaluated first)
+        CardHighTicketRule(threshold=5000.0),
+        CardVelocityRule(threshold=4.0),
+        CardChannelRule(),
+        ACHLimitRule(limit=2000.0),
+        ACHLocationMismatchRule(),
+        ACHChannelRule(),
+        # General rules (evaluated after rail-specific)
         HighTicketRule(threshold=500.0),
         VelocityRule(threshold=3.0),
+        ItemCountRule(threshold=10),
         LocationMismatchRule(),
         HighIpDistanceRule(),
         ChargebackHistoryRule(),
