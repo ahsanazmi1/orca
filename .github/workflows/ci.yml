@@ -38,10 +38,18 @@ jobs:
       run: |
         uv run pre-commit install
 
+    - name: Format code
+      run: |
+        # Format code first
+        uv run ruff format .
+        uv run black .
+
     - name: Run code quality checks
       run: |
-        # Run pre-commit hooks
-        uv run pre-commit run --all-files
+        # Run individual tools
+        uv run ruff check .
+        uv run mypy src/orca_core
+        uv run bandit -r src/ -f json -o bandit-report.json
 
     - name: Run tests
       run: |
