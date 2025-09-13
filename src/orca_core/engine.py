@@ -101,6 +101,7 @@ def evaluate_rules(request: DecisionRequest, use_ml: bool = True) -> DecisionRes
         model_version=model_version,
         features_used=features_used,
         rules_evaluated=rules_evaluated,
+        approved_amount=None,
     )
 
     # Create legacy meta dict for backward compatibility
@@ -160,7 +161,15 @@ def evaluate_rules(request: DecisionRequest, use_ml: bool = True) -> DecisionRes
         signals_triggered.append("HIGH_RISK")
 
     # Map REVIEW to ROUTE for the new status field
-    status = "ROUTE" if final_decision == "REVIEW" else final_decision
+    from .models import DecisionStatus
+
+    status: DecisionStatus
+    if final_decision == "REVIEW":
+        status = "ROUTE"
+    elif final_decision == "DECLINE":
+        status = "DECLINE"
+    else:
+        status = "APPROVE"
 
     return DecisionResponse(
         # Legacy fields for backward compatibility

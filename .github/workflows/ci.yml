@@ -30,9 +30,14 @@ jobs:
       run: |
         uv sync --dev
 
-    - name: Run pre-commit hooks
+    - name: Run code quality checks
       run: |
-        uv run pre-commit run --all-files
+        # Run individual tools instead of pre-commit
+        uv run black --check src/ tests/ apps/
+        uv run ruff check src/ tests/ apps/
+        uv run ruff format --check src/ tests/ apps/
+        uv run mypy src/orca_core
+        uv run bandit -r src/ -f json -o bandit-report.json
 
     - name: Run tests
       run: |
@@ -45,60 +50,6 @@ jobs:
         flags: unittests
         name: codecov-umbrella
         fail_ci_if_error: false
-
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.12'
-
-    - name: Install uv
-      uses: astral-sh/setup-uv@v2
-      with:
-        version: "latest"
-
-    - name: Install dependencies
-      run: |
-        uv sync --dev
-
-    - name: Run Black
-      run: |
-        uv run black --check src/ tests/ apps/
-
-    - name: Run Ruff
-      run: |
-        uv run ruff check src/ tests/ apps/
-
-    - name: Run MyPy
-      run: |
-        uv run mypy src/orca_core
-
-  security:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.12'
-
-    - name: Install uv
-      uses: astral-sh/setup-uv@v2
-      with:
-        version: "latest"
-
-    - name: Install dependencies
-      run: |
-        uv sync --dev
-
-    - name: Run Bandit
-      run: |
-        uv run bandit -r src/ -f json -o bandit-report.json
 
     - name: Upload Bandit report
       uses: actions/upload-artifact@v3

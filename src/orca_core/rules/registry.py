@@ -144,7 +144,19 @@ class RuleRegistry:
             meta["approved_amount"] = request.cart_total
 
         return DecisionResponse(
-            decision=final_decision, reasons=all_reasons, actions=all_actions, meta=meta
+            decision=final_decision,
+            reasons=all_reasons,
+            actions=all_actions,
+            meta=meta,
+            status=None,
+            meta_structured=None,
+            explanation=None,
+            explanation_human=None,
+            routing_hint=None,
+            transaction_id=None,
+            cart_total=None,
+            timestamp=None,
+            rail=None,
         )
 
     def clear(self) -> None:
