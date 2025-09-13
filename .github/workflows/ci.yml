@@ -30,6 +30,10 @@ jobs:
       run: |
         uv sync --dev
 
+    - name: Install pre-commit
+      run: |
+        uv pip install pre-commit
+
     - name: Install pre-commit hooks
       run: |
         uv run pre-commit install
