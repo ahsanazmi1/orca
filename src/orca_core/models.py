@@ -54,12 +54,18 @@ class DecisionRequest(BaseModel):
 class DecisionMeta(BaseModel):
     """Metadata for decision responses."""
 
+    model_config = {"protected_namespaces": ()}
+
     timestamp: datetime = Field(..., description="Decision timestamp")
     transaction_id: str = Field(..., description="Unique transaction identifier")
     rail: RailType = Field(..., description="Payment rail type used for this transaction")
     channel: ChannelType = Field(..., description="Transaction channel")
     cart_total: float = Field(..., description="Total cart value for this transaction")
     risk_score: float = Field(default=0.0, description="ML risk score (0.0-1.0)")
+    model_version: str = Field(default="none", description="ML model version used for risk scoring")
+    features_used: list[str] = Field(
+        default_factory=list, description="Features used in ML scoring"
+    )
     rules_evaluated: list[str] = Field(
         default_factory=list, description="List of rules that were evaluated"
     )

@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop, phase-2-orca-ai-llm ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.11, 3.12]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v2
+      with:
+        version: "latest"
+
+    - name: Install dependencies
+      run: |
+        uv sync --dev
+
+    - name: Install pre-commit
+      run: |
+        uv pip install pre-commit
+
+    - name: Install pre-commit hooks
+      run: |
+        uv run pre-commit install
+
+    - name: Format code
+      run: |
+        # Format code first
+        uv run ruff format .
+        uv run black .
+
+    - name: Run code quality checks
+      run: |
+        # Run individual tools
+        uv run ruff check .
+        uv run mypy src/orca_core
+        uv run bandit -r src/ -f json -o bandit-report.json
+
+    - name: Run tests
+      run: |
+        uv run pytest -v --cov=src/orca_core --cov-report=xml --cov-report=html
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false

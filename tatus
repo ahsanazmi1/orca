@@ -1,0 +1,56 @@
+[33md5da172[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mphase-2-orca-ai-llm[m[33m, [m[1;31morigin/phase-2-orca-ai-llm[m[33m)[m feat: Complete Phase 2 - AI/LLM Integration
+ .artifacts/batch_summary.csv                       |   6 [32m+[m[31m-[m
+ .coverage                                          | Bin [31m53248[m -> [32m53248[m bytes
+ .github/workflows/azure-oidc.yml                   |  81 [32m++++[m
+ .github/workflows/ci.yml                           | 107 [32m++++++[m
+ CHECKLIST.md                                       |  59 [32m+++[m
+ PHASE.md                                           |  49 [32m+++[m
+ README.md                                          |  33 [32m+[m[31m-[m
+ apps/debug/__init__.py                             |   1 [32m+[m
+ apps/debug/app_streamlit.py                        | 401 [32m+++++++++++++++++++[m
+ coverage.xml                                       | 427 [32m+++++++++++++++[m[31m------[m
+ docs/infra/azure-oidc-setup.md                     | 215 [32m+++++++++++[m
+ docs/validation/phase2-radar-vs-orca.md            | 330 [32m++++++++++++++++[m
+ fixtures/phase2/requests/approve_low_risk.json     |  13 [32m+[m
+ fixtures/phase2/requests/borderline_review.json    |  13 [32m+[m
+ fixtures/phase2/requests/decline_high_risk.json    |  13 [32m+[m
+ fixtures/phase2/responses/approve_low_risk.json    |  53 [32m+++[m
+ fixtures/phase2/responses/borderline_review.json   |  62 [32m+++[m
+ fixtures/phase2/responses/decline_high_risk.json   |  74 [32m++++[m
+ infra/azure/README.md                              | 113 [32m++++++[m
+ infra/azure/main.bicep                             | 127 [32m++++++[m
+ infra/azure/parameters.json                        |  18 [32m+[m
+ src/orca_core/__pycache__/cli.cpython-312.pyc      | Bin [31m9567[m -> [32m11487[m bytes
+ src/orca_core/__pycache__/engine.cpython-312.pyc   | Bin [31m5624[m -> [32m6043[m bytes
+ src/orca_core/__pycache__/models.cpython-312.pyc   | Bin [31m4766[m -> [32m5053[m bytes
+ src/orca_core/cli.py                               |  48 [32m++[m[31m-[m
+ .../core/__pycache__/ml_hooks.cpython-312.pyc      | Bin [31m648[m -> [32m1072[m bytes
+ src/orca_core/core/ml_hooks.py                     |  19 [32m+[m[31m-[m
+ src/orca_core/engine.py                            |  23 [32m+[m[31m-[m
+ src/orca_core/llm/__init__.py                      |   1 [32m+[m
+ .../llm/__pycache__/__init__.cpython-312.pyc       | Bin [31m0[m -> [32m208[m bytes
+ .../llm/__pycache__/adapter.cpython-312.pyc        | Bin [31m0[m -> [32m7632[m bytes
+ src/orca_core/llm/adapter.py                       | 165 [32m++++++++[m
+ src/orca_core/ml/__init__.py                       |   1 [32m+[m
+ .../ml/__pycache__/__init__.cpython-312.pyc        | Bin [31m0[m -> [32m206[m bytes
+ .../ml/__pycache__/features.cpython-312.pyc        | Bin [31m0[m -> [32m2474[m bytes
+ .../ml/__pycache__/stub_model.cpython-312.pyc      | Bin [31m0[m -> [32m2617[m bytes
+ src/orca_core/ml/features.py                       |  50 [32m+++[m
+ src/orca_core/ml/stub_model.py                     |  80 [32m++++[m
+ src/orca_core/models.py                            |   6 [32m+[m
+ test_explain.json                                  |   0
+ .../test_cli.cpython-312-pytest-8.4.2.pyc          | Bin [31m51250[m -> [32m51128[m bytes
+ .../test_engine.cpython-312-pytest-8.4.2.pyc       | Bin [31m27871[m -> [32m28099[m bytes
+ ...st_engine_coverage.cpython-312-pytest-8.4.2.pyc | Bin [31m21702[m -> [32m21593[m bytes
+ .../test_golden.cpython-312-pytest-8.4.2.pyc       | Bin [31m23381[m -> [32m23956[m bytes
+ ...t_llm_explanations.cpython-312-pytest-8.4.2.pyc | Bin [31m0[m -> [32m29054[m bytes
+ .../test_ml_hooks.cpython-312-pytest-8.4.2.pyc     | Bin [31m4135[m -> [32m4730[m bytes
+ .../test_ml_scoring.cpython-312-pytest-8.4.2.pyc   | Bin [31m0[m -> [32m23920[m bytes
+ ...channel_validation.cpython-312-pytest-8.4.2.pyc | Bin [31m14425[m -> [32m14425[m bytes
+ .../test_rule_modules.cpython-312-pytest-8.4.2.pyc | Bin [31m34819[m -> [32m34758[m bytes
+ tests/test_engine.py                               |   2 [32m+[m[31m-[m
+ tests/test_golden.py                               |  15 [32m+[m[31m-[m
+ tests/test_llm_explanations.py                     | 283 [32m++++++++++++++[m
+ tests/test_ml_hooks.py                             |  14 [32m+[m[31m-[m
+ tests/test_ml_scoring.py                           | 185 [32m+++++++++[m
+ 54 files changed, 2946 insertions(+), 141 deletions(-)

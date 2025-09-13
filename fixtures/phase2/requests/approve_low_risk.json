@@ -1,0 +1,13 @@
+{
+  "cart_total": 75.0,
+  "rail": "Card",
+  "channel": "online",
+  "context": {
+    "velocity_24h": 1,
+    "item_count": 2,
+    "location_mismatch": 0,
+    "user_age_days": 730,
+    "previous_chargebacks": 0,
+    "account_verification_status": 1
+  }
+}

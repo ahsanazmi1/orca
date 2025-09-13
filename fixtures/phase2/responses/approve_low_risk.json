@@ -1,0 +1,53 @@
+{
+  "decision": "APPROVE",
+  "reasons": [
+    "Cart total $75.00 within approved threshold"
+  ],
+  "actions": [
+    "Process payment",
+    "Send confirmation"
+  ],
+  "meta": {
+    "risk_score": 0.146,
+    "model_version": "stub-0.1",
+    "features_used": [
+      "cart_total",
+      "item_count",
+      "velocity_24h",
+      "location_mismatch"
+    ],
+    "rules_evaluated": [],
+    "timestamp": "2025-09-11 22:23:37.441387",
+    "transaction_id": "txn_49f0fb1cd68e40e5",
+    "rail": "Card",
+    "channel": "online",
+    "cart_total": 75.0,
+    "approved_amount": 75.0
+  },
+  "status": "APPROVE",
+  "meta_structured": {
+    "timestamp": "2025-09-11 22:23:37.441387",
+    "transaction_id": "txn_49f0fb1cd68e40e5",
+    "rail": "Card",
+    "channel": "online",
+    "cart_total": 75.0,
+    "risk_score": 0.146,
+    "model_version": "stub-0.1",
+    "features_used": [
+      "cart_total",
+      "item_count",
+      "velocity_24h",
+      "location_mismatch"
+    ],
+    "rules_evaluated": [],
+    "approved_amount": 75.0
+  },
+  "signals_triggered": [],
+  "explanation": "Transaction approved for $75.00. Cart total within approved limits.",
+  "explanation_human": "Approved: Transaction amount within approved limits.",
+  "routing_hint": "PROCESS_NORMALLY",
+  "transaction_id": "txn_49f0fb1cd68e40e5",
+  "cart_total": 75.0,
+  "timestamp": "2025-09-11 22:23:37.441387",
+  "rail": "Card"
+}

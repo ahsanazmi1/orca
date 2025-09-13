@@ -1,0 +1,81 @@
+name: Azure OIDC Deploy
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'src/**'
+      - 'Dockerfile'
+      - 'pyproject.toml'
+  workflow_dispatch:
+
+env:
+  AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+  AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v2
+      with:
+        version: "latest"
+
+    - name: Install dependencies
+      run: |
+        uv sync --dev
+
+    - name: Run tests
+      run: |
+        uv run pytest -v
+
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        client-id: ${{ env.AZURE_CLIENT_ID }}
+        tenant-id: ${{ env.AZURE_TENANT_ID }}
+        subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+
+    - name: Build and push Docker image
+      run: |
+        # Get ACR login server
+        ACR_NAME=$(az acr list --resource-group rg-orca-core-dev --query "[0].name" -o tsv)
+        ACR_LOGIN_SERVER=$(az acr show --name $ACR_NAME --resource-group rg-orca-core-dev --query "loginServer" -o tsv)
+
+        # Login to ACR
+        az acr login --name $ACR_NAME
+
+        # Build and push image
+        docker build -t $ACR_LOGIN_SERVER/orca-core:${{ github.sha }} .
+        docker push $ACR_LOGIN_SERVER/orca-core:${{ github.sha }}
+
+    # TODO: Uncomment when ready to deploy
+    # - name: Deploy to AKS
+    #   run: |
+    #     # Get AKS credentials
+    #     az aks get-credentials --resource-group rg-orca-core-dev --name aks-orca-core-dev --overwrite-existing
+    #
+    #     # Update image in deployment
+    #     ACR_NAME=$(az acr list --resource-group rg-orca-core-dev --query "[0].name" -o tsv)
+    #     ACR_LOGIN_SERVER=$(az acr show --name $ACR_NAME --resource-group rg-orca-core-dev --query "loginServer" -o tsv)
+    #
+    #     kubectl set image deployment/orca-core orca-core=$ACR_LOGIN_SERVER/orca-core:${{ github.sha }}
+    #     kubectl rollout status deployment/orca-core
+
+    - name: Logout from Azure
+      run: |
+        az logout

@@ -13,19 +13,24 @@ from rich.console import Console
 
 from .core.explainer import explain_decision
 from .engine import evaluate_rules
+from .llm.adapter import explain_decision as llm_explain_decision
 from .models import DecisionRequest
 
 app = typer.Typer(help="Orca Core Decision Engine CLI")
 console = Console()
 
 
-@app.command()  # type: ignore[misc]
+@app.command()
 def decide(
     json_input: str = typer.Argument(
         None, help="JSON string with decision request data (or '-' for stdin)"
     ),
     rail: str = typer.Option(None, "--rail", help="Override rail type (Card or ACH)"),
     channel: str = typer.Option(None, "--channel", help="Override channel (online or pos)"),
+    use_ml: bool = typer.Option(True, "--use-ml/--no-ml", help="Enable/disable ML scoring"),
+    explain: str = typer.Option(
+        None, "--explain", help="Generate explanation (merchant|developer)"
+    ),
 ) -> None:
     """
     Evaluate a decision request and return the response.
@@ -57,12 +62,27 @@ def decide(
         request = DecisionRequest(**data)
 
         # Evaluate rules
-        response = evaluate_rules(request)
+        response = evaluate_rules(request, use_ml=use_ml)
 
         # Output compact JSON
         output = orjson.dumps(response.model_dump(), option=orjson.OPT_SORT_KEYS)
-
         console.print(output.decode())
+
+        # Generate explanation if requested
+        if explain:
+            if explain not in ["merchant", "developer"]:
+                console.print(
+                    f"[red]Invalid explain style: {explain}. Use 'merchant' or 'developer'[/red]"
+                )
+                raise typer.Exit(1)
+
+            try:
+                explanation = llm_explain_decision(response, explain)  # type: ignore
+                console.print(f"\n[bold]Explanation ({explain}):[/bold]")
+                console.print(explanation)
+            except Exception as e:
+                console.print(f"[red]Error generating explanation: {e}[/red]")
+                raise typer.Exit(1) from e
 
     except orjson.JSONDecodeError as e:
         console.print(f"[red]Invalid JSON: {e}[/red]")
@@ -72,11 +92,15 @@ def decide(
         raise typer.Exit(1) from e
 
 
-@app.command()  # type: ignore[misc]
+@app.command()
 def decide_file(
     file_path: str = typer.Argument(..., help="Path to JSON file with decision request data"),
     rail: str = typer.Option(None, "--rail", help="Override rail type (Card or ACH)"),
     channel: str = typer.Option(None, "--channel", help="Override channel (online or pos)"),
+    use_ml: bool = typer.Option(True, "--use-ml/--no-ml", help="Enable/disable ML scoring"),
+    explain: str = typer.Option(
+        None, "--explain", help="Generate explanation (merchant|developer)"
+    ),
 ) -> None:
     """
     Evaluate a decision request from a JSON file and return the response.
@@ -99,12 +123,27 @@ def decide_file(
         request = DecisionRequest(**data)
 
         # Evaluate rules
-        response = evaluate_rules(request)
+        response = evaluate_rules(request, use_ml=use_ml)
 
         # Output compact JSON
         output = orjson.dumps(response.model_dump(), option=orjson.OPT_SORT_KEYS)
-
         console.print(output.decode())
+
+        # Generate explanation if requested
+        if explain:
+            if explain not in ["merchant", "developer"]:
+                console.print(
+                    f"[red]Invalid explain style: {explain}. Use 'merchant' or 'developer'[/red]"
+                )
+                raise typer.Exit(1)
+
+            try:
+                explanation = llm_explain_decision(response, explain)  # type: ignore
+                console.print(f"\n[bold]Explanation ({explain}):[/bold]")
+                console.print(explanation)
+            except Exception as e:
+                console.print(f"[red]Error generating explanation: {e}[/red]")
+                raise typer.Exit(1) from e
 
     except FileNotFoundError:
         console.print(f"[red]File not found: {file_path}[/red]")
@@ -117,11 +156,12 @@ def decide_file(
         raise typer.Exit(1) from e
 
 
-@app.command()  # type: ignore[misc]
+@app.command()
 def decide_batch(
     glob_pattern: str = typer.Option(
         "fixtures/requests/*.json", "--glob", help="Glob pattern to match JSON files"
     ),
+    use_ml: bool = typer.Option(True, "--use-ml/--no-ml", help="Enable/disable ML scoring"),
 ) -> None:
     """
     Evaluate decision requests from multiple JSON files and output results.
@@ -201,7 +241,7 @@ def decide_batch(
         raise typer.Exit(1) from e
 
 
-@app.command()  # type: ignore[misc]
+@app.command()
 def explain(
     request_json: str = typer.Argument(..., help="JSON string with decision request data"),
 ) -> None:

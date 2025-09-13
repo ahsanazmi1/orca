@@ -71,11 +71,11 @@ check-all: lint type-check security-check test ## Run all checks (lint, type-che
 # Pre-commit hooks
 pre-commit-run: ## Run pre-commit on all files
 	@echo "🔧 Running pre-commit hooks..."
-	pre-commit run --all-files
+	uv run pre-commit run --all-files
 
 pre-commit-update: ## Update pre-commit hooks
 	@echo "🔄 Updating pre-commit hooks..."
-	pre-commit autoupdate
+	uv run pre-commit autoupdate
 
 # Development utilities
 clean: ## Clean up temporary files and caches
