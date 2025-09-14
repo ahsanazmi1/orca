@@ -5,7 +5,7 @@ from datetime import datetime
 
 from .core.ml_hooks import predict_risk
 from .explanations import generate_human_explanation
-from .models import DecisionMeta, DecisionRequest, DecisionResponse
+from .models import DecisionMeta, DecisionRequest, DecisionResponse, DecisionStatus
 from .rules.registry import run_rules
 
 
@@ -74,7 +74,7 @@ def evaluate_rules(request: DecisionRequest) -> DecisionResponse:
     decision_hint, reasons, actions, rules_evaluated = run_rules(request)
 
     # Start with APPROVE
-    final_decision = "APPROVE"
+    final_decision: str = "APPROVE"
 
     # Generate transaction metadata
     transaction_id = f"txn_{uuid.uuid4().hex[:16]}"
@@ -89,6 +89,7 @@ def evaluate_rules(request: DecisionRequest) -> DecisionResponse:
         cart_total=request.cart_total,
         risk_score=risk_score,
         rules_evaluated=rules_evaluated,
+        approved_amount=None,
     )
 
     # Create legacy meta dict for backward compatibility
@@ -145,7 +146,14 @@ def evaluate_rules(request: DecisionRequest) -> DecisionResponse:
         signals_triggered.append("HIGH_RISK")
 
     # Map REVIEW to ROUTE for the new status field
-    status = "ROUTE" if final_decision == "REVIEW" else final_decision
+    if final_decision == "REVIEW":
+        status: DecisionStatus = "ROUTE"
+    elif final_decision == "APPROVE":
+        status = "APPROVE"
+    elif final_decision == "DECLINE":
+        status = "DECLINE"
+    else:
+        status = "APPROVE"  # Default fallback
 
     return DecisionResponse(
         # Legacy fields for backward compatibility

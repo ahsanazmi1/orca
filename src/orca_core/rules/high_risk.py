@@ -1,6 +1,5 @@
 """High risk rule for Orca Core decision engine."""
 
-
 from ..core.ml_hooks import predict_risk
 from ..models import DecisionRequest
 from .base import Rule, RuleResult
