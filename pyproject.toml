@@ -35,6 +35,8 @@ dependencies = [
     "orjson>=3.9.0",
     "rich>=13.0.0",
     "streamlit>=1.28.0",
+    "fastapi>=0.104.0",
+    "uvicorn[standard]>=0.24.0",
 ]
 
 [project.optional-dependencies]
@@ -46,6 +48,7 @@ dev = [
     "pytest-cov>=4.1.0",
     "pre-commit>=3.4.0",
     "bandit>=1.7.0",
+    "httpx>=0.25.0",
 ]
 
 [project.scripts]
@@ -131,6 +134,9 @@ module = [
     "pandas.*",
     "sklearn.*",
     "scikit_learn.*",
+    "fastapi.*",
+    "uvicorn.*",
+    "httpx.*",
 ]
 ignore_missing_imports = true
 
@@ -181,3 +187,14 @@ exclude_lines = [
 [tool.bandit]
 exclude_dirs = ["tests", "demos"]
 skips = ["B101", "B601"]
+
+[dependency-groups]
+dev = [
+    "black>=25.1.0",
+    "httpx>=0.28.1",
+    "mypy>=1.17.1",
+    "pre-commit>=4.3.0",
+    "pytest>=8.4.2",
+    "pytest-cov>=7.0.0",
+    "ruff>=0.12.12",
+]

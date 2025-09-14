@@ -1,7 +1,7 @@
 # Orca Development Makefile
 # Provides common development tasks and shortcuts
 
-.PHONY: help doctor init install install-mac install-win clean test lint format type-check security-check
+.PHONY: help doctor init install install-mac install-win clean test lint format type-check security-check run fmt type
 
 # Default target
 help: ## Show this help message
@@ -44,23 +44,32 @@ else
 	$(MAKE) install-mac
 endif
 
+# API and development
+run: ## Run the FastAPI server
+	@echo "🚀 Starting FastAPI server..."
+	PYTHONPATH=src uv run uvicorn orca_api.main:app --reload --port 8080
+
 # Code quality and testing
 test: ## Run tests with pytest
 	@echo "🧪 Running tests..."
-	uv run pytest
+	PYTHONPATH=src uv run pytest
 
 lint: ## Run linting with ruff
 	@echo "🔍 Running linter..."
 	uv run ruff check .
 
-format: ## Format code with ruff and black
+fmt: ## Format code with ruff and black
 	@echo "✨ Formatting code..."
 	uv run ruff format .
 	uv run black .
 
-type-check: ## Run type checking with mypy
+format: fmt ## Alias for fmt
+
+type: ## Run type checking with mypy on src/
 	@echo "🔍 Running type checker..."
-	uv run mypy .
+	uv run mypy src/
+
+type-check: type ## Alias for type
 
 security-check: ## Run security check with bandit
 	@echo "🔒 Running security check..."

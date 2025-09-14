@@ -61,9 +61,11 @@ cart_total = st.sidebar.number_input(
 currency = st.sidebar.selectbox(
     "Currency",
     ["USD", "EUR", "GBP", "CAD", "AUD"],
-    index=0
-    if not preset_data
-    else ["USD", "EUR", "GBP", "CAD", "AUD"].index(preset_data.get("currency", "USD")),
+    index=(
+        0
+        if not preset_data
+        else ["USD", "EUR", "GBP", "CAD", "AUD"].index(preset_data.get("currency", "USD"))
+    ),
 )
 
 # Features section
@@ -92,20 +94,24 @@ context = preset_data.get("context", {}) if preset_data else {}
 location_ip_country = st.sidebar.selectbox(
     "IP Country",
     ["US", "CA", "GB", "DE", "FR", "AU", "JP", "Other"],
-    index=0
-    if not context
-    else ["US", "CA", "GB", "DE", "FR", "AU", "JP", "Other"].index(
-        context.get("location_ip_country", "US")
+    index=(
+        0
+        if not context
+        else ["US", "CA", "GB", "DE", "FR", "AU", "JP", "Other"].index(
+            context.get("location_ip_country", "US")
+        )
     ),
 )
 
 billing_country = st.sidebar.selectbox(
     "Billing Country",
     ["US", "CA", "GB", "DE", "FR", "AU", "JP", "Other"],
-    index=0
-    if not context
-    else ["US", "CA", "GB", "DE", "FR", "AU", "JP", "Other"].index(
-        context.get("billing_country", "US")
+    index=(
+        0
+        if not context
+        else ["US", "CA", "GB", "DE", "FR", "AU", "JP", "Other"].index(
+            context.get("billing_country", "US")
+        )
     ),
 )
 
@@ -114,9 +120,11 @@ customer = context.get("customer", {}) if context else {}
 loyalty_tier = st.sidebar.selectbox(
     "Loyalty Tier",
     ["NONE", "SILVER", "GOLD", "PLATINUM"],
-    index=0
-    if not customer
-    else ["NONE", "SILVER", "GOLD", "PLATINUM"].index(customer.get("loyalty_tier", "NONE")),
+    index=(
+        0
+        if not customer
+        else ["NONE", "SILVER", "GOLD", "PLATINUM"].index(customer.get("loyalty_tier", "NONE"))
+    ),
 )
 
 chargebacks_12m = st.sidebar.number_input(
@@ -191,9 +199,11 @@ with col2:
                 "Field": ["Decision", "Risk Score", "Rules Evaluated"],
                 "Value": [
                     response.decision,
-                    f"{response.meta.get('risk_score', 'N/A'):.3f}"
-                    if use_ml
-                    else "N/A (Rules only)",
+                    (
+                        f"{response.meta.get('risk_score', 'N/A'):.3f}"
+                        if use_ml
+                        else "N/A (Rules only)"
+                    ),
                     ", ".join(response.meta.get("rules_evaluated", [])) or "None",
                 ],
             }
@@ -242,7 +252,7 @@ with col2:
                         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
                         line-height: 1.6;
                     ">
-                        {explanation.replace(chr(10), '<br>')}
+                        {explanation.replace(chr(10), "<br>")}
                     </div>
                     """,
                     unsafe_allow_html=True,

@@ -1,6 +1,5 @@
 """Built-in deterministic rules for Orca Core decision engine."""
 
-
 from ..models import DecisionRequest
 from .base import Rule, RuleResult
 

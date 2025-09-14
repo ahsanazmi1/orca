@@ -1,6 +1,5 @@
 """Velocity rule for Orca Core decision engine."""
 
-
 from ..models import DecisionRequest
 from .base import Rule, RuleResult
 

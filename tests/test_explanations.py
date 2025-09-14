@@ -1,6 +1,5 @@
 """Unit tests for explanation templates and generation."""
 
-
 from orca_core.explanations import (
     EXPLANATION_TEMPLATES,
     FALLBACK_TEMPLATE,

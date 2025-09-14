@@ -142,6 +142,82 @@ print(f"Risk Score: {response.meta.risk_score}")
 print(f"Human Explanation: {response.explanation_human}")
 ```
 
+#### FastAPI Web Service
+
+Start the API server:
+
+```bash
+# Run the FastAPI service
+uv run python -m orca_api.main
+
+# Or with uvicorn directly
+uv run uvicorn orca_api.main:app --host 0.0.0.0 --port 8080
+```
+
+The API provides three endpoints:
+
+**Health Check:**
+```bash
+curl http://localhost:8080/healthz
+# Response: {"ok": true}
+```
+
+**Decision Evaluation:**
+```bash
+curl -X POST http://localhost:8080/decision \
+  -H "Content-Type: application/json" \
+  -d '{
+    "cart_total": 150.0,
+    "currency": "USD",
+    "rail": "Card",
+    "channel": "online",
+    "features": {"velocity_24h": 1.0},
+    "context": {"customer": {"loyalty_tier": "GOLD"}}
+  }'
+
+# Response:
+{
+  "decision": "APPROVE",
+  "reasons": ["LOYALTY_BOOST: Customer has GOLD loyalty tier"],
+  "actions": ["LOYALTY_BOOST"],
+  "meta": {
+    "timestamp": "2025-01-15T10:30:45.123456",
+    "transaction_id": "txn_a82c4dfcfbe945e4",
+    "rail": "Card",
+    "channel": "online",
+    "cart_total": 150.0,
+    "risk_score": 0.15,
+    "rules_evaluated": []
+  },
+  "status": "APPROVE",
+  "explanation_human": "Approved: Customer loyalty tier provides approval boost."
+}
+```
+
+**Decision Explanation:**
+```bash
+curl -X POST http://localhost:8080/explain \
+  -H "Content-Type: application/json" \
+  -d '{
+    "decision": {
+      "decision": "DECLINE",
+      "reasons": ["HIGH_TICKET: Amount exceeds card threshold of $5000"],
+      "actions": ["BLOCK"],
+      "meta": {"risk_score": 0.9, "cart_total": 10000.0},
+      "status": "DECLINE"
+    }
+  }'
+
+# Response:
+{
+  "explanation": "Declined: Amount exceeds card threshold of $5,000. Please try a smaller amount or contact support."
+}
+```
+
+**Interactive API Documentation:**
+- Visit http://localhost:8080/docs for Swagger UI
+- Visit http://localhost:8080/redoc for ReDoc documentation
+
 #### Streamlit Demo
 
 ```bash
