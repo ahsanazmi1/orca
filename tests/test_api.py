@@ -1,6 +1,7 @@
 """Tests for the Orca API FastAPI service."""
 
 from fastapi.testclient import TestClient
+
 from orca_api.main import app
 
 # Create test client
