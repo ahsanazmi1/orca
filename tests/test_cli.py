@@ -229,12 +229,10 @@ class TestCLI:
         assert result.exit_code == 0
         assert "Explain a decision request in plain English" in result.stdout
 
-    def test_cli_with_week4_fixtures(self):
-        """Test CLI with Week 4 fixtures."""
-        # Test with a Week 4 fixture file
-        result = self.runner.invoke(
-            app, ["decide-file", "fixtures/week4/requests/card_approve_small.json"]
-        )
+    def test_cli_with_fixtures(self):
+        """Test CLI with existing fixtures."""
+        # Test with an existing fixture file
+        result = self.runner.invoke(app, ["decide-file", "fixtures/requests/low_ticket_ok.json"])
 
         assert result.exit_code == 0
         assert "decision" in result.stdout.lower()

@@ -173,3 +173,58 @@ Thumbs.db
 # ML models (too large for git)
 models/
 *.pkl
+
+# Coverage and testing artifacts
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+.pytest_cache/
+
+# Bandit security reports
+bandit-report.json
+
+# Sample and test files (development artifacts)
+*_sample.json
+*response.json
+decision*.json
+cart_scenario.json
+empty_cart.json
+multi_signal_sample.json
+test_*.json
+test_*.py
+
+# Development scripts and temporary files
+generate_*.py
+validate_*.py
+setup-windows-tools.ps1
+transparency_comparison.md
+
+# Cache directories
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
