@@ -20,7 +20,7 @@ app = typer.Typer(help="Orca Core Decision Engine CLI")
 console = Console()
 
 
-@app.command()  # type: ignore[misc]
+@app.command()
 def decide(
     json_input: str = typer.Argument(
         None, help="JSON string with decision request data (or '-' for stdin)"
@@ -73,7 +73,7 @@ def decide(
         raise typer.Exit(1) from e
 
 
-@app.command()  # type: ignore[misc]
+@app.command()
 def decide_file(
     file_path: str = typer.Argument(..., help="Path to JSON file with decision request data"),
     rail: str = typer.Option(None, "--rail", help="Override rail type (Card or ACH)"),
@@ -118,7 +118,7 @@ def decide_file(
         raise typer.Exit(1) from e
 
 
-@app.command()  # type: ignore[misc]
+@app.command()
 def decide_batch(
     glob_pattern: str = typer.Option(
         "fixtures/requests/*.json", "--glob", help="Glob pattern to match JSON files"
@@ -202,7 +202,7 @@ def decide_batch(
         raise typer.Exit(1) from e
 
 
-@app.command()  # type: ignore[misc]
+@app.command()
 def explain(
     request_json: str = typer.Argument(..., help="JSON string with decision request data"),
 ) -> None:
@@ -239,7 +239,7 @@ def explain(
         raise typer.Exit(1) from e
 
 
-@app.command()  # type: ignore[misc]
+@app.command()
 def train(
     data_file: str = typer.Option(None, "--data", help="Path to CSV file with training data"),
     model_path: str = typer.Option(
@@ -326,7 +326,7 @@ def train(
         raise typer.Exit(1) from e
 
 
-@app.command()  # type: ignore[misc]
+@app.command()
 def model_info() -> None:
     """
     Show information about the current ML model.
