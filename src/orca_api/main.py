@@ -43,7 +43,7 @@ class ExplainResponse(BaseModel):
     explanation: str = Field(..., description="Plain-English explanation of the decision")
 
 
-@app.get("/healthz", response_model=HealthResponse)  # type: ignore[misc]
+@app.get("/healthz", response_model=HealthResponse)
 async def health_check() -> HealthResponse:
     """
     Health check endpoint.
@@ -54,7 +54,7 @@ async def health_check() -> HealthResponse:
     return HealthResponse(ok=True)
 
 
-@app.post("/decision", response_model=DecisionResponse)  # type: ignore[misc]
+@app.post("/decision", response_model=DecisionResponse)
 async def make_decision(request: DecisionRequest) -> DecisionResponse:
     """
     Evaluate a decision request using the Orca Core engine.
@@ -85,7 +85,7 @@ async def make_decision(request: DecisionRequest) -> DecisionResponse:
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}") from e
 
 
-@app.post("/explain", response_model=ExplainResponse)  # type: ignore[misc]
+@app.post("/explain", response_model=ExplainResponse)
 async def explain_decision(request: ExplainRequest) -> ExplainResponse:
     """
     Generate a plain-English explanation for a decision.
@@ -125,13 +125,13 @@ async def explain_decision(request: ExplainRequest) -> ExplainResponse:
         ) from e
 
 
-@app.exception_handler(ValidationError)  # type: ignore[misc]
+@app.exception_handler(ValidationError)
 async def validation_exception_handler(request: Any, exc: ValidationError) -> ORJSONResponse:
     """Handle Pydantic validation errors."""
     return ORJSONResponse(status_code=422, content={"detail": f"Validation error: {exc}"})
 
 
-@app.exception_handler(Exception)  # type: ignore[misc]
+@app.exception_handler(Exception)
 async def general_exception_handler(request: Any, exc: Exception) -> ORJSONResponse:
     """Handle general exceptions."""
     logger.error(f"Unhandled exception: {exc}")
