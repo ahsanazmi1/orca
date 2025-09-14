@@ -73,7 +73,7 @@ type-check: type ## Alias for type
 
 security-check: ## Run security check with bandit
 	@echo "🔒 Running security check..."
-	uv run bandit -r .
+	uv run bandit -r src/ -x tests,demos,scripts
 
 check-all: lint type-check security-check test ## Run all checks (lint, type-check, security, test)
 
@@ -109,6 +109,19 @@ streamlit-dev: ## Run Streamlit in development mode
 demo: ## Run Streamlit demo
 	@echo "🌊 Starting Orca Core demo..."
 	uv run streamlit run demos/app.py
+
+# ML Training commands
+train-model: ## Train Random Forest risk prediction model
+	@echo "🤖 Training Random Forest model..."
+	PYTHONPATH=src uv run python -m orca_core.cli train --samples 2000
+
+model-info: ## Show ML model information
+	@echo "📊 ML Model Information:"
+	PYTHONPATH=src uv run python -m orca_core.cli model-info
+
+train-script: ## Run standalone training script
+	@echo "🚀 Running training script..."
+	PYTHONPATH=src uv run python scripts/train_model.py
 
 # Git utilities
 git-setup: ## Set up Git configuration
