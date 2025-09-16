@@ -10,10 +10,12 @@ from pathlib import Path
 # Add src to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
+from typing import Any
+
 from orca_core.ml.model import get_model_info, predict_risk
 
 
-def create_sample_data() -> None:
+def create_sample_data() -> list[dict[str, Any]]:
     """Create sample training data for the ML model."""
     sample_data = []
 
