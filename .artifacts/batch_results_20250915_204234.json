@@ -1,0 +1,91 @@
+{
+  "results": [
+    {
+      "file": "/var/folders/nc/hyym1ntd5t50x4f0wv_6s5vh0000gn/T/tmpyhz3hc02/fixtures/test1.json",
+      "timestamp": "2025-09-15T20:42:34.989432",
+      "input": {
+        "cart_total": 100.0,
+        "currency": "USD",
+        "rail": "Card",
+        "channel": "online",
+        "features": {
+          "amount": 100.0,
+          "velocity_24h": 1.0,
+          "cross_border": 0
+        }
+      },
+      "output": {
+        "decision": "APPROVE",
+        "reasons": [
+          "Cart total $100.00 within approved threshold"
+        ],
+        "actions": [
+          "Process payment",
+          "Send confirmation"
+        ],
+        "meta": {
+          "risk_score": 0.033333333830038704,
+          "rules_evaluated": [],
+          "timestamp": "2025-09-15 20:42:34.989246",
+          "transaction_id": "txn_7069c8d66ebd40a3",
+          "rail": "Card",
+          "channel": "online",
+          "cart_total": 100.0,
+          "ai": {
+            "risk_score": 0.033333333830038704,
+            "reason_codes": [
+              "LOW_RISK"
+            ],
+            "version": "1.0.0",
+            "model_type": "xgboost",
+            "ml_version": "1.0.0",
+            "llm_explanation": {
+              "explanation": "Transaction approved. The payment of $100.00 was processed successfully through online channel. Risk assessment indicates acceptable risk level.",
+              "confidence": 0.85,
+              "model_provenance": {
+                "model_name": "mock-explainer",
+                "provider": "orca_core",
+                "endpoint": "mock",
+                "api_version": "1.0.0",
+                "temperature": 0.1,
+                "max_tokens": 300,
+                "response_format": "json_object",
+                "timestamp": "2025-09-15T20:42:34.989406",
+                "request_id": "mock-20250915204234",
+                "fallback_mode": true
+              },
+              "processing_time_ms": 0,
+              "tokens_used": 0
+            }
+          },
+          "approved_amount": 100.0
+        },
+        "status": "APPROVE",
+        "meta_structured": {
+          "timestamp": "2025-09-15 20:42:34.989246",
+          "transaction_id": "txn_7069c8d66ebd40a3",
+          "rail": "Card",
+          "channel": "online",
+          "cart_total": 100.0,
+          "risk_score": 0.033333333830038704,
+          "rules_evaluated": [],
+          "approved_amount": 100.0
+        },
+        "signals_triggered": [],
+        "explanation": "Transaction approved for $100.00. Cart total within approved limits.",
+        "explanation_human": "Approved: Transaction amount within approved limits.",
+        "routing_hint": "PROCESS_NORMALLY",
+        "transaction_id": "txn_7069c8d66ebd40a3",
+        "cart_total": 100.0,
+        "timestamp": "2025-09-15 20:42:34.989246",
+        "rail": "Card"
+      }
+    }
+  ],
+  "summary": {
+    "total_files": 1,
+    "successful_files": 1,
+    "failed_files": 0,
+    "timestamp": "2025-09-15T20:42:34.989650"
+  }
+}

@@ -1,0 +1,33 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "environment": {
+            "value": "staging"
+        },
+        "location": {
+            "value": "East US"
+        },
+        "openaiServiceName": {
+            "value": "orca-openai-staging"
+        },
+        "mlWorkspaceName": {
+            "value": "orca-ml-workspace-staging"
+        },
+        "acrName": {
+            "value": "orcacoreacrstaging"
+        },
+        "aksName": {
+            "value": "orca-aks-staging"
+        },
+        "keyVaultName": {
+            "value": "orca-keyvault-staging"
+        },
+        "appInsightsName": {
+            "value": "orca-appinsights-staging"
+        },
+        "storageAccountName": {
+            "value": "orcacorestoragestaging"
+        }
+    }
+}

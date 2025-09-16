@@ -1,0 +1,33 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environment": {
+      "value": "dev"
+    },
+    "location": {
+      "value": "East US"
+    },
+    "openaiServiceName": {
+      "value": "orca-openai"
+    },
+    "mlWorkspaceName": {
+      "value": "orca-ml-workspace-dev"
+    },
+    "acrName": {
+      "value": "orcacoreacrdev"
+    },
+    "aksName": {
+      "value": "orca-aks-dev"
+    },
+    "keyVaultName": {
+      "value": "orca-keyvault-dev"
+    },
+    "appInsightsName": {
+      "value": "orca-appinsights-dev"
+    },
+    "storageAccountName": {
+      "value": "orcacorestoragedev"
+    }
+  }
+}

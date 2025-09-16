@@ -1,0 +1,141 @@
+[
+  {
+    "features": {
+      "amount": 50.0,
+      "velocity_24h": 1.0,
+      "cross_border": 0.0
+    },
+    "risk_score": 0.35,
+    "reason_codes": [
+      "BASELINE"
+    ],
+    "version": "stub-0.1.0"
+  },
+  {
+    "features": {
+      "amount": 100.0,
+      "velocity_24h": 1.0,
+      "cross_border": 0.0
+    },
+    "risk_score": 0.35,
+    "reason_codes": [
+      "BASELINE"
+    ],
+    "version": "stub-0.1.0"
+  },
+  {
+    "features": {
+      "amount": 200.0,
+      "velocity_24h": 2.0,
+      "cross_border": 0.0
+    },
+    "risk_score": 0.35,
+    "reason_codes": [
+      "BASELINE"
+    ],
+    "version": "stub-0.1.0"
+  },
+  {
+    "features": {
+      "amount": 600.0,
+      "velocity_24h": 1.0,
+      "cross_border": 0.0
+    },
+    "risk_score": 0.55,
+    "reason_codes": [
+      "DUMMY_MCC"
+    ],
+    "version": "stub-0.1.0"
+  },
+  {
+    "features": {
+      "amount": 100.0,
+      "velocity_24h": 3.0,
+      "cross_border": 0.0
+    },
+    "risk_score": 0.44999999999999996,
+    "reason_codes": [
+      "VELOCITY"
+    ],
+    "version": "stub-0.1.0"
+  },
+  {
+    "features": {
+      "amount": 100.0,
+      "velocity_24h": 1.0,
+      "cross_border": 1.0
+    },
+    "risk_score": 0.44999999999999996,
+    "reason_codes": [
+      "CROSS_BORDER"
+    ],
+    "version": "stub-0.1.0"
+  },
+  {
+    "features": {
+      "amount": 600.0,
+      "velocity_24h": 3.0,
+      "cross_border": 0.0
+    },
+    "risk_score": 0.65,
+    "reason_codes": [
+      "DUMMY_MCC",
+      "VELOCITY"
+    ],
+    "version": "stub-0.1.0"
+  },
+  {
+    "features": {
+      "amount": 600.0,
+      "velocity_24h": 1.0,
+      "cross_border": 1.0
+    },
+    "risk_score": 0.65,
+    "reason_codes": [
+      "DUMMY_MCC",
+      "CROSS_BORDER"
+    ],
+    "version": "stub-0.1.0"
+  },
+  {
+    "features": {
+      "amount": 100.0,
+      "velocity_24h": 3.0,
+      "cross_border": 1.0
+    },
+    "risk_score": 0.5499999999999999,
+    "reason_codes": [
+      "VELOCITY",
+      "CROSS_BORDER"
+    ],
+    "version": "stub-0.1.0"
+  },
+  {
+    "features": {
+      "amount": 600.0,
+      "velocity_24h": 3.0,
+      "cross_border": 1.0
+    },
+    "risk_score": 0.75,
+    "reason_codes": [
+      "DUMMY_MCC",
+      "VELOCITY",
+      "CROSS_BORDER"
+    ],
+    "version": "stub-0.1.0"
+  },
+  {
+    "features": {
+      "amount": 1000.0,
+      "velocity_24h": 5.0,
+      "cross_border": 1.0
+    },
+    "risk_score": 0.75,
+    "reason_codes": [
+      "DUMMY_MCC",
+      "VELOCITY",
+      "CROSS_BORDER"
+    ],
+    "version": "stub-0.1.0"
+  }
+]

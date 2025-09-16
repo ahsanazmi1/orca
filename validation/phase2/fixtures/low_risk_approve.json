@@ -1,0 +1,22 @@
+{
+    "cart_total": 50.0,
+    "currency": "USD",
+    "rail": "Card",
+    "channel": "online",
+    "features": {
+        "amount": 50.0,
+        "velocity_24h": 1.0,
+        "cross_border": 0,
+        "velocity_7d": 3.0,
+        "velocity_30d": 12.0,
+        "customer_age_days": 365.0,
+        "loyalty_score": 0.8,
+        "chargebacks_12m": 0.0
+    },
+    "expected_decision": "APPROVE",
+    "expected_risk_score_range": [
+        0.0,
+        0.3
+    ],
+    "description": "Low risk transaction - small amount, low velocity, domestic"
+}

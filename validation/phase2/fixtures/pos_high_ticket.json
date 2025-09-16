@@ -1,0 +1,22 @@
+{
+    "cart_total": 2500.0,
+    "currency": "USD",
+    "rail": "Card",
+    "channel": "pos",
+    "features": {
+        "amount": 2500.0,
+        "velocity_24h": 2.0,
+        "cross_border": 0,
+        "velocity_7d": 8.0,
+        "velocity_30d": 30.0,
+        "customer_age_days": 450.0,
+        "loyalty_score": 0.7,
+        "chargebacks_12m": 0.0
+    },
+    "expected_decision": "REVIEW",
+    "expected_risk_score_range": [
+        0.4,
+        0.7
+    ],
+    "description": "POS high-ticket transaction - in-person payment, moderate risk due to amount"
+}

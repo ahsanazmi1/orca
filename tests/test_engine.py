@@ -116,8 +116,22 @@ class TestDecisionEngine:
     def test_high_risk_rule_triggered(self) -> None:
         """Test when high risk rule triggers with monkeypatched prediction."""
         with (
-            patch("orca_core.engine.predict_risk", return_value=0.95),
-            patch("orca_core.rules.high_risk.predict_risk", return_value=0.95),
+            patch(
+                "orca_core.engine.predict_risk",
+                return_value={
+                    "risk_score": 0.95,
+                    "reason_codes": ["HIGH_RISK"],
+                    "version": "test-1.0.0",
+                },
+            ),
+            patch(
+                "orca_core.rules.high_risk.predict_risk",
+                return_value={
+                    "risk_score": 0.95,
+                    "reason_codes": ["HIGH_RISK"],
+                    "version": "test-1.0.0",
+                },
+            ),
         ):
             request = DecisionRequest(
                 cart_total=100.0, features={"velocity_24h": 2.0, "customer_age": 30}
@@ -132,10 +146,18 @@ class TestDecisionEngine:
 
     def test_risk_score_always_in_meta(self) -> None:
         """Test that risk_score is always added to response meta."""
-        request = DecisionRequest(
-            cart_total=250.0, features={"velocity_24h": 1.0, "customer_age": 25}
-        )
-        response = evaluate_rules(request)
+        with patch(
+            "orca_core.engine.predict_risk",
+            return_value={
+                "risk_score": 0.15,
+                "reason_codes": ["LOW_RISK"],
+                "version": "test-1.0.0",
+            },
+        ):
+            request = DecisionRequest(
+                cart_total=250.0, features={"velocity_24h": 1.0, "customer_age": 25}
+            )
+            response = evaluate_rules(request)
 
-        assert "risk_score" in response.meta
-        assert response.meta["risk_score"] == 0.15  # Default value
+            assert "risk_score" in response.meta
+            assert response.meta["risk_score"] == 0.15  # Mocked value

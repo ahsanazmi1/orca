@@ -1,0 +1,31 @@
+{
+  "parameters": {
+    "subscriptionId": {
+      "value": "12345678-1234-1234-1234-123456789012"
+    },
+    "tenantId": {
+      "value": "87654321-4321-4321-4321-210987654321"
+    },
+    "resourceGroupName": {
+      "value": "orca-rg"
+    },
+    "acrName": {
+      "value": "orcaregistry"
+    },
+    "aksName": {
+      "value": "orca-aks"
+    },
+    "keyVaultName": {
+      "value": "orca-kv"
+    },
+    "openaiEndpoint": {
+      "value": "https://your-resource.openai.azure.com"
+    },
+    "openaiDeployment": {
+      "value": "gpt-4o-mini"
+    },
+    "environment": {
+      "value": "dev"
+    }
+  }
+}

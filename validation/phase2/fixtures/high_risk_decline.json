@@ -1,0 +1,22 @@
+{
+    "cart_total": 5000.0,
+    "currency": "USD",
+    "rail": "Card",
+    "channel": "online",
+    "features": {
+        "amount": 5000.0,
+        "velocity_24h": 10.0,
+        "cross_border": 1,
+        "velocity_7d": 50.0,
+        "velocity_30d": 200.0,
+        "customer_age_days": 5.0,
+        "loyalty_score": 0.1,
+        "chargebacks_12m": 2.0
+    },
+    "expected_decision": "DECLINE",
+    "expected_risk_score_range": [
+        0.7,
+        1.0
+    ],
+    "description": "High risk transaction - large amount, high velocity, cross-border, new customer with chargebacks"
+}

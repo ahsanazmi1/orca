@@ -1,0 +1,22 @@
+{
+    "cart_total": 200.0,
+    "currency": "USD",
+    "rail": "ACH",
+    "channel": "online",
+    "features": {
+        "amount": 200.0,
+        "velocity_24h": 1.0,
+        "cross_border": 0,
+        "velocity_7d": 5.0,
+        "velocity_30d": 20.0,
+        "customer_age_days": 730.0,
+        "loyalty_score": 0.9,
+        "chargebacks_12m": 0.0
+    },
+    "expected_decision": "APPROVE",
+    "expected_risk_score_range": [
+        0.0,
+        0.4
+    ],
+    "description": "ACH transaction - low risk, established customer, domestic payment"
+}

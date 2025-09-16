@@ -1,0 +1,22 @@
+{
+    "cart_total": 1200.0,
+    "currency": "EUR",
+    "rail": "Card",
+    "channel": "online",
+    "features": {
+        "amount": 1200.0,
+        "velocity_24h": 8.0,
+        "cross_border": 1,
+        "velocity_7d": 40.0,
+        "velocity_30d": 150.0,
+        "customer_age_days": 180.0,
+        "loyalty_score": 0.3,
+        "chargebacks_12m": 1.0
+    },
+    "expected_decision": "REVIEW",
+    "expected_risk_score_range": [
+        0.5,
+        0.8
+    ],
+    "description": "Cross-border transaction with high velocity - international payment with elevated risk factors"
+}

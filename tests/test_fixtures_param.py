@@ -82,7 +82,14 @@ class TestFixturesParametrized:
 
         # For high_risk_decline, monkeypatch predict_risk to return 0.95
         if fixture_name == "high_risk_decline.json":
-            with patch("orca_core.engine.predict_risk", return_value=0.95):
+            with patch(
+                "orca_core.engine.predict_risk",
+                return_value={
+                    "risk_score": 0.95,
+                    "reason_codes": ["HIGH_RISK"],
+                    "version": "test-1.0.0",
+                },
+            ):
                 response = evaluate_rules(request)
         else:
             # For other fixtures, use normal ML evaluation
@@ -270,7 +277,14 @@ class TestFixturesParametrized:
 
         # Use monkeypatch for high_risk_decline to ensure DECLINE
         if fixture_name == "high_risk_decline.json":
-            with patch("orca_core.engine.predict_risk", return_value=0.95):
+            with patch(
+                "orca_core.engine.predict_risk",
+                return_value={
+                    "risk_score": 0.95,
+                    "reason_codes": ["HIGH_RISK"],
+                    "version": "test-1.0.0",
+                },
+            ):
                 response = evaluate_rules(request)
         else:
             response = evaluate_rules(request)

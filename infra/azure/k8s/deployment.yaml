@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orca-core
+  labels:
+    app: orca-core
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: orca-core
+  template:
+    metadata:
+      labels:
+        app: orca-core
+    spec:
+      containers:
+      - name: orca-core
+        image: orcaregistry.azurecr.io/orca-core:latest
+        ports:
+        - containerPort: 8080
+        - containerPort: 8501
+        env:
+        - name: ORCA_MODE
+          value: "RULES_PLUS_AI"
+        - name: AZURE_OPENAI_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              name: orca-secrets
+              key: azure-openai-endpoint
+        - name: AZURE_OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: orca-secrets
+              key: azure-openai-api-key
+        - name: AZURE_OPENAI_DEPLOYMENT
+          value: "gpt-4o-mini"
+        - name: ORCA_EXPLAIN_MAX_TOKENS
+          value: "300"
+        - name: ORCA_EXPLAIN_STRICT_JSON
+          value: "true"
+        - name: ORCA_EXPLAIN_REFUSE_ON_UNCERTAINTY
+          value: "true"
+        - name: DEBUG_UI_ENABLED
+          value: "true"
+        - name: DEBUG_UI_PORT
+          value: "8501"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5

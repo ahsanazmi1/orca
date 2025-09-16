@@ -1,0 +1,213 @@
+name: Test and Validate
+
+on:
+  push:
+    branches: [ main, develop, feature/* ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+env:
+  ORCA_MODE: RULES_ONLY
+  ORCA_USE_XGB: false
+
+jobs:
+  # Lint and Format Check
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install uv
+        uv pip install -e .
+
+    - name: Run linting
+      run: |
+        echo "🔍 Running code linting..."
+        PYTHONPATH=src python -m ruff check src/ tests/
+        PYTHONPATH=src python -m black --check src/ tests/
+
+    - name: Run type checking
+      run: |
+        echo "🔍 Running type checking..."
+        PYTHONPATH=src python -m mypy src/orca_core
+
+  # Unit Tests
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12']
+        test-group: ['unit', 'integration']
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install uv
+        uv pip install -e .
+
+    - name: Run unit tests
+      if: matrix.test-group == 'unit'
+      run: |
+        echo "🧪 Running unit tests..."
+        PYTHONPATH=src python -m pytest tests/ -v --cov=src/orca_core --cov-report=xml -m "not integration"
+
+    - name: Run integration tests
+      if: matrix.test-group == 'integration'
+      run: |
+        echo "🧪 Running integration tests..."
+        PYTHONPATH=src python -m pytest tests/ -v --cov=src/orca_core --cov-report=xml -m "integration"
+
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: ${{ matrix.test-group }},python-${{ matrix.python-version }}
+        name: codecov-umbrella
+
+  # Model Training Tests
+  test-models:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install uv
+        uv pip install -e .
+
+    - name: Test ML stub model
+      run: |
+        echo "🤖 Testing ML stub model..."
+        PYTHONPATH=src python -m pytest tests/test_model_stub.py -v
+
+    - name: Test XGBoost training
+      run: |
+        echo "🤖 Testing XGBoost training..."
+        PYTHONPATH=src python -m orca_core.cli train-xgb --samples 1000
+        PYTHONPATH=src python -m orca_core.cli model-info
+
+    - name: Test model validation
+      run: |
+        echo "🧪 Testing model validation..."
+        PYTHONPATH=src python -m pytest tests/test_ml_hooks.py -v
+
+  # CLI Tests
+  test-cli:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install uv
+        uv pip install -e .
+
+    - name: Test CLI commands
+      run: |
+        echo "🖥️ Testing CLI commands..."
+        PYTHONPATH=src python -m orca_core.cli --help
+        PYTHONPATH=src python -m orca_core.cli config
+        PYTHONPATH=src python -m orca_core.cli model-info
+
+    - name: Test decision commands
+      run: |
+        echo "🖥️ Testing decision commands..."
+        PYTHONPATH=src python -m orca_core.cli decide '{"cart_total": 100.0, "currency": "USD", "rail": "Card", "channel": "online", "features": {"amount": 100.0, "velocity_24h": 1.0, "cross_border": 0}}'
+        PYTHONPATH=src python -m orca_core.cli decide-file fixtures/requests/low_ticket_ok.json
+
+  # Validation Tests
+  test-validation:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install uv
+        uv pip install -e .
+
+    - name: Test validation fixtures
+      run: |
+        echo "🧪 Testing validation fixtures..."
+        PYTHONPATH=src python -m orca_core.cli decide-batch --glob "validation/phase2/fixtures/*.json" --format csv --output validation_results.csv
+
+    - name: Test LLM guardrails
+      run: |
+        echo "🛡️ Testing LLM guardrails..."
+        PYTHONPATH=src python -m pytest tests/test_llm_guardrails.py -v
+
+  # Security Tests
+  security:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install uv
+        uv pip install -e .
+
+    - name: Run security scan
+      run: |
+        echo "🔒 Running security scan..."
+        PYTHONPATH=src python -m bandit -r src/ -f json -o bandit-report.json || true
+
+    - name: Upload security report
+      uses: actions/upload-artifact@v3
+      with:
+        name: security-report
+        path: bandit-report.json
+        retention-days: 30
