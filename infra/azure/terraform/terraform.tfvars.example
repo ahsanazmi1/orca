@@ -1,0 +1,38 @@
+# Example Terraform variables file for Orca Core Azure Infrastructure
+# Copy this file to terraform.tfvars and customize the values
+
+# Resource Group Configuration
+resource_group_name = "orcacore-rg"
+location           = "East US"
+environment        = "dev"
+
+# Azure OpenAI Configuration
+openai_service_name     = "orca-openai"
+openai_deployment_name  = "gpt-4o-mini"
+
+# Azure ML Configuration
+ml_workspace_name = "orca-ml-workspace"
+
+# Container Registry Configuration
+acr_name = "orcacoreacr"
+
+# Kubernetes Configuration
+aks_name = "orca-aks"
+
+# Key Vault Configuration
+key_vault_name = "orca-keyvault"
+
+# Application Insights Configuration
+app_insights_name = "orca-appinsights"
+
+# Storage Account Configuration
+storage_account_name = "orcacorestorage"
+
+# Tags
+tags = {
+  Project     = "OrcaCore"
+  Environment = "dev"
+  ManagedBy   = "Terraform"
+  Owner       = "Orca Team"
+  CostCenter  = "Engineering"
+}

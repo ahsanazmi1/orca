@@ -1,0 +1,190 @@
+{
+  "results": [
+    {
+      "file": "/var/folders/nc/hyym1ntd5t50x4f0wv_6s5vh0000gn/T/tmpl4p83ezr/fixtures/test0.json",
+      "timestamp": "2025-09-15T00:05:03.810208",
+      "input": {
+        "cart_total": 100.0,
+        "currency": "USD",
+        "rail": "Card",
+        "channel": "online",
+        "features": {
+          "amount": 100.0,
+          "velocity_24h": 1.0,
+          "cross_border": 0
+        }
+      },
+      "output": {
+        "error": "'>' not supported between instances of 'MagicMock' and 'float'"
+      }
+    },
+    {
+      "file": "/var/folders/nc/hyym1ntd5t50x4f0wv_6s5vh0000gn/T/tmpl4p83ezr/fixtures/test1.json",
+      "timestamp": "2025-09-15T00:05:03.810747",
+      "input": {
+        "cart_total": 100.0,
+        "currency": "USD",
+        "rail": "Card",
+        "channel": "online",
+        "features": {
+          "amount": 100.0,
+          "velocity_24h": 1.0,
+          "cross_border": 0
+        }
+      },
+      "output": {
+        "error": "'>' not supported between instances of 'MagicMock' and 'float'"
+      }
+    },
+    {
+      "file": "/var/folders/nc/hyym1ntd5t50x4f0wv_6s5vh0000gn/T/tmpl4p83ezr/fixtures/test2.json",
+      "timestamp": "2025-09-15T00:05:03.811291",
+      "input": {
+        "cart_total": 100.0,
+        "currency": "USD",
+        "rail": "Card",
+        "channel": "online",
+        "features": {
+          "amount": 100.0,
+          "velocity_24h": 1.0,
+          "cross_border": 0
+        }
+      },
+      "output": {
+        "error": "'>' not supported between instances of 'MagicMock' and 'float'"
+      }
+    },
+    {
+      "file": "/var/folders/nc/hyym1ntd5t50x4f0wv_6s5vh0000gn/T/tmpl4p83ezr/fixtures/test3.json",
+      "timestamp": "2025-09-15T00:05:03.811809",
+      "input": {
+        "cart_total": 100.0,
+        "currency": "USD",
+        "rail": "Card",
+        "channel": "online",
+        "features": {
+          "amount": 100.0,
+          "velocity_24h": 1.0,
+          "cross_border": 0
+        }
+      },
+      "output": {
+        "error": "'>' not supported between instances of 'MagicMock' and 'float'"
+      }
+    },
+    {
+      "file": "/var/folders/nc/hyym1ntd5t50x4f0wv_6s5vh0000gn/T/tmpl4p83ezr/fixtures/test4.json",
+      "timestamp": "2025-09-15T00:05:03.812316",
+      "input": {
+        "cart_total": 100.0,
+        "currency": "USD",
+        "rail": "Card",
+        "channel": "online",
+        "features": {
+          "amount": 100.0,
+          "velocity_24h": 1.0,
+          "cross_border": 0
+        }
+      },
+      "output": {
+        "error": "'>' not supported between instances of 'MagicMock' and 'float'"
+      }
+    },
+    {
+      "file": "/var/folders/nc/hyym1ntd5t50x4f0wv_6s5vh0000gn/T/tmpl4p83ezr/fixtures/test5.json",
+      "timestamp": "2025-09-15T00:05:03.812817",
+      "input": {
+        "cart_total": 100.0,
+        "currency": "USD",
+        "rail": "Card",
+        "channel": "online",
+        "features": {
+          "amount": 100.0,
+          "velocity_24h": 1.0,
+          "cross_border": 0
+        }
+      },
+      "output": {
+        "error": "'>' not supported between instances of 'MagicMock' and 'float'"
+      }
+    },
+    {
+      "file": "/var/folders/nc/hyym1ntd5t50x4f0wv_6s5vh0000gn/T/tmpl4p83ezr/fixtures/test6.json",
+      "timestamp": "2025-09-15T00:05:03.813329",
+      "input": {
+        "cart_total": 100.0,
+        "currency": "USD",
+        "rail": "Card",
+        "channel": "online",
+        "features": {
+          "amount": 100.0,
+          "velocity_24h": 1.0,
+          "cross_border": 0
+        }
+      },
+      "output": {
+        "error": "'>' not supported between instances of 'MagicMock' and 'float'"
+      }
+    },
+    {
+      "file": "/var/folders/nc/hyym1ntd5t50x4f0wv_6s5vh0000gn/T/tmpl4p83ezr/fixtures/test7.json",
+      "timestamp": "2025-09-15T00:05:03.813836",
+      "input": {
+        "cart_total": 100.0,
+        "currency": "USD",
+        "rail": "Card",
+        "channel": "online",
+        "features": {
+          "amount": 100.0,
+          "velocity_24h": 1.0,
+          "cross_border": 0
+        }
+      },
+      "output": {
+        "error": "'>' not supported between instances of 'MagicMock' and 'float'"
+      }
+    },
+    {
+      "file": "/var/folders/nc/hyym1ntd5t50x4f0wv_6s5vh0000gn/T/tmpl4p83ezr/fixtures/test8.json",
+      "timestamp": "2025-09-15T00:05:03.814345",
+      "input": {
+        "cart_total": 100.0,
+        "currency": "USD",
+        "rail": "Card",
+        "channel": "online",
+        "features": {
+          "amount": 100.0,
+          "velocity_24h": 1.0,
+          "cross_border": 0
+        }
+      },
+      "output": {
+        "error": "'>' not supported between instances of 'MagicMock' and 'float'"
+      }
+    },
+    {
+      "file": "/var/folders/nc/hyym1ntd5t50x4f0wv_6s5vh0000gn/T/tmpl4p83ezr/fixtures/test9.json",
+      "timestamp": "2025-09-15T00:05:03.815152",
+      "input": {
+        "cart_total": 100.0,
+        "currency": "USD",
+        "rail": "Card",
+        "channel": "online",
+        "features": {
+          "amount": 100.0,
+          "velocity_24h": 1.0,
+          "cross_border": 0
+        }
+      },
+      "output": {
+        "error": "'>' not supported between instances of 'MagicMock' and 'float'"
+      }
+    }
+  ],
+  "summary": {
+    "total_files": 10,
+    "successful_files": 0,
+    "failed_files": 10,
+    "timestamp": "2025-09-15T00:05:03.815165"
+  }
+}

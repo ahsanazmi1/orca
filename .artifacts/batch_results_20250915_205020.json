@@ -1,0 +1,23 @@
+{
+  "results": [
+    {
+      "file": "/var/folders/nc/hyym1ntd5t50x4f0wv_6s5vh0000gn/T/tmpm8dmzxmi/fixtures/invalid.json",
+      "timestamp": "2025-09-15T20:50:20.986621",
+      "input": {
+        "cart_total": "invalid",
+        "currency": "USD",
+        "rail": "Card",
+        "channel": "online"
+      },
+      "output": {
+        "error": "1 validation error for DecisionRequest\ncart_total\n  Input should be a valid number, unable to parse string as a number [type=float_parsing, input_value='invalid', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.11/v/float_parsing"
+      }
+    }
+  ],
+  "summary": {
+    "total_files": 1,
+    "successful_files": 0,
+    "failed_files": 1,
+    "timestamp": "2025-09-15T20:50:20.986634"
+  }
+}

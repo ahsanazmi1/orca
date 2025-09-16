@@ -1,0 +1,640 @@
+{
+  "results": [
+    {
+      "file": "/var/folders/nc/hyym1ntd5t50x4f0wv_6s5vh0000gn/T/tmpbsivz7eb/fixtures/test0.json",
+      "timestamp": "2025-09-15T00:05:51.676192",
+      "input": {
+        "cart_total": 100.0,
+        "currency": "USD",
+        "rail": "Card",
+        "channel": "online",
+        "features": {
+          "amount": 100.0,
+          "velocity_24h": 1.0,
+          "cross_border": 0
+        }
+      },
+      "output": {
+        "decision": "APPROVE",
+        "reasons": [
+          "Cart total $100.00 within approved threshold"
+        ],
+        "actions": [
+          "Process payment",
+          "Send confirmation"
+        ],
+        "meta": {
+          "risk_score": 0.033333333830038704,
+          "rules_evaluated": [],
+          "timestamp": "2025-09-15 00:05:51.676162",
+          "transaction_id": "txn_ce16483b26844c0a",
+          "rail": "Card",
+          "channel": "online",
+          "cart_total": 100.0,
+          "ai": {
+            "risk_score": 0.033333333830038704,
+            "reason_codes": [
+              "LOW_RISK"
+            ],
+            "version": "1.0.0",
+            "model_type": "xgboost",
+            "ml_version": "1.0.0"
+          },
+          "approved_amount": 100.0
+        },
+        "status": "APPROVE",
+        "meta_structured": {
+          "timestamp": "2025-09-15 00:05:51.676162",
+          "transaction_id": "txn_ce16483b26844c0a",
+          "rail": "Card",
+          "channel": "online",
+          "cart_total": 100.0,
+          "risk_score": 0.033333333830038704,
+          "rules_evaluated": [],
+          "approved_amount": 100.0
+        },
+        "signals_triggered": [],
+        "explanation": "Transaction approved for $100.00. Cart total within approved limits.",
+        "explanation_human": "Approved: Transaction amount within approved limits.",
+        "routing_hint": "PROCESS_NORMALLY",
+        "transaction_id": "txn_ce16483b26844c0a",
+        "cart_total": 100.0,
+        "timestamp": "2025-09-15 00:05:51.676162",
+        "rail": "Card"
+      }
+    },
+    {
+      "file": "/var/folders/nc/hyym1ntd5t50x4f0wv_6s5vh0000gn/T/tmpbsivz7eb/fixtures/test1.json",
+      "timestamp": "2025-09-15T00:05:51.679111",
+      "input": {
+        "cart_total": 100.0,
+        "currency": "USD",
+        "rail": "Card",
+        "channel": "online",
+        "features": {
+          "amount": 100.0,
+          "velocity_24h": 1.0,
+          "cross_border": 0
+        }
+      },
+      "output": {
+        "decision": "APPROVE",
+        "reasons": [
+          "Cart total $100.00 within approved threshold"
+        ],
+        "actions": [
+          "Process payment",
+          "Send confirmation"
+        ],
+        "meta": {
+          "risk_score": 0.033333333830038704,
+          "rules_evaluated": [],
+          "timestamp": "2025-09-15 00:05:51.679068",
+          "transaction_id": "txn_6ded31238c5742b5",
+          "rail": "Card",
+          "channel": "online",
+          "cart_total": 100.0,
+          "ai": {
+            "risk_score": 0.033333333830038704,
+            "reason_codes": [
+              "LOW_RISK"
+            ],
+            "version": "1.0.0",
+            "model_type": "xgboost",
+            "ml_version": "1.0.0"
+          },
+          "approved_amount": 100.0
+        },
+        "status": "APPROVE",
+        "meta_structured": {
+          "timestamp": "2025-09-15 00:05:51.679068",
+          "transaction_id": "txn_6ded31238c5742b5",
+          "rail": "Card",
+          "channel": "online",
+          "cart_total": 100.0,
+          "risk_score": 0.033333333830038704,
+          "rules_evaluated": [],
+          "approved_amount": 100.0
+        },
+        "signals_triggered": [],
+        "explanation": "Transaction approved for $100.00. Cart total within approved limits.",
+        "explanation_human": "Approved: Transaction amount within approved limits.",
+        "routing_hint": "PROCESS_NORMALLY",
+        "transaction_id": "txn_6ded31238c5742b5",
+        "cart_total": 100.0,
+        "timestamp": "2025-09-15 00:05:51.679068",
+        "rail": "Card"
+      }
+    },
+    {
+      "file": "/var/folders/nc/hyym1ntd5t50x4f0wv_6s5vh0000gn/T/tmpbsivz7eb/fixtures/test2.json",
+      "timestamp": "2025-09-15T00:05:51.681728",
+      "input": {
+        "cart_total": 100.0,
+        "currency": "USD",
+        "rail": "Card",
+        "channel": "online",
+        "features": {
+          "amount": 100.0,
+          "velocity_24h": 1.0,
+          "cross_border": 0
+        }
+      },
+      "output": {
+        "decision": "APPROVE",
+        "reasons": [
+          "Cart total $100.00 within approved threshold"
+        ],
+        "actions": [
+          "Process payment",
+          "Send confirmation"
+        ],
+        "meta": {
+          "risk_score": 0.033333333830038704,
+          "rules_evaluated": [],
+          "timestamp": "2025-09-15 00:05:51.681699",
+          "transaction_id": "txn_0a08c70524e14654",
+          "rail": "Card",
+          "channel": "online",
+          "cart_total": 100.0,
+          "ai": {
+            "risk_score": 0.033333333830038704,
+            "reason_codes": [
+              "LOW_RISK"
+            ],
+            "version": "1.0.0",
+            "model_type": "xgboost",
+            "ml_version": "1.0.0"
+          },
+          "approved_amount": 100.0
+        },
+        "status": "APPROVE",
+        "meta_structured": {
+          "timestamp": "2025-09-15 00:05:51.681699",
+          "transaction_id": "txn_0a08c70524e14654",
+          "rail": "Card",
+          "channel": "online",
+          "cart_total": 100.0,
+          "risk_score": 0.033333333830038704,
+          "rules_evaluated": [],
+          "approved_amount": 100.0
+        },
+        "signals_triggered": [],
+        "explanation": "Transaction approved for $100.00. Cart total within approved limits.",
+        "explanation_human": "Approved: Transaction amount within approved limits.",
+        "routing_hint": "PROCESS_NORMALLY",
+        "transaction_id": "txn_0a08c70524e14654",
+        "cart_total": 100.0,
+        "timestamp": "2025-09-15 00:05:51.681699",
+        "rail": "Card"
+      }
+    },
+    {
+      "file": "/var/folders/nc/hyym1ntd5t50x4f0wv_6s5vh0000gn/T/tmpbsivz7eb/fixtures/test3.json",
+      "timestamp": "2025-09-15T00:05:51.684231",
+      "input": {
+        "cart_total": 100.0,
+        "currency": "USD",
+        "rail": "Card",
+        "channel": "online",
+        "features": {
+          "amount": 100.0,
+          "velocity_24h": 1.0,
+          "cross_border": 0
+        }
+      },
+      "output": {
+        "decision": "APPROVE",
+        "reasons": [
+          "Cart total $100.00 within approved threshold"
+        ],
+        "actions": [
+          "Process payment",
+          "Send confirmation"
+        ],
+        "meta": {
+          "risk_score": 0.033333333830038704,
+          "rules_evaluated": [],
+          "timestamp": "2025-09-15 00:05:51.684206",
+          "transaction_id": "txn_3e28dbfaa4f04041",
+          "rail": "Card",
+          "channel": "online",
+          "cart_total": 100.0,
+          "ai": {
+            "risk_score": 0.033333333830038704,
+            "reason_codes": [
+              "LOW_RISK"
+            ],
+            "version": "1.0.0",
+            "model_type": "xgboost",
+            "ml_version": "1.0.0"
+          },
+          "approved_amount": 100.0
+        },
+        "status": "APPROVE",
+        "meta_structured": {
+          "timestamp": "2025-09-15 00:05:51.684206",
+          "transaction_id": "txn_3e28dbfaa4f04041",
+          "rail": "Card",
+          "channel": "online",
+          "cart_total": 100.0,
+          "risk_score": 0.033333333830038704,
+          "rules_evaluated": [],
+          "approved_amount": 100.0
+        },
+        "signals_triggered": [],
+        "explanation": "Transaction approved for $100.00. Cart total within approved limits.",
+        "explanation_human": "Approved: Transaction amount within approved limits.",
+        "routing_hint": "PROCESS_NORMALLY",
+        "transaction_id": "txn_3e28dbfaa4f04041",
+        "cart_total": 100.0,
+        "timestamp": "2025-09-15 00:05:51.684206",
+        "rail": "Card"
+      }
+    },
+    {
+      "file": "/var/folders/nc/hyym1ntd5t50x4f0wv_6s5vh0000gn/T/tmpbsivz7eb/fixtures/test4.json",
+      "timestamp": "2025-09-15T00:05:51.686716",
+      "input": {
+        "cart_total": 100.0,
+        "currency": "USD",
+        "rail": "Card",
+        "channel": "online",
+        "features": {
+          "amount": 100.0,
+          "velocity_24h": 1.0,
+          "cross_border": 0
+        }
+      },
+      "output": {
+        "decision": "APPROVE",
+        "reasons": [
+          "Cart total $100.00 within approved threshold"
+        ],
+        "actions": [
+          "Process payment",
+          "Send confirmation"
+        ],
+        "meta": {
+          "risk_score": 0.033333333830038704,
+          "rules_evaluated": [],
+          "timestamp": "2025-09-15 00:05:51.686678",
+          "transaction_id": "txn_4977d4c658884f2e",
+          "rail": "Card",
+          "channel": "online",
+          "cart_total": 100.0,
+          "ai": {
+            "risk_score": 0.033333333830038704,
+            "reason_codes": [
+              "LOW_RISK"
+            ],
+            "version": "1.0.0",
+            "model_type": "xgboost",
+            "ml_version": "1.0.0"
+          },
+          "approved_amount": 100.0
+        },
+        "status": "APPROVE",
+        "meta_structured": {
+          "timestamp": "2025-09-15 00:05:51.686678",
+          "transaction_id": "txn_4977d4c658884f2e",
+          "rail": "Card",
+          "channel": "online",
+          "cart_total": 100.0,
+          "risk_score": 0.033333333830038704,
+          "rules_evaluated": [],
+          "approved_amount": 100.0
+        },
+        "signals_triggered": [],
+        "explanation": "Transaction approved for $100.00. Cart total within approved limits.",
+        "explanation_human": "Approved: Transaction amount within approved limits.",
+        "routing_hint": "PROCESS_NORMALLY",
+        "transaction_id": "txn_4977d4c658884f2e",
+        "cart_total": 100.0,
+        "timestamp": "2025-09-15 00:05:51.686678",
+        "rail": "Card"
+      }
+    },
+    {
+      "file": "/var/folders/nc/hyym1ntd5t50x4f0wv_6s5vh0000gn/T/tmpbsivz7eb/fixtures/test5.json",
+      "timestamp": "2025-09-15T00:05:51.689264",
+      "input": {
+        "cart_total": 100.0,
+        "currency": "USD",
+        "rail": "Card",
+        "channel": "online",
+        "features": {
+          "amount": 100.0,
+          "velocity_24h": 1.0,
+          "cross_border": 0
+        }
+      },
+      "output": {
+        "decision": "APPROVE",
+        "reasons": [
+          "Cart total $100.00 within approved threshold"
+        ],
+        "actions": [
+          "Process payment",
+          "Send confirmation"
+        ],
+        "meta": {
+          "risk_score": 0.033333333830038704,
+          "rules_evaluated": [],
+          "timestamp": "2025-09-15 00:05:51.689229",
+          "transaction_id": "txn_c7f3cc217ce249c0",
+          "rail": "Card",
+          "channel": "online",
+          "cart_total": 100.0,
+          "ai": {
+            "risk_score": 0.033333333830038704,
+            "reason_codes": [
+              "LOW_RISK"
+            ],
+            "version": "1.0.0",
+            "model_type": "xgboost",
+            "ml_version": "1.0.0"
+          },
+          "approved_amount": 100.0
+        },
+        "status": "APPROVE",
+        "meta_structured": {
+          "timestamp": "2025-09-15 00:05:51.689229",
+          "transaction_id": "txn_c7f3cc217ce249c0",
+          "rail": "Card",
+          "channel": "online",
+          "cart_total": 100.0,
+          "risk_score": 0.033333333830038704,
+          "rules_evaluated": [],
+          "approved_amount": 100.0
+        },
+        "signals_triggered": [],
+        "explanation": "Transaction approved for $100.00. Cart total within approved limits.",
+        "explanation_human": "Approved: Transaction amount within approved limits.",
+        "routing_hint": "PROCESS_NORMALLY",
+        "transaction_id": "txn_c7f3cc217ce249c0",
+        "cart_total": 100.0,
+        "timestamp": "2025-09-15 00:05:51.689229",
+        "rail": "Card"
+      }
+    },
+    {
+      "file": "/var/folders/nc/hyym1ntd5t50x4f0wv_6s5vh0000gn/T/tmpbsivz7eb/fixtures/test6.json",
+      "timestamp": "2025-09-15T00:05:51.692085",
+      "input": {
+        "cart_total": 100.0,
+        "currency": "USD",
+        "rail": "Card",
+        "channel": "online",
+        "features": {
+          "amount": 100.0,
+          "velocity_24h": 1.0,
+          "cross_border": 0
+        }
+      },
+      "output": {
+        "decision": "APPROVE",
+        "reasons": [
+          "Cart total $100.00 within approved threshold"
+        ],
+        "actions": [
+          "Process payment",
+          "Send confirmation"
+        ],
+        "meta": {
+          "risk_score": 0.033333333830038704,
+          "rules_evaluated": [],
+          "timestamp": "2025-09-15 00:05:51.692058",
+          "transaction_id": "txn_3e3a0b01b6464865",
+          "rail": "Card",
+          "channel": "online",
+          "cart_total": 100.0,
+          "ai": {
+            "risk_score": 0.033333333830038704,
+            "reason_codes": [
+              "LOW_RISK"
+            ],
+            "version": "1.0.0",
+            "model_type": "xgboost",
+            "ml_version": "1.0.0"
+          },
+          "approved_amount": 100.0
+        },
+        "status": "APPROVE",
+        "meta_structured": {
+          "timestamp": "2025-09-15 00:05:51.692058",
+          "transaction_id": "txn_3e3a0b01b6464865",
+          "rail": "Card",
+          "channel": "online",
+          "cart_total": 100.0,
+          "risk_score": 0.033333333830038704,
+          "rules_evaluated": [],
+          "approved_amount": 100.0
+        },
+        "signals_triggered": [],
+        "explanation": "Transaction approved for $100.00. Cart total within approved limits.",
+        "explanation_human": "Approved: Transaction amount within approved limits.",
+        "routing_hint": "PROCESS_NORMALLY",
+        "transaction_id": "txn_3e3a0b01b6464865",
+        "cart_total": 100.0,
+        "timestamp": "2025-09-15 00:05:51.692058",
+        "rail": "Card"
+      }
+    },
+    {
+      "file": "/var/folders/nc/hyym1ntd5t50x4f0wv_6s5vh0000gn/T/tmpbsivz7eb/fixtures/test7.json",
+      "timestamp": "2025-09-15T00:05:51.694770",
+      "input": {
+        "cart_total": 100.0,
+        "currency": "USD",
+        "rail": "Card",
+        "channel": "online",
+        "features": {
+          "amount": 100.0,
+          "velocity_24h": 1.0,
+          "cross_border": 0
+        }
+      },
+      "output": {
+        "decision": "APPROVE",
+        "reasons": [
+          "Cart total $100.00 within approved threshold"
+        ],
+        "actions": [
+          "Process payment",
+          "Send confirmation"
+        ],
+        "meta": {
+          "risk_score": 0.033333333830038704,
+          "rules_evaluated": [],
+          "timestamp": "2025-09-15 00:05:51.694740",
+          "transaction_id": "txn_80277f3518414fca",
+          "rail": "Card",
+          "channel": "online",
+          "cart_total": 100.0,
+          "ai": {
+            "risk_score": 0.033333333830038704,
+            "reason_codes": [
+              "LOW_RISK"
+            ],
+            "version": "1.0.0",
+            "model_type": "xgboost",
+            "ml_version": "1.0.0"
+          },
+          "approved_amount": 100.0
+        },
+        "status": "APPROVE",
+        "meta_structured": {
+          "timestamp": "2025-09-15 00:05:51.694740",
+          "transaction_id": "txn_80277f3518414fca",
+          "rail": "Card",
+          "channel": "online",
+          "cart_total": 100.0,
+          "risk_score": 0.033333333830038704,
+          "rules_evaluated": [],
+          "approved_amount": 100.0
+        },
+        "signals_triggered": [],
+        "explanation": "Transaction approved for $100.00. Cart total within approved limits.",
+        "explanation_human": "Approved: Transaction amount within approved limits.",
+        "routing_hint": "PROCESS_NORMALLY",
+        "transaction_id": "txn_80277f3518414fca",
+        "cart_total": 100.0,
+        "timestamp": "2025-09-15 00:05:51.694740",
+        "rail": "Card"
+      }
+    },
+    {
+      "file": "/var/folders/nc/hyym1ntd5t50x4f0wv_6s5vh0000gn/T/tmpbsivz7eb/fixtures/test8.json",
+      "timestamp": "2025-09-15T00:05:51.697179",
+      "input": {
+        "cart_total": 100.0,
+        "currency": "USD",
+        "rail": "Card",
+        "channel": "online",
+        "features": {
+          "amount": 100.0,
+          "velocity_24h": 1.0,
+          "cross_border": 0
+        }
+      },
+      "output": {
+        "decision": "APPROVE",
+        "reasons": [
+          "Cart total $100.00 within approved threshold"
+        ],
+        "actions": [
+          "Process payment",
+          "Send confirmation"
+        ],
+        "meta": {
+          "risk_score": 0.033333333830038704,
+          "rules_evaluated": [],
+          "timestamp": "2025-09-15 00:05:51.697156",
+          "transaction_id": "txn_8680f19a63bf496e",
+          "rail": "Card",
+          "channel": "online",
+          "cart_total": 100.0,
+          "ai": {
+            "risk_score": 0.033333333830038704,
+            "reason_codes": [
+              "LOW_RISK"
+            ],
+            "version": "1.0.0",
+            "model_type": "xgboost",
+            "ml_version": "1.0.0"
+          },
+          "approved_amount": 100.0
+        },
+        "status": "APPROVE",
+        "meta_structured": {
+          "timestamp": "2025-09-15 00:05:51.697156",
+          "transaction_id": "txn_8680f19a63bf496e",
+          "rail": "Card",
+          "channel": "online",
+          "cart_total": 100.0,
+          "risk_score": 0.033333333830038704,
+          "rules_evaluated": [],
+          "approved_amount": 100.0
+        },
+        "signals_triggered": [],
+        "explanation": "Transaction approved for $100.00. Cart total within approved limits.",
+        "explanation_human": "Approved: Transaction amount within approved limits.",
+        "routing_hint": "PROCESS_NORMALLY",
+        "transaction_id": "txn_8680f19a63bf496e",
+        "cart_total": 100.0,
+        "timestamp": "2025-09-15 00:05:51.697156",
+        "rail": "Card"
+      }
+    },
+    {
+      "file": "/var/folders/nc/hyym1ntd5t50x4f0wv_6s5vh0000gn/T/tmpbsivz7eb/fixtures/test9.json",
+      "timestamp": "2025-09-15T00:05:51.699541",
+      "input": {
+        "cart_total": 100.0,
+        "currency": "USD",
+        "rail": "Card",
+        "channel": "online",
+        "features": {
+          "amount": 100.0,
+          "velocity_24h": 1.0,
+          "cross_border": 0
+        }
+      },
+      "output": {
+        "decision": "APPROVE",
+        "reasons": [
+          "Cart total $100.00 within approved threshold"
+        ],
+        "actions": [
+          "Process payment",
+          "Send confirmation"
+        ],
+        "meta": {
+          "risk_score": 0.033333333830038704,
+          "rules_evaluated": [],
+          "timestamp": "2025-09-15 00:05:51.699507",
+          "transaction_id": "txn_eb7bca0914e04ae5",
+          "rail": "Card",
+          "channel": "online",
+          "cart_total": 100.0,
+          "ai": {
+            "risk_score": 0.033333333830038704,
+            "reason_codes": [
+              "LOW_RISK"
+            ],
+            "version": "1.0.0",
+            "model_type": "xgboost",
+            "ml_version": "1.0.0"
+          },
+          "approved_amount": 100.0
+        },
+        "status": "APPROVE",
+        "meta_structured": {
+          "timestamp": "2025-09-15 00:05:51.699507",
+          "transaction_id": "txn_eb7bca0914e04ae5",
+          "rail": "Card",
+          "channel": "online",
+          "cart_total": 100.0,
+          "risk_score": 0.033333333830038704,
+          "rules_evaluated": [],
+          "approved_amount": 100.0
+        },
+        "signals_triggered": [],
+        "explanation": "Transaction approved for $100.00. Cart total within approved limits.",
+        "explanation_human": "Approved: Transaction amount within approved limits.",
+        "routing_hint": "PROCESS_NORMALLY",
+        "transaction_id": "txn_eb7bca0914e04ae5",
+        "cart_total": 100.0,
+        "timestamp": "2025-09-15 00:05:51.699507",
+        "rail": "Card"
+      }
+    }
+  ],
+  "summary": {
+    "total_files": 10,
+    "successful_files": 10,
+    "failed_files": 0,
+    "timestamp": "2025-09-15T00:05:51.699841"
+  }
+}

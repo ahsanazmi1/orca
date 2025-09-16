@@ -3,8 +3,10 @@
 import uuid
 from datetime import datetime
 
-from .core.ml_hooks import predict_risk
+from .config import decision_mode, get_settings, is_ai_enabled
 from .explanations import generate_human_explanation
+from .llm.explain import explain_decision_llm, is_llm_configured
+from .ml.model import predict_risk
 from .models import DecisionMeta, DecisionRequest, DecisionResponse, DecisionStatus
 from .rules.registry import run_rules
 
@@ -67,8 +69,20 @@ def evaluate_rules(request: DecisionRequest) -> DecisionResponse:
     Returns:
         Decision response with decision, reasons, and actions
     """
-    # Get risk prediction
-    risk_score = predict_risk(request.features)
+    # Get current configuration
+    get_settings()
+    decision_mode()
+
+    # Get risk prediction (enhanced for AI mode)
+    ai_risk_data = None
+    if is_ai_enabled():
+        # Use ML model (XGBoost or stub based on configuration)
+        ai_risk_data = predict_risk(request.features)
+        risk_score = ai_risk_data["risk_score"]
+    else:
+        # Use local ML model for RULES_ONLY mode
+        ai_risk_data = predict_risk(request.features)
+        risk_score = ai_risk_data["risk_score"]
 
     # Run deterministic rules
     decision_hint, reasons, actions, rules_evaluated = run_rules(request)
@@ -103,6 +117,49 @@ def evaluate_rules(request: DecisionRequest) -> DecisionResponse:
         "cart_total": request.cart_total,
     }
 
+    # Add AI risk data for RULES_PLUS_AI mode
+    if ai_risk_data:
+        meta["ai"] = {
+            "risk_score": ai_risk_data["risk_score"],
+            "reason_codes": ai_risk_data["reason_codes"],
+            "version": ai_risk_data["version"],
+            "model_type": ai_risk_data.get("model_type", "unknown"),
+            "ml_version": ai_risk_data["version"],  # Add ml_version for compatibility
+        }
+
+        # Generate LLM explanation if available
+        if is_llm_configured():
+            try:
+                llm_explanation = explain_decision_llm(
+                    decision=final_decision,
+                    risk_score=ai_risk_data["risk_score"],
+                    reason_codes=ai_risk_data["reason_codes"],
+                    transaction_data={
+                        "amount": request.cart_total,
+                        "channel": request.channel,
+                        "rail": request.rail,
+                        "currency": request.currency,
+                    },
+                    model_type=ai_risk_data.get("model_type", "unknown"),
+                    model_version=ai_risk_data["version"],
+                    rules_evaluated=rules_evaluated,
+                    meta_data=meta,
+                )
+
+                if llm_explanation:
+                    meta["ai"]["llm_explanation"] = {
+                        "explanation": llm_explanation.explanation,
+                        "confidence": llm_explanation.confidence,
+                        "model_provenance": llm_explanation.model_provenance,
+                        "processing_time_ms": llm_explanation.processing_time_ms,
+                        "tokens_used": llm_explanation.tokens_used,
+                    }
+            except Exception as e:
+                # Log error but don't fail the decision
+                import logging
+
+                logging.warning(f"Failed to generate LLM explanation: {e}")
+
     # If any rule hints REVIEW, set decision to REVIEW
     if decision_hint == "REVIEW":
         final_decision = "REVIEW"
@@ -136,7 +193,17 @@ def evaluate_rules(request: DecisionRequest) -> DecisionResponse:
     explanation = generate_explanation(final_decision, unique_reasons, request, meta)
 
     # Generate human-readable explanation using templates
-    explanation_human = generate_human_explanation(unique_reasons, final_decision, request.context)
+    # Enhanced with AI/LLM for RULES_PLUS_AI mode
+    if is_ai_enabled():
+        # TODO: Integrate with Azure OpenAI for enhanced explanations
+        explanation_human = generate_human_explanation(
+            unique_reasons, final_decision, request.context
+        )
+    else:
+        # Use template-based explanations for RULES_ONLY mode
+        explanation_human = generate_human_explanation(
+            unique_reasons, final_decision, request.context
+        )
 
     # Extract signals triggered from rules_evaluated
     signals_triggered: list[str] = []

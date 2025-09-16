@@ -1,0 +1,136 @@
+{
+  "results": [
+    {
+      "file": "/var/folders/nc/hyym1ntd5t50x4f0wv_6s5vh0000gn/T/tmpwjxdpkil/fixtures/test1.json",
+      "timestamp": "2025-09-14T23:31:38.300672",
+      "input": {
+        "cart_total": 100.0,
+        "currency": "USD",
+        "rail": "Card",
+        "channel": "online",
+        "features": {
+          "amount": 100.0,
+          "velocity_24h": 1.0,
+          "cross_border": 0
+        }
+      },
+      "output": {
+        "decision": "APPROVE",
+        "reasons": [
+          "Cart total $100.00 within approved threshold"
+        ],
+        "actions": [
+          "Process payment",
+          "Send confirmation"
+        ],
+        "meta": {
+          "risk_score": 0.35,
+          "rules_evaluated": [],
+          "timestamp": "2025-09-14 23:31:38.300340",
+          "transaction_id": "txn_67bb007d243f4506",
+          "rail": "Card",
+          "channel": "online",
+          "cart_total": 100.0,
+          "ai": {
+            "risk_score": 0.35,
+            "reason_codes": [
+              "BASELINE"
+            ],
+            "version": "stub-0.1.0",
+            "model_type": "stub",
+            "ml_version": "stub-0.1.0"
+          },
+          "approved_amount": 100.0
+        },
+        "status": "APPROVE",
+        "meta_structured": {
+          "timestamp": "2025-09-14 23:31:38.300340",
+          "transaction_id": "txn_67bb007d243f4506",
+          "rail": "Card",
+          "channel": "online",
+          "cart_total": 100.0,
+          "risk_score": 0.35,
+          "rules_evaluated": [],
+          "approved_amount": 100.0
+        },
+        "signals_triggered": [],
+        "explanation": "Transaction approved for $100.00. Cart total within approved limits.",
+        "explanation_human": "Approved: Transaction amount within approved limits.",
+        "routing_hint": "PROCESS_NORMALLY",
+        "transaction_id": "txn_67bb007d243f4506",
+        "cart_total": 100.0,
+        "timestamp": "2025-09-14 23:31:38.300340",
+        "rail": "Card"
+      }
+    },
+    {
+      "file": "/var/folders/nc/hyym1ntd5t50x4f0wv_6s5vh0000gn/T/tmpwjxdpkil/fixtures/test2.json",
+      "timestamp": "2025-09-14T23:31:38.301387",
+      "input": {
+        "cart_total": 500.0,
+        "currency": "USD",
+        "rail": "Card",
+        "channel": "online",
+        "features": {
+          "amount": 500.0,
+          "velocity_24h": 2.0,
+          "cross_border": 1
+        }
+      },
+      "output": {
+        "decision": "APPROVE",
+        "reasons": [
+          "Cart total $500.00 within approved threshold"
+        ],
+        "actions": [
+          "Process payment",
+          "Send confirmation"
+        ],
+        "meta": {
+          "risk_score": 0.44999999999999996,
+          "rules_evaluated": [],
+          "timestamp": "2025-09-14 23:31:38.301357",
+          "transaction_id": "txn_f8ba13865fe1442a",
+          "rail": "Card",
+          "channel": "online",
+          "cart_total": 500.0,
+          "ai": {
+            "risk_score": 0.44999999999999996,
+            "reason_codes": [
+              "CROSS_BORDER"
+            ],
+            "version": "stub-0.1.0",
+            "model_type": "stub",
+            "ml_version": "stub-0.1.0"
+          },
+          "approved_amount": 500.0
+        },
+        "status": "APPROVE",
+        "meta_structured": {
+          "timestamp": "2025-09-14 23:31:38.301357",
+          "transaction_id": "txn_f8ba13865fe1442a",
+          "rail": "Card",
+          "channel": "online",
+          "cart_total": 500.0,
+          "risk_score": 0.44999999999999996,
+          "rules_evaluated": [],
+          "approved_amount": 500.0
+        },
+        "signals_triggered": [],
+        "explanation": "Transaction approved for $500.00. Cart total within approved limits.",
+        "explanation_human": "Approved: Transaction amount within approved limits.",
+        "routing_hint": "PROCESS_NORMALLY",
+        "transaction_id": "txn_f8ba13865fe1442a",
+        "cart_total": 500.0,
+        "timestamp": "2025-09-14 23:31:38.301357",
+        "rail": "Card"
+      }
+    }
+  ],
+  "summary": {
+    "total_files": 2,
+    "successful_files": 2,
+    "failed_files": 0,
+    "timestamp": "2025-09-14T23:31:38.301669"
+  }
+}

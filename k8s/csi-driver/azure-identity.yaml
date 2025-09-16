@@ -1,0 +1,18 @@
+apiVersion: aadpodidentity.k8s.io/v1
+kind: AzureIdentity
+metadata:
+  name: orca-keyvault-identity
+  namespace: orca-core
+spec:
+  type: 0  # 0 = UserAssigned, 1 = ServicePrincipal
+  resourceID: /subscriptions/89a32178-eb47-4bd6-bd0a-68be9709723f/resourceGroups/orcacore-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/orca-keyvault-identity
+  clientID: ""  # Will be populated by the managed identity
+---
+apiVersion: aadpodidentity.k8s.io/v1
+kind: AzureIdentityBinding
+metadata:
+  name: orca-keyvault-identity-binding
+  namespace: orca-core
+spec:
+  AzureIdentity: orca-keyvault-identity
+  Selector: orca-keyvault-access

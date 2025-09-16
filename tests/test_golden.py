@@ -1,6 +1,7 @@
 """Golden tests for Orca Core decision engine."""
 
 import json
+from unittest.mock import patch
 
 from orca_core.engine import evaluate_rules
 from orca_core.models import DecisionRequest
@@ -11,104 +12,124 @@ class TestGolden:
 
     def test_golden_high_risk_scenario(self) -> None:
         """Test golden scenario with high cart total and velocity."""
-        # Input data
-        request = DecisionRequest(
-            cart_total=750.0, features={"velocity_24h": 4.0}, context={"channel": "ecom"}
-        )
+        with patch(
+            "orca_core.engine.predict_risk",
+            return_value={
+                "risk_score": 0.15,
+                "reason_codes": ["LOW_RISK"],
+                "version": "test-1.0.0",
+            },
+        ):
+            # Input data
+            request = DecisionRequest(
+                cart_total=750.0, features={"velocity_24h": 4.0}, context={"channel": "ecom"}
+            )
 
-        # Evaluate decision
-        response = evaluate_rules(request)
+            # Evaluate decision
+            response = evaluate_rules(request)
 
-        # Convert to dict and normalize ordering (use json mode for datetime serialization)
-        response_dict = response.model_dump(mode="json")
+            # Convert to dict and normalize ordering (use json mode for datetime serialization)
+            response_dict = response.model_dump(mode="json")
 
-        # Serialize to JSON with consistent ordering
-        serialized_json = json.dumps(response_dict, sort_keys=True)
+            # Serialize to JSON with consistent ordering
+            serialized_json = json.dumps(response_dict, sort_keys=True)
 
-        # Parse back to dict for comparison (normalizes ordering)
-        normalized_response = json.loads(serialized_json)
+            # Parse back to dict for comparison (normalizes ordering)
+            normalized_response = json.loads(serialized_json)
 
-        # Expected golden snapshot (updated for actual rule behavior)
-        expected_snapshot = {
-            "decision": "REVIEW",
-            "reasons": [
-                "HIGH_TICKET: Cart total $750.00 exceeds $500.00 threshold",
-                "VELOCITY_FLAG: 24h velocity 4.0 exceeds 3.0 threshold",
-            ],
-            "actions": ["ROUTE_TO_REVIEW", "ROUTE_TO_REVIEW"],
-            "meta": {"rules_evaluated": ["HIGH_TICKET", "VELOCITY"], "risk_score": 0.15},
-        }
+            # Expected golden snapshot (updated for actual rule behavior)
+            expected_snapshot = {
+                "decision": "REVIEW",
+                "reasons": [
+                    "HIGH_TICKET: Cart total $750.00 exceeds $500.00 threshold",
+                    "VELOCITY_FLAG: 24h velocity 4.0 exceeds 3.0 threshold",
+                ],
+                "actions": ["ROUTE_TO_REVIEW", "ROUTE_TO_REVIEW"],
+                "meta": {"rules_evaluated": ["HIGH_TICKET", "VELOCITY"], "risk_score": 0.15},
+            }
 
-        # Assert the response matches the golden snapshot (check only relevant fields)
-        assert normalized_response["decision"] == expected_snapshot["decision"]
-        assert normalized_response["reasons"] == expected_snapshot["reasons"]
-        assert normalized_response["actions"] == expected_snapshot["actions"]
-        assert (
-            normalized_response["meta"]["rules_evaluated"]
-            == expected_snapshot["meta"]["rules_evaluated"]
-        )
-        assert normalized_response["meta"]["risk_score"] == expected_snapshot["meta"]["risk_score"]
+            # Assert the response matches the golden snapshot (check only relevant fields)
+            assert normalized_response["decision"] == expected_snapshot["decision"]
+            assert normalized_response["reasons"] == expected_snapshot["reasons"]
+            assert normalized_response["actions"] == expected_snapshot["actions"]
+            assert (
+                normalized_response["meta"]["rules_evaluated"]
+                == expected_snapshot["meta"]["rules_evaluated"]
+            )
+            assert (
+                normalized_response["meta"]["risk_score"] == expected_snapshot["meta"]["risk_score"]
+            )
 
-        # Also assert individual fields for better error messages
-        assert response.decision == "REVIEW"
-        assert len(response.reasons) == 2
-        assert "HIGH_TICKET" in response.reasons[0]
-        assert "VELOCITY_FLAG" in response.reasons[1]
-        assert len(response.actions) == 2
-        assert all(action == "ROUTE_TO_REVIEW" for action in response.actions)
-        assert response.meta["risk_score"] == 0.15
-        assert set(response.meta["rules_evaluated"]) == {"HIGH_TICKET", "VELOCITY"}
+            # Also assert individual fields for better error messages
+            assert response.decision == "REVIEW"
+            assert len(response.reasons) == 2
+            assert "HIGH_TICKET" in response.reasons[0]
+            assert "VELOCITY_FLAG" in response.reasons[1]
+            assert len(response.actions) == 2
+            assert all(action == "ROUTE_TO_REVIEW" for action in response.actions)
+            assert response.meta["risk_score"] == 0.15
+            assert set(response.meta["rules_evaluated"]) == {"HIGH_TICKET", "VELOCITY"}
 
     def test_golden_approve_scenario(self) -> None:
         """Test golden scenario with low cart total and velocity."""
-        # Input data
-        request = DecisionRequest(
-            cart_total=250.0, features={"velocity_24h": 1.0}, context={"channel": "ecom"}
-        )
+        with patch(
+            "orca_core.engine.predict_risk",
+            return_value={
+                "risk_score": 0.15,
+                "reason_codes": ["LOW_RISK"],
+                "version": "test-1.0.0",
+            },
+        ):
+            # Input data
+            request = DecisionRequest(
+                cart_total=250.0, features={"velocity_24h": 1.0}, context={"channel": "ecom"}
+            )
 
-        # Evaluate decision
-        response = evaluate_rules(request)
+            # Evaluate decision
+            response = evaluate_rules(request)
 
-        # Convert to dict and normalize ordering (use json mode for datetime serialization)
-        response_dict = response.model_dump(mode="json")
+            # Convert to dict and normalize ordering (use json mode for datetime serialization)
+            response_dict = response.model_dump(mode="json")
 
-        # Serialize to JSON with consistent ordering
-        serialized_json = json.dumps(response_dict, sort_keys=True)
+            # Serialize to JSON with consistent ordering
+            serialized_json = json.dumps(response_dict, sort_keys=True)
 
-        # Parse back to dict for comparison (normalizes ordering)
-        normalized_response = json.loads(serialized_json)
+            # Parse back to dict for comparison (normalizes ordering)
+            normalized_response = json.loads(serialized_json)
 
-        # Expected golden snapshot (updated for actual rule behavior)
-        expected_snapshot = {
-            "decision": "APPROVE",
-            "reasons": ["Cart total $250.00 within approved threshold"],
-            "actions": ["Process payment", "Send confirmation"],
-            "meta": {"approved_amount": 250.0, "risk_score": 0.15, "rules_evaluated": []},
-        }
+            # Expected golden snapshot (updated for actual rule behavior)
+            expected_snapshot = {
+                "decision": "APPROVE",
+                "reasons": ["Cart total $250.00 within approved threshold"],
+                "actions": ["Process payment", "Send confirmation"],
+                "meta": {"approved_amount": 250.0, "risk_score": 0.15, "rules_evaluated": []},
+            }
 
-        # Assert the response matches the golden snapshot (check only relevant fields)
-        assert normalized_response["decision"] == expected_snapshot["decision"]
-        assert normalized_response["reasons"] == expected_snapshot["reasons"]
-        assert normalized_response["actions"] == expected_snapshot["actions"]
-        assert (
-            normalized_response["meta"]["approved_amount"]
-            == expected_snapshot["meta"]["approved_amount"]
-        )
-        assert normalized_response["meta"]["risk_score"] == expected_snapshot["meta"]["risk_score"]
-        assert (
-            normalized_response["meta"]["rules_evaluated"]
-            == expected_snapshot["meta"]["rules_evaluated"]
-        )
+            # Assert the response matches the golden snapshot (check only relevant fields)
+            assert normalized_response["decision"] == expected_snapshot["decision"]
+            assert normalized_response["reasons"] == expected_snapshot["reasons"]
+            assert normalized_response["actions"] == expected_snapshot["actions"]
+            assert (
+                normalized_response["meta"]["approved_amount"]
+                == expected_snapshot["meta"]["approved_amount"]
+            )
+            assert (
+                normalized_response["meta"]["risk_score"] == expected_snapshot["meta"]["risk_score"]
+            )
+            assert (
+                normalized_response["meta"]["rules_evaluated"]
+                == expected_snapshot["meta"]["rules_evaluated"]
+            )
 
-        # Also assert individual fields for better error messages
-        assert response.decision == "APPROVE"
-        assert len(response.reasons) == 1
-        assert "within approved threshold" in response.reasons[0]
-        assert len(response.actions) == 2
-        assert "Process payment" in response.actions
-        assert "Send confirmation" in response.actions
-        assert response.meta["risk_score"] == 0.15
-        assert response.meta["approved_amount"] == 250.0
+            # Also assert individual fields for better error messages
+            assert response.decision == "APPROVE"
+            assert len(response.reasons) == 1
+            assert "within approved threshold" in response.reasons[0]
+            assert len(response.actions) == 2
+            assert "Process payment" in response.actions
+            assert "Send confirmation" in response.actions
+            assert response.meta["risk_score"] == 0.15
+            assert response.meta["approved_amount"] == 250.0
 
     def test_golden_decline_scenario(self) -> None:
         """Test golden scenario with high ML risk score."""
@@ -121,8 +142,22 @@ class TestGolden:
 
         # Mock high risk score
         with (
-            patch("orca_core.engine.predict_risk", return_value=0.95),
-            patch("orca_core.rules.high_risk.predict_risk", return_value=0.95),
+            patch(
+                "orca_core.engine.predict_risk",
+                return_value={
+                    "risk_score": 0.95,
+                    "reason_codes": ["HIGH_RISK"],
+                    "version": "test-1.0.0",
+                },
+            ),
+            patch(
+                "orca_core.rules.high_risk.predict_risk",
+                return_value={
+                    "risk_score": 0.95,
+                    "reason_codes": ["HIGH_RISK"],
+                    "version": "test-1.0.0",
+                },
+            ),
         ):
             # Evaluate decision
             response = evaluate_rules(request)

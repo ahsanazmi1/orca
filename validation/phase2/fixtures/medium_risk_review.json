@@ -1,0 +1,22 @@
+{
+    "cart_total": 750.0,
+    "currency": "USD",
+    "rail": "Card",
+    "channel": "online",
+    "features": {
+        "amount": 750.0,
+        "velocity_24h": 3.0,
+        "cross_border": 0,
+        "velocity_7d": 15.0,
+        "velocity_30d": 60.0,
+        "customer_age_days": 90.0,
+        "loyalty_score": 0.5,
+        "chargebacks_12m": 0.0
+    },
+    "expected_decision": "REVIEW",
+    "expected_risk_score_range": [
+        0.3,
+        0.7
+    ],
+    "description": "Medium risk transaction - moderate amount, medium velocity, established customer"
+}

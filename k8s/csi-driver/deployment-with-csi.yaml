@@ -1,0 +1,134 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orca-core-api
+  namespace: orca-core
+  labels:
+    app: orca-core-api
+    environment: dev
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: orca-core-api
+  template:
+    metadata:
+      labels:
+        app: orca-core-api
+        environment: dev
+        aadpodidbinding: orca-keyvault-access  # Required for Azure Identity binding
+    spec:
+      containers:
+      - name: orca-core-api
+        image: orcacoreacrdev.azurecr.io/orca-core-api:latest
+        ports:
+        - containerPort: 8000
+        env:
+        # Environment variables for Key Vault CSI driver
+        - name: AZURE_OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: orca-secrets
+              key: AZURE_OPENAI_API_KEY
+              optional: true
+        - name: AZURE_OPENAI_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              name: orca-secrets
+              key: AZURE_OPENAI_ENDPOINT
+              optional: true
+        - name: AZURE_OPENAI_DEPLOYMENT
+          valueFrom:
+            secretKeyRef:
+              name: orca-secrets
+              key: AZURE_OPENAI_DEPLOYMENT
+              optional: true
+        - name: ORCA_DECISION_MODE
+          valueFrom:
+            secretKeyRef:
+              name: orca-secrets
+              key: ORCA_DECISION_MODE
+              optional: true
+        - name: ORCA_USE_XGB
+          valueFrom:
+            secretKeyRef:
+              name: orca-secrets
+              key: ORCA_USE_XGB
+              optional: true
+        - name: ORCA_EXPLAIN_ENABLED
+          valueFrom:
+            secretKeyRef:
+              name: orca-secrets
+              key: ORCA_EXPLAIN_ENABLED
+              optional: true
+        # Fallback environment variables (for development)
+        - name: ORCA_DECISION_MODE
+          value: "RULES_PLUS_AI"
+        - name: ORCA_USE_XGB
+          value: "true"
+        - name: ORCA_EXPLAIN_ENABLED
+          value: "true"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
+        - name: secrets-store
+          mountPath: "/mnt/secrets-store"
+          readOnly: true
+      volumes:
+      - name: secrets-store
+        csi:
+          driver: secrets-store.csi.k8s.io
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: "orca-keyvault-secrets"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: orca-core-api-service
+  namespace: orca-core
+  labels:
+    app: orca-core-api
+    environment: dev
+spec:
+  selector:
+    app: orca-core-api
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8000
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: orca-core-api-loadbalancer
+  namespace: orca-core
+  labels:
+    app: orca-core-api
+    environment: dev
+spec:
+  selector:
+    app: orca-core-api
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8000
+  type: LoadBalancer

@@ -95,11 +95,39 @@ class TestMLHooks:
 
     def test_feature_importance(self) -> None:
         """Test feature importance functionality."""
-        model = RiskPredictionModel()
+        with tempfile.TemporaryDirectory() as temp_dir:
+            model_path = Path(temp_dir) / "test_model.pkl"
 
-        # Feature importance should be empty for untrained model
-        importance = model.get_feature_importance()
-        assert importance == {}
+            # Create a new model (not loading existing one)
+            model = RiskPredictionModel(str(model_path))
+
+            # Feature importance should be empty for untrained model
+            importance = model.get_feature_importance()
+            assert importance == {}
+
+            # Test with trained model
+            X = pd.DataFrame(
+                {
+                    "velocity_24h": [1.0, 5.0, 2.0],
+                    "velocity_7d": [3.0, 15.0, 6.0],
+                    "cart_total": [100.0, 2000.0, 250.0],
+                    "customer_age_days": [365.0, 730.0, 180.0],
+                    "loyalty_score": [0.5, 0.8, 0.3],
+                    "chargebacks_12m": [0.0, 2.0, 0.0],
+                    "location_mismatch": [0.0, 1.0, 0.0],
+                    "high_ip_distance": [0.0, 1.0, 0.0],
+                    "time_since_last_purchase": [7.0, 1.0, 14.0],
+                    "payment_method_risk": [0.3, 0.8, 0.2],
+                }
+            )
+            y = pd.Series([0, 1, 0])
+
+            model.train(X, y)
+            importance = model.get_feature_importance()
+
+            # Should have feature importance after training
+            assert len(importance) > 0
+            assert all(isinstance(v, (int, float)) for v in importance.values())
 
     def test_model_fallback_on_prediction_error(self) -> None:
         """Test that model falls back gracefully on prediction errors."""
@@ -111,3 +139,126 @@ class TestMLHooks:
         features = {"velocity_24h": 1.0}
         risk_score = model.predict_risk_score(features)
         assert risk_score == 0.15  # Default fallback value
+
+    def test_model_load_error_handling(self) -> None:
+        """Test error handling when loading a corrupted model file."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            model_path = Path(temp_dir) / "corrupted_model.pkl"
+
+            # Create a corrupted model file
+            model_path.write_text("corrupted data")
+
+            # Should create a new model when loading fails
+            model = RiskPredictionModel(str(model_path))
+            assert model.model is not None
+
+    def test_model_training_with_none_model(self) -> None:
+        """Test training when model is None."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            model_path = Path(temp_dir) / "test_model.pkl"
+            model = RiskPredictionModel(str(model_path))
+            model.model = None  # Simulate failed model creation
+
+            X = pd.DataFrame(
+                {
+                    "velocity_24h": [1.0, 2.0],
+                    "velocity_7d": [3.0, 6.0],
+                    "cart_total": [100.0, 250.0],
+                    "customer_age_days": [365.0, 180.0],
+                    "loyalty_score": [0.5, 0.3],
+                    "chargebacks_12m": [0.0, 0.0],
+                    "location_mismatch": [0.0, 0.0],
+                    "high_ip_distance": [0.0, 0.0],
+                    "time_since_last_purchase": [7.0, 14.0],
+                    "payment_method_risk": [0.3, 0.2],
+                }
+            )
+            y = pd.Series([0, 1])
+
+            # Should handle None model gracefully
+            model.train(X, y)
+            # Should not crash, but model might still be None
+
+    def test_save_model_with_none_model(self) -> None:
+        """Test saving when model is None."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            model_path = Path(temp_dir) / "test_model.pkl"
+            model = RiskPredictionModel(str(model_path))
+            model.model = None
+
+            # Should handle None model gracefully
+            model.save_model()
+            # Should not crash
+
+    def test_predict_risk_score_exception_handling(self) -> None:
+        """Test exception handling in predict_risk_score."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            model_path = Path(temp_dir) / "test_model.pkl"
+            model = RiskPredictionModel(str(model_path))
+
+            # Create a mock model that will raise an exception
+            class MockModel:
+                def predict_proba(self, X):
+                    raise Exception("Mock prediction error")
+
+            model.model = MockModel()
+
+            # Should return default risk score on exception
+            features = {"velocity_24h": 1.0}
+            risk_score = model.predict_risk_score(features)
+            assert risk_score == 0.15
+
+    def test_get_feature_importance_exception_handling(self) -> None:
+        """Test exception handling in get_feature_importance."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            model_path = Path(temp_dir) / "test_model.pkl"
+            model = RiskPredictionModel(str(model_path))
+
+            # Create a mock model that will raise an exception
+            class MockModel:
+                @property
+                def feature_importances_(self):
+                    raise Exception("Mock feature importance error")
+
+            model.model = MockModel()
+
+            # Should return empty dict on exception
+            importance = model.get_feature_importance()
+            assert importance == {}
+
+    def test_global_model_singleton(self) -> None:
+        """Test that get_model returns the same instance."""
+        model1 = get_model()
+        model2 = get_model()
+        assert model1 is model2
+
+    def test_train_model_function(self) -> None:
+        """Test the train_model function."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            model_path = Path(temp_dir) / "trained_model.pkl"
+
+            X = pd.DataFrame(
+                {
+                    "velocity_24h": [1.0, 5.0, 2.0],
+                    "velocity_7d": [3.0, 15.0, 6.0],
+                    "cart_total": [100.0, 2000.0, 250.0],
+                    "customer_age_days": [365.0, 730.0, 180.0],
+                    "loyalty_score": [0.5, 0.8, 0.3],
+                    "chargebacks_12m": [0.0, 2.0, 0.0],
+                    "location_mismatch": [0.0, 1.0, 0.0],
+                    "high_ip_distance": [0.0, 1.0, 0.0],
+                    "time_since_last_purchase": [7.0, 1.0, 14.0],
+                    "payment_method_risk": [0.3, 0.8, 0.2],
+                }
+            )
+            y = pd.Series([0, 1, 0])
+
+            # Train model using the function
+            train_model(X, y, str(model_path))
+
+            # Verify model was saved
+            assert model_path.exists()
+
+            # Test that global model was updated
+            model = get_model()
+            assert model.model is not None

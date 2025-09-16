@@ -1,0 +1,384 @@
+name: Deploy Orca Core to Azure
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'src/**'
+      - 'Dockerfile'
+      - 'pyproject.toml'
+      - 'requirements.txt'
+      - '.github/workflows/deploy.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'src/**'
+      - 'Dockerfile'
+      - 'pyproject.toml'
+      - 'requirements.txt'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+      skip_tests:
+        description: 'Skip tests'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+  AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  REGISTRY_NAME: ${{ secrets.ACR_NAME }}
+  IMAGE_NAME: orca-core-api
+  RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
+  CLUSTER_NAME: ${{ secrets.AKS_NAME }}
+
+jobs:
+  # Build and Test Job
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tags }}
+      image-digest: ${{ steps.build.outputs.digest }}
+      model-version: ${{ steps.train.outputs.model-version }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install uv
+        uv pip install -e .
+
+    - name: Run tests
+      if: ${{ !inputs.skip_tests }}
+      run: |
+        PYTHONPATH=src python -m pytest tests/ -v --cov=src/orca_core --cov-report=xml
+      env:
+        ORCA_MODE: RULES_ONLY
+        ORCA_USE_XGB: false
+
+    - name: Train XGBoost model
+      id: train
+      run: |
+        echo "🤖 Training XGBoost model..."
+        PYTHONPATH=src python -m orca_core.cli train-xgb --samples 10000
+
+        # Get model version from metadata
+        if [ -f "models/metadata.json" ]; then
+          MODEL_VERSION=$(python -c "import json; print(json.load(open('models/metadata.json'))['version'])")
+          echo "model-version=$MODEL_VERSION" >> $GITHUB_OUTPUT
+        else
+          echo "model-version=unknown" >> $GITHUB_OUTPUT
+        fi
+
+        echo "✅ XGBoost model training completed"
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to Azure Container Registry
+      uses: azure/docker-login@v1
+      with:
+        login-server: ${{ env.REGISTRY_NAME }}.azurecr.io
+        username: ${{ secrets.ACR_USERNAME }}
+        password: ${{ secrets.ACR_PASSWORD }}
+
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=sha,prefix={{branch}}-
+          type=raw,value=latest,enable={{is_default_branch}}
+          type=raw,value=${{ steps.train.outputs.model-version }}
+
+    - name: Build and push Docker image
+      id: build
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        platforms: linux/amd64
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        build-args: |
+          MODEL_VERSION=${{ steps.train.outputs.model-version }}
+
+    - name: Upload model artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: model-artifacts
+        path: models/
+        retention-days: 30
+
+    - name: Upload test results
+      if: ${{ !inputs.skip_tests }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results
+        path: |
+          coverage.xml
+          .coverage
+        retention-days: 30
+
+  # Deploy Job
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop' || github.event_name == 'workflow_dispatch'
+    environment: ${{ github.event.inputs.environment || (github.ref == 'refs/heads/main' && 'prod') || (github.ref == 'refs/heads/develop' && 'staging') || 'dev' }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Azure Login with OIDC
+      uses: azure/login@v1
+      with:
+        client-id: ${{ env.AZURE_CLIENT_ID }}
+        tenant-id: ${{ env.AZURE_TENANT_ID }}
+        subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+
+    - name: Set up kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'v1.28.0'
+
+    - name: Get AKS credentials
+      run: |
+        az aks get-credentials --resource-group ${{ env.RESOURCE_GROUP }} --name ${{ env.CLUSTER_NAME }} --overwrite-existing
+
+    - name: Verify cluster connection
+      run: |
+        kubectl cluster-info
+        kubectl get nodes
+
+    - name: Create namespace if not exists
+      run: |
+        kubectl create namespace orca-core --dry-run=client -o yaml | kubectl apply -f -
+
+    - name: Get secrets from Key Vault
+      id: secrets
+      run: |
+        # Get Key Vault name based on environment
+        ENVIRONMENT=${{ github.event.inputs.environment || (github.ref == 'refs/heads/main' && 'prod') || (github.ref == 'refs/heads/develop' && 'staging') || 'dev' }}
+        KEY_VAULT_NAME="orca-keyvault-$ENVIRONMENT"
+
+        # Get secrets from Key Vault
+        OPENAI_API_KEY=$(az keyvault secret show --vault-name "$KEY_VAULT_NAME" --name "azure-openai-api-key" --query "value" -o tsv)
+        OPENAI_ENDPOINT=$(az keyvault secret show --vault-name "$KEY_VAULT_NAME" --name "azure-openai-endpoint" --query "value" -o tsv)
+        OPENAI_DEPLOYMENT=$(az keyvault secret show --vault-name "$KEY_VAULT_NAME" --name "azure-openai-deployment" --query "value" -o tsv)
+
+        # Create Kubernetes secret
+        kubectl create secret generic orca-secrets \
+          --namespace=orca-core \
+          --from-literal=AZURE_OPENAI_API_KEY="$OPENAI_API_KEY" \
+          --from-literal=AZURE_OPENAI_ENDPOINT="$OPENAI_ENDPOINT" \
+          --from-literal=AZURE_OPENAI_DEPLOYMENT="$OPENAI_DEPLOYMENT" \
+          --from-literal=ORCA_DECISION_MODE="RULES_PLUS_AI" \
+          --from-literal=ORCA_USE_XGB="true" \
+          --from-literal=ORCA_EXPLAIN_ENABLED="true" \
+          --dry-run=client -o yaml | kubectl apply -f -
+
+    - name: Deploy to AKS
+      run: |
+        # Set environment variables
+        ENVIRONMENT=${{ github.event.inputs.environment || (github.ref == 'refs/heads/main' && 'prod') || (github.ref == 'refs/heads/develop' && 'staging') || 'dev' }}
+        IMAGE_TAG=${{ needs.build.outputs.image-tag }}
+        MODEL_VERSION=${{ needs.build.outputs.model-version }}
+
+        # Create deployment manifest
+        cat > k8s-deployment.yaml << EOF
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: orca-core-api
+          namespace: orca-core
+          labels:
+            app: orca-core-api
+            environment: $ENVIRONMENT
+            model-version: $MODEL_VERSION
+        spec:
+          replicas: ${{ env.ENVIRONMENT == 'prod' && '3' || '2' }}
+          selector:
+            matchLabels:
+              app: orca-core-api
+          template:
+            metadata:
+              labels:
+                app: orca-core-api
+                environment: $ENVIRONMENT
+                model-version: $MODEL_VERSION
+            spec:
+              containers:
+              - name: orca-core-api
+                image: ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:$IMAGE_TAG
+                ports:
+                - containerPort: 8000
+                env:
+                - name: ORCA_DECISION_MODE
+                  valueFrom:
+                    secretKeyRef:
+                      name: orca-secrets
+                      key: ORCA_DECISION_MODE
+                - name: ORCA_USE_XGB
+                  valueFrom:
+                    secretKeyRef:
+                      name: orca-secrets
+                      key: ORCA_USE_XGB
+                - name: ORCA_EXPLAIN_ENABLED
+                  valueFrom:
+                    secretKeyRef:
+                      name: orca-secrets
+                      key: ORCA_EXPLAIN_ENABLED
+                - name: AZURE_OPENAI_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: orca-secrets
+                      key: AZURE_OPENAI_API_KEY
+                - name: AZURE_OPENAI_ENDPOINT
+                  valueFrom:
+                    secretKeyRef:
+                      name: orca-secrets
+                      key: AZURE_OPENAI_ENDPOINT
+                - name: AZURE_OPENAI_DEPLOYMENT
+                  valueFrom:
+                    secretKeyRef:
+                      name: orca-secrets
+                      key: AZURE_OPENAI_DEPLOYMENT
+                resources:
+                  requests:
+                    memory: "512Mi"
+                    cpu: "500m"
+                  limits:
+                    memory: "1Gi"
+                    cpu: "1000m"
+                livenessProbe:
+                  httpGet:
+                    path: /health
+                    port: 8000
+                  initialDelaySeconds: 30
+                  periodSeconds: 10
+                readinessProbe:
+                  httpGet:
+                    path: /health
+                    port: 8000
+                  initialDelaySeconds: 5
+                  periodSeconds: 5
+        ---
+        apiVersion: v1
+        kind: Service
+        metadata:
+          name: orca-core-api-service
+          namespace: orca-core
+          labels:
+            app: orca-core-api
+            environment: $ENVIRONMENT
+        spec:
+          selector:
+            app: orca-core-api
+          ports:
+          - protocol: TCP
+            port: 80
+            targetPort: 8000
+          type: ClusterIP
+        EOF
+
+        # Apply deployment
+        kubectl apply -f k8s-deployment.yaml
+
+        # Wait for deployment to be ready
+        kubectl rollout status deployment/orca-core-api --namespace=orca-core --timeout=300s
+
+    - name: Verify deployment
+      run: |
+        echo "🔍 Verifying deployment..."
+        kubectl get pods --namespace=orca-core -l app=orca-core-api
+        kubectl get services --namespace=orca-core
+        kubectl get deployment orca-core-api --namespace=orca-core
+
+    - name: Run health check
+      run: |
+        echo "🏥 Running health check..."
+        # Get service IP
+        SERVICE_IP=$(kubectl get service orca-core-api-service --namespace=orca-core -o jsonpath='{.spec.clusterIP}')
+
+        # Port forward and test
+        kubectl port-forward service/orca-core-api-service 8080:80 --namespace=orca-core &
+        PORT_FORWARD_PID=$!
+        sleep 10
+
+        # Test health endpoint
+        curl -f http://localhost:8080/health || exit 1
+
+        # Clean up port forward
+        kill $PORT_FORWARD_PID
+
+    - name: Deploy to Azure Container Instances (Optional)
+      if: ${{ github.event.inputs.environment == 'dev' }}
+      run: |
+        echo "🚀 Deploying to Azure Container Instances for dev environment..."
+
+        # Create container instance
+        az container create \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --name orca-core-dev \
+          --image ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ needs.build.outputs.image-tag }} \
+          --registry-login-server ${{ env.REGISTRY_NAME }}.azurecr.io \
+          --registry-username ${{ secrets.ACR_USERNAME }} \
+          --registry-password ${{ secrets.ACR_PASSWORD }} \
+          --dns-name-label orca-core-dev \
+          --ports 8000 \
+          --environment-variables \
+            ORCA_DECISION_MODE=RULES_PLUS_AI \
+            ORCA_USE_XGB=true \
+            ORCA_EXPLAIN_ENABLED=true \
+          --secure-environment-variables \
+            AZURE_OPENAI_API_KEY="${{ secrets.AZURE_OPENAI_API_KEY }}" \
+            AZURE_OPENAI_ENDPOINT="${{ secrets.AZURE_OPENAI_ENDPOINT }}" \
+            AZURE_OPENAI_DEPLOYMENT="${{ secrets.AZURE_OPENAI_DEPLOYMENT }}"
+
+  # Notification Job
+  notify:
+    needs: [build, deploy]
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+    - name: Notify deployment status
+      run: |
+        if [ "${{ needs.deploy.result }}" == "success" ]; then
+          echo "✅ Deployment successful!"
+          echo "Environment: ${{ github.event.inputs.environment || 'auto-detected' }}"
+          echo "Image: ${{ needs.build.outputs.image-tag }}"
+          echo "Model Version: ${{ needs.build.outputs.model-version }}"
+        else
+          echo "❌ Deployment failed!"
+          echo "Check the logs for details."
+        fi

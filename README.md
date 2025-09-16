@@ -51,6 +51,79 @@ source .venv/bin/activate  # Linux/macOS
 make init
 ```
 
+### Phase 2 Setup (AI/LLM Features)
+
+For Phase 2 AI/LLM features, you'll need to configure Azure OpenAI and Azure infrastructure:
+
+```bash
+# Copy the example configuration
+cp .env.example .env.local
+
+# Configure Azure OpenAI and Azure infrastructure
+make configure-azure-openai
+
+# Test your configuration
+make test-config
+
+# Run demo with AI features enabled
+ORCA_MODE=RULES_PLUS_AI make demo
+```
+
+The configuration script will:
+- Collect your Azure OpenAI endpoint, API key, and deployment details
+- Gather Azure infrastructure information (subscription, resource group, etc.)
+- Create `.env.local` with your configuration (DO NOT commit this file)
+- Generate `infra/azure/params/dev.json` for infrastructure deployment
+
+**Required Azure Resources:**
+- Azure OpenAI service with GPT-4 deployment
+- Azure subscription with appropriate permissions
+- Azure Resource Group for infrastructure
+- Azure Container Registry (ACR)
+- Azure Kubernetes Service (AKS)
+- Azure Key Vault for secrets management
+
+### Phase 2 Demo
+
+Experience the full AI/LLM explainability features with our interactive demo:
+
+```bash
+# Run the comprehensive Phase 2 demo
+./scripts/demo_phase2.sh
+```
+
+The demo script will showcase:
+- **Configuration validation** - Verify your Azure OpenAI setup
+- **Model information** - Display current ML model details
+- **Template explanations** - Show rule-based explanations
+- **LLM explanations** - Demonstrate AI-generated explanations with guardrails
+- **Batch processing** - Process multiple requests efficiently
+- **Model training** - Train XGBoost models with synthetic data
+- **Evaluation plots** - Generate model performance visualizations
+- **Debug UI** - Launch the interactive Streamlit interface
+
+**Demo Features:**
+- Interactive step-by-step walkthrough
+- Colored output for better readability
+- Error handling and validation
+- Automatic cleanup and resource management
+- Comprehensive feature demonstration
+
+**Quick Demo Commands:**
+```bash
+# Test XGBoost model
+make test-xgb
+
+# Test LLM explanations
+make test-llm
+
+# Launch debug UI
+make debug-ui
+
+# Generate model plots
+make generate-plots
+```
+
 ### Usage
 
 #### Command Line Interface
@@ -333,6 +406,57 @@ This is a **local development** implementation focused on:
 - ML hooks integration
 - API contract stability
 - Development tooling and testing
+
+## Phase 2 — Orca + AI/LLM Explainability
+
+### Objectives
+
+Phase 2 introduces advanced AI/LLM capabilities to enhance decision explainability and provide more sophisticated risk assessment:
+
+- **Enhanced ML Risk Assessment**: Real-time ML model integration with Azure ML services
+- **LLM-Powered Explanations**: Natural language explanations using Azure OpenAI
+- **Debug UI**: Interactive web interface for decision analysis and debugging
+- **Azure Integration**: Cloud-native deployment with Azure services
+- **Advanced Feature Engineering**: Sophisticated feature extraction and model serving
+
+### Feature Flags
+
+The system supports two operational modes controlled by environment variables:
+
+- **`RULES_ONLY`**: Traditional rule-based decisions (Phase 1 behavior)
+- **`RULES_PLUS_AI`**: Enhanced decisions with ML risk assessment and LLM explanations
+
+### Environment Variables
+
+```bash
+# Feature flags
+ORCA_MODE=RULES_PLUS_AI  # or RULES_ONLY
+
+# Azure ML Configuration
+AZURE_ML_ENDPOINT=https://your-ml-endpoint.azureml.net
+AZURE_ML_KEY=your-ml-key
+AZURE_ML_MODEL_NAME=orca-risk-model
+
+# Azure OpenAI Configuration
+AZURE_OPENAI_ENDPOINT=https://your-openai-endpoint.openai.azure.com
+AZURE_OPENAI_API_KEY=your-openai-key
+AZURE_OPENAI_DEPLOYMENT_NAME=orca-gpt-4
+
+# Debug UI Configuration
+DEBUG_UI_ENABLED=true
+DEBUG_UI_PORT=8501
+```
+
+### Validation Checklist
+
+- [ ] **ML Risk Integration**: Azure ML endpoint returns risk scores for test transactions
+- [ ] **LLM Explanations**: Azure OpenAI generates human-readable explanations
+- [ ] **Debug UI**: Streamlit interface displays decision flow and ML insights
+- [ ] **Feature Flags**: System correctly switches between RULES_ONLY and RULES_PLUS_AI modes
+- [ ] **Azure Connectivity**: All Azure services are accessible and authenticated
+- [ ] **Performance**: Decision latency remains under 100ms with AI enhancements
+- [ ] **Fallback Behavior**: System gracefully degrades when AI services are unavailable
+- [ ] **Security**: API keys and endpoints are properly secured and not exposed in logs
 
 ## Decision Rules
 

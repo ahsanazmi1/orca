@@ -163,6 +163,43 @@ class TestHumanExplanationGeneration:
         assert "We made this decision based on" in explanation
         assert "More detail coming soon" in explanation
 
+    def test_template_formatting_error(self):
+        """Test that template formatting errors are handled gracefully."""
+        # Test with a template that actually has a formatting error
+        from orca_core.explanations import EXPLANATION_TEMPLATES
+
+        reasons = ["high_ticket"]
+        context = {"threshold": "test"}
+
+        # Temporarily modify a template to have a formatting error
+        original_template = EXPLANATION_TEMPLATES["high_ticket"]["DECLINE"]
+        EXPLANATION_TEMPLATES["high_ticket"][
+            "DECLINE"
+        ] = "Declined: Amount exceeds {invalid_var} threshold."
+
+        try:
+            explanation = generate_human_explanation(reasons, "DECLINE", context)
+            # Should fall back to FALLBACK_TEMPLATE when formatting fails
+            assert "We made this decision based on" in explanation
+            assert "More detail coming soon" in explanation
+        finally:
+            # Restore original template
+            EXPLANATION_TEMPLATES["high_ticket"]["DECLINE"] = original_template
+
+    def test_loyalty_reason_patterns(self):
+        """Test that loyalty-related reasons are handled correctly."""
+        # Test gold pattern
+        explanation = generate_human_explanation(["gold_member"], "APPROVE")
+        assert "Approved: Customer loyalty tier benefits applied." in explanation
+
+        # Test silver pattern
+        explanation = generate_human_explanation(["silver_status"], "DECLINE")
+        assert "Declined: Loyalty benefits could not be applied." in explanation
+
+        # Test loyalty pattern
+        explanation = generate_human_explanation(["loyalty_program"], "REVIEW")
+        assert "Under review: Loyalty tier verification required." in explanation
+
 
 class TestTemplateVersions:
     """Test template versioning and consistency."""

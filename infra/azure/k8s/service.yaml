@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: orca-core
+  labels:
+    app: orca-core
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+    name: api
+  - port: 8501
+    targetPort: 8501
+    protocol: TCP
+    name: streamlit
+  selector:
+    app: orca-core

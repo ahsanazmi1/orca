@@ -1,0 +1,171 @@
+# Azure Key Vault CSI Driver Installation
+# This manifest installs the Azure Key Vault CSI driver and related components
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kube-system
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: secrets-store-csi-driver
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: secrets-store-csi-driver
+rules:
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "list"]
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["get", "list", "watch", "create", "update", "patch"]
+- apiGroups: ["coordination.k8s.io"]
+  resources: ["leases"]
+  verbs: ["get", "watch", "list", "delete", "update", "create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: secrets-store-csi-driver
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: secrets-store-csi-driver
+subjects:
+- kind: ServiceAccount
+  name: secrets-store-csi-driver
+  namespace: kube-system
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: secrets-store-csi-driver
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      app: secrets-store-csi-driver
+  template:
+    metadata:
+      labels:
+        app: secrets-store-csi-driver
+    spec:
+      serviceAccountName: secrets-store-csi-driver
+      containers:
+      - name: secrets-store
+        image: mcr.microsoft.com/oss/kubernetes-csi/secrets-store/driver:v1.3.2
+        imagePullPolicy: Always
+        args:
+        - --endpoint=$(CSI_ENDPOINT)
+        - --nodeid=$(KUBE_NODE_NAME)
+        - --metrics-addr=:8080
+        - --provider-volume=/etc/kubernetes/secrets-store-csi-providers
+        - --grpc-supported-providers=azure
+        env:
+        - name: CSI_ENDPOINT
+          value: unix:///csi/csi.sock
+        - name: KUBE_NODE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        volumeMounts:
+        - name: mountpoint-dir
+          mountPath: /csi
+        - name: providers-dir
+          mountPath: /etc/kubernetes/secrets-store-csi-providers
+        ports:
+        - name: metrics
+          containerPort: 8080
+          protocol: TCP
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /healthz
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 5
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+      - name: liveness-probe
+        image: mcr.microsoft.com/oss/kubernetes-csi/livenessprobe:v2.10.0
+        args:
+        - --csi-address=/csi/csi.sock
+        - --probe-timeout=3s
+        - --health-port=8080
+        - --v=2
+        volumeMounts:
+        - name: mountpoint-dir
+          mountPath: /csi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+      volumes:
+      - name: mountpoint-dir
+        hostPath:
+          path: /var/lib/kubelet/plugins/secrets-store.csi.k8s.io
+          type: DirectoryOrCreate
+      - name: providers-dir
+        hostPath:
+          path: /etc/kubernetes/secrets-store-csi-providers
+          type: DirectoryOrCreate
+      nodeSelector:
+        kubernetes.io/os: linux
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: csi-secrets-store-provider-azure
+  namespace: kube-system
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: csi-secrets-store-provider-azure
+  template:
+    metadata:
+      labels:
+        app: csi-secrets-store-provider-azure
+    spec:
+      containers:
+      - name: provider-azure-installer
+        image: mcr.microsoft.com/oss/kubernetes-csi/secrets-store/driver:v1.3.2
+        imagePullPolicy: Always
+        command:
+        - /bin/sh
+        - -c
+        - |
+          #!/bin/sh
+          echo "Installing Azure Key Vault provider..."
+          cp -p /etc/kubernetes/secrets-store-csi-providers/azure/provider-azure /host/etc/kubernetes/secrets-store-csi-providers/azure/provider-azure
+          chmod 755 /host/etc/kubernetes/secrets-store-csi-providers/azure/provider-azure
+          echo "Azure Key Vault provider installed successfully"
+          while true; do
+            sleep 3600
+          done
+        volumeMounts:
+        - name: host-etc-kubernetes
+          mountPath: /host/etc/kubernetes
+          readOnly: false
+        securityContext:
+          privileged: true
+      volumes:
+      - name: host-etc-kubernetes
+        hostPath:
+          path: /etc/kubernetes
+          type: DirectoryOrCreate
+      nodeSelector:
+        kubernetes.io/os: linux
