@@ -254,8 +254,8 @@ class OrcaDebugUI:
                         request = DecisionRequest(
                             cart_total=cart_total,
                             currency=currency,
-                            rail=rail,
-                            channel=channel,
+                            rail=rail,  # type: ignore
+                            channel=channel,  # type: ignore
                             features={
                                 "amount": amount,
                                 "velocity_24h": velocity_24h,
