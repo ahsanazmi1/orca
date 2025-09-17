@@ -167,7 +167,15 @@ class ModelRegistry:
 
         # Apply scaling if available
         if self.scaler is not None:
-            feature_vector = self.scaler.transform(feature_vector.reshape(1, -1))
+            # Convert to DataFrame with feature names for proper scaling
+            import pandas as pd
+
+            feature_names = self.feature_spec.get("feature_names", []) if self.feature_spec else []
+            if feature_names:
+                feature_df = pd.DataFrame(feature_vector.reshape(1, -1), columns=feature_names)
+                feature_vector = self.scaler.transform(feature_df)
+            else:
+                feature_vector = self.scaler.transform(feature_vector.reshape(1, -1))
 
         # Get raw prediction
         if self.model is not None:
@@ -185,10 +193,12 @@ class ModelRegistry:
         # Get key signals (top contributing features)
         key_signals = self._get_key_signals(features, calibrated_score)
 
-        # Compute SHAP values if enabled
+        # Compute SHAP values if enabled (use original unscaled features)
         shap_values = None
         if enable_shap and os.getenv("ORCA_ENABLE_SHAP", "false").lower() == "true":
-            shap_values = self._compute_shap_values(feature_vector)
+            # Use original unscaled features for SHAP
+            original_features = self._features_to_vector(features)
+            shap_values = self._compute_shap_values(original_features)
 
         return {
             "risk_score": float(calibrated_score),
@@ -325,7 +335,9 @@ class ModelRegistry:
             # Create SHAP explainer
             explainer = shap.TreeExplainer(self.model)
 
-            # Compute SHAP values
+            # Compute SHAP values (ensure 2D input)
+            if feature_vector.ndim == 1:
+                feature_vector = feature_vector.reshape(1, -1)
             shap_values = explainer.shap_values(feature_vector)
 
             # Map to feature names

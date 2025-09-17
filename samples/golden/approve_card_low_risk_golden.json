@@ -9,7 +9,7 @@
       "created": "2024-01-15 10:30:00+00:00",
       "expires": "2024-01-15 11:30:00+00:00"
     },
-    "nonce": "0ec5c497-47c4-4103-a757-ebb0a15de564",
+    "nonce": "6575a6d1-243e-4759-a91a-89aee4fe44ea",
     "metadata": null
   },
   "cart": {
@@ -69,9 +69,9 @@
     "meta": {
       "model": "xgboost",
       "model_version": "1.0.0",
-      "model_sha256": "293297e4785c4857",
+      "model_sha256": "4c8b4f96c5dce7b9",
       "model_trained_on": "2024-01-01",
-      "trace_id": "fc0184fa-34e0-446f-ab55-95af6e918013",
+      "trace_id": "ee85f240-c24a-4603-8fae-7996a00d0174",
       "processing_time_ms": null,
       "version": "0.1.0",
       "rules_evaluated": [],
@@ -123,7 +123,7 @@
     ],
     "model_meta": {
       "model_version": "1.0.0",
-      "model_sha256": "293297e4785c4857",
+      "model_sha256": "4c8b4f96c5dce7b9",
       "trained_on": "2024-01-01",
       "thresholds": {
         "amount": 500.0,
