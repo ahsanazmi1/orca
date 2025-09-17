@@ -164,6 +164,9 @@ class ModelRegistry:
 
         # Convert features to model input
         feature_vector = self._features_to_vector(features)
+        
+        # Store raw features for calibration
+        raw_feature_vector = feature_vector.copy()
 
         # Apply scaling if available
         if self.scaler is not None:
@@ -177,16 +180,16 @@ class ModelRegistry:
             else:
                 feature_vector = self.scaler.transform(feature_vector.reshape(1, -1))
 
-        # Get raw prediction
+        # Get raw prediction (use scaled features for XGBoost)
         if self.model is not None:
             dmatrix = xgb.DMatrix(feature_vector)
             raw_score = self.model.predict(dmatrix)[0]
         else:
             raw_score = 0.5  # Default fallback
 
-        # Apply calibration
+        # Apply calibration (use raw features, not scaled)
         if self.calibrator is not None:
-            calibrated_score = self.calibrator.predict_proba(feature_vector.reshape(1, -1))[0, 1]
+            calibrated_score = self.calibrator.predict_proba(raw_feature_vector.reshape(1, -1))[0, 1]
         else:
             calibrated_score = raw_score  # Fallback to raw score
 

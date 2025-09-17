@@ -55,3 +55,5 @@ output namespace string = namespace
 output imageTag string = imageTag
 output acrLoginServer string = acrLoginServer
 output keyVaultUri string = keyVaultUri
+
+

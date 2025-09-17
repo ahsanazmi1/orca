@@ -341,3 +341,5 @@ class TestFeatureExtraction:
         # Result should be a new dictionary
         assert result is not raw
         assert result is not raw["features"]
+
+

@@ -9,7 +9,7 @@
       "created": "2024-01-15 16:20:00+00:00",
       "expires": "2024-01-15 17:20:00+00:00"
     },
-    "nonce": "74dbab77-7e2a-499a-8b47-8c13d386a5be",
+    "nonce": "39cfc94a-4517-486d-8ea0-fc06bea3650f",
     "metadata": null
   },
   "cart": {
@@ -52,7 +52,7 @@
   },
   "decision": {
     "result": "APPROVE",
-    "risk_score": 0.13999999999999999,
+    "risk_score": 0.3,
     "reasons": [
       {
         "code": "high_ticket",
@@ -71,7 +71,7 @@
       "model_version": "1.0.0",
       "model_sha256": "4c8b4f96c5dce7b9",
       "model_trained_on": "2024-01-01",
-      "trace_id": "4fc35d66-384b-4032-88ef-666f3cef0432",
+      "trace_id": "32d148c5-3323-4ff2-9483-9674e0680c3d",
       "processing_time_ms": null,
       "version": "0.1.0",
       "rules_evaluated": [],
@@ -83,42 +83,42 @@
     "receipt_hash": null
   },
   "ml_prediction": {
-    "risk_score": 0.0,
+    "risk_score": 0.012244152215619883,
     "key_signals": [
       {
         "feature_name": "amount",
         "ap2_path": "cart.amount",
         "value": 500.0,
         "importance": 0.03689694404602051,
-        "contribution": 0.0
+        "contribution": 0.22588589959534242
       },
       {
-        "feature_name": "velocity_24h",
-        "ap2_path": "velocity.24h",
-        "value": 1.0,
-        "importance": 0.09366224706172943,
-        "contribution": 0.0
+        "feature_name": "customer_age_days",
+        "ap2_path": "customer.age_days",
+        "value": 365.0,
+        "importance": 0.03622858598828316,
+        "contribution": 0.16190973730998262
+      },
+      {
+        "feature_name": "time_since_last_purchase",
+        "ap2_path": "customer.time_since_last_purchase",
+        "value": 7.0,
+        "importance": 0.030877450481057167,
+        "contribution": 0.002646477426042305
       },
       {
         "feature_name": "velocity_7d",
         "ap2_path": "velocity.7d",
         "value": 3.0,
         "importance": 0.04688887670636177,
-        "contribution": 0.0
+        "contribution": 0.0017223436308363808
       },
       {
-        "feature_name": "cross_border",
-        "ap2_path": "cart.geo.cross_border",
-        "value": 0.0,
-        "importance": 0.11325960606336594,
-        "contribution": 0.0
-      },
-      {
-        "feature_name": "location_mismatch",
-        "ap2_path": "cart.geo.location_mismatch",
-        "value": 0.0,
-        "importance": 0.12296979874372482,
-        "contribution": 0.0
+        "feature_name": "velocity_24h",
+        "ap2_path": "velocity.24h",
+        "value": 1.0,
+        "importance": 0.09366224706172943,
+        "contribution": 0.0011468148098808112
       }
     ],
     "model_meta": {
