@@ -13,6 +13,7 @@ from unittest.mock import MagicMock, patch
 
 import numpy as np
 import pytest
+
 from orca_core.ml.xgb_infer import (
     XGBoostInference,
     get_xgb_inference,

@@ -7,6 +7,7 @@ import tempfile
 from unittest.mock import Mock, patch
 
 import numpy as np
+
 from orca_core.ml.plotting import MLPlotter, plot_xgb_model_evaluation
 
 
@@ -342,7 +343,7 @@ def test_plot_roc_curve_with_save():
             temp_path = temp_file.name
 
         try:
-            result = plotter.plot_roc_curve(y_true, y_scores, "Test Model", save_path=temp_path)
+            plotter.plot_roc_curve(y_true, y_scores, "Test Model", save_path=temp_path)
             mock_plt.savefig.assert_called_with(temp_path, dpi=300, bbox_inches="tight")
         finally:
             if os.path.exists(temp_path):
@@ -366,7 +367,7 @@ def test_plot_precision_recall_curve_with_save():
             temp_path = temp_file.name
 
         try:
-            result = plotter.plot_precision_recall_curve(
+            plotter.plot_precision_recall_curve(
                 y_true, y_scores, "Test Model", save_path=temp_path
             )
             mock_plt.savefig.assert_called_with(temp_path, dpi=300, bbox_inches="tight")

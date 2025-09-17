@@ -7,6 +7,7 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import numpy as np
+
 from orca_core.ml.features import FeatureExtractor
 from orca_core.ml.model import predict_risk, predict_risk_stub
 from orca_core.ml.xgb_infer import XGBoostInference, predict_risk_xgb
@@ -205,7 +206,7 @@ class TestXGBoostInference:
                 mock_load.side_effect = [mock_model, mock_calibrator, mock_scaler]
 
                 inference = XGBoostInference(model_dir=temp_dir)
-                success = inference._load_model()
+                inference._load_model()
 
                 # The load might fail due to other issues, so let's just check that it was called
                 assert mock_load.call_count >= 1
@@ -360,24 +361,23 @@ class TestXGBoostInference:
 
     def test_predict_risk_xgb_success(self):
         """Test predict_risk_xgb function success."""
-        with tempfile.TemporaryDirectory() as temp_dir:
-            with patch("orca_core.ml.xgb_infer.get_xgb_inference") as mock_get_inference:
-                mock_inference = MagicMock()
-                mock_inference.predict_risk.return_value = {
-                    "risk_score": 0.6,
-                    "reason_codes": ["XGB_PREDICTION"],
-                    "version": "xgb-1.0.0",
-                    "model_type": "xgb",
-                }
-                mock_get_inference.return_value = mock_inference
+        with patch("orca_core.ml.xgb_infer.get_xgb_inference") as mock_get_inference:
+            mock_inference = MagicMock()
+            mock_inference.predict_risk.return_value = {
+                "risk_score": 0.6,
+                "reason_codes": ["XGB_PREDICTION"],
+                "version": "xgb-1.0.0",
+                "model_type": "xgb",
+            }
+            mock_get_inference.return_value = mock_inference
 
-                features = {"amount": 100.0, "velocity_24h": 2.0, "cross_border": 0}
+            features = {"amount": 100.0, "velocity_24h": 2.0, "cross_border": 0}
 
-                result = predict_risk_xgb(features)
+            result = predict_risk_xgb(features)
 
-                assert result["model_type"] == "xgb"
-                assert result["risk_score"] == 0.6
-                mock_inference.predict_risk.assert_called_once_with(features)
+            assert result["model_type"] == "xgb"
+            assert result["risk_score"] == 0.6
+            mock_inference.predict_risk.assert_called_once_with(features)
 
     def test_predict_risk_xgb_fallback(self):
         """Test predict_risk_xgb function fallback."""
