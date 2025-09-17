@@ -1,0 +1,209 @@
+{
+  "ap2_version": "0.1.0",
+  "intent": {
+    "actor": "human",
+    "intent_type": "purchase",
+    "channel": "web",
+    "agent_presence": "none",
+    "timestamps": {
+      "created": "2024-01-15 14:45:00+00:00",
+      "expires": "2024-01-15 15:45:00+00:00"
+    },
+    "nonce": "30297dfb-9f91-430e-bc54-81f8968be6a8",
+    "metadata": null
+  },
+  "cart": {
+    "items": [
+      {
+        "id": "item_002",
+        "name": "MacBook Pro 16-inch",
+        "description": null,
+        "quantity": 1,
+        "unit_price": "2499.00",
+        "total_price": "2499.00",
+        "category": null,
+        "sku": null
+      }
+    ],
+    "amount": "2499.00",
+    "currency": "USD",
+    "mcc": "5732",
+    "geo": {
+      "country": "US",
+      "region": null,
+      "city": null,
+      "latitude": null,
+      "longitude": null,
+      "timezone": null
+    },
+    "risk_flags": [],
+    "metadata": null
+  },
+  "payment": {
+    "instrument_ref": "card_mastercard_****5678",
+    "instrument_token": null,
+    "modality": "immediate",
+    "constraints": null,
+    "routing_hints": [],
+    "auth_requirements": [
+      "pin",
+      "biometric"
+    ],
+    "metadata": null
+  },
+  "decision": {
+    "result": "REVIEW",
+    "risk_score": 0.16799999999999998,
+    "reasons": [
+      {
+        "code": "high_ticket",
+        "detail": "Transaction amount $2499.00 exceeds $500.0 threshold"
+      },
+      {
+        "code": "online_verification",
+        "detail": "Online card transaction requires additional verification"
+      }
+    ],
+    "actions": [
+      {
+        "type": "manual_review",
+        "to": null,
+        "detail": "Transaction requires review"
+      },
+      {
+        "type": "step_up_auth",
+        "to": null,
+        "detail": "Card verification required"
+      },
+      {
+        "type": "process_payment",
+        "to": null,
+        "detail": "Biometric authentication verified"
+      }
+    ],
+    "meta": {
+      "model": "xgboost",
+      "model_version": "1.0.0",
+      "model_sha256": "293297e4785c4857",
+      "model_trained_on": "2024-01-01",
+      "trace_id": "24d997b2-07b4-467d-a79b-4d1601614606",
+      "processing_time_ms": null,
+      "version": "0.1.0",
+      "rules_evaluated": [],
+      "feature_snapshot": {}
+    }
+  },
+  "signing": {
+    "vc_proof": null,
+    "receipt_hash": null
+  },
+  "ml_prediction": {
+    "risk_score": 0.0,
+    "key_signals": [
+      {
+        "feature_name": "amount",
+        "ap2_path": "cart.amount",
+        "value": 2499.0,
+        "importance": 0.03689694404602051,
+        "contribution": 0.0
+      },
+      {
+        "feature_name": "velocity_24h",
+        "ap2_path": "velocity.24h",
+        "value": 1.0,
+        "importance": 0.09366224706172943,
+        "contribution": 0.0
+      },
+      {
+        "feature_name": "velocity_7d",
+        "ap2_path": "velocity.7d",
+        "value": 3.0,
+        "importance": 0.04688887670636177,
+        "contribution": 0.0
+      },
+      {
+        "feature_name": "cross_border",
+        "ap2_path": "cart.geo.cross_border",
+        "value": 0.0,
+        "importance": 0.11325960606336594,
+        "contribution": 0.0
+      },
+      {
+        "feature_name": "location_mismatch",
+        "ap2_path": "cart.geo.location_mismatch",
+        "value": 0.0,
+        "importance": 0.12296979874372482,
+        "contribution": 0.0
+      }
+    ],
+    "model_meta": {
+      "model_version": "1.0.0",
+      "model_sha256": "293297e4785c4857",
+      "trained_on": "2024-01-01",
+      "thresholds": {
+        "amount": 500.0,
+        "velocity_24h": 3.0,
+        "cross_border": 0.5,
+        "location_mismatch": 0.5,
+        "payment_method_risk": 0.7,
+        "chargebacks_12m": 1.0
+      },
+      "feature_count": 10
+    },
+    "shap_values": {
+      "explanations": [
+        {
+          "feature_name": "chargebacks_12m",
+          "ap2_path": "customer.chargebacks_12m",
+          "shap_value": -1.8174740076065063
+        },
+        {
+          "feature_name": "amount",
+          "ap2_path": "cart.amount",
+          "shap_value": 1.269483208656311
+        },
+        {
+          "feature_name": "velocity_24h",
+          "ap2_path": "velocity.24h",
+          "shap_value": -0.8564935326576233
+        },
+        {
+          "feature_name": "cross_border",
+          "ap2_path": "cart.geo.cross_border",
+          "shap_value": -0.679224967956543
+        },
+        {
+          "feature_name": "velocity_7d",
+          "ap2_path": "velocity.7d",
+          "shap_value": 0.5225306749343872
+        },
+        {
+          "feature_name": "location_mismatch",
+          "ap2_path": "cart.geo.location_mismatch",
+          "shap_value": -0.49459609389305115
+        },
+        {
+          "feature_name": "loyalty_score",
+          "ap2_path": "customer.loyalty_score",
+          "shap_value": -0.38923195004463196
+        },
+        {
+          "feature_name": "customer_age_days",
+          "ap2_path": "customer.age_days",
+          "shap_value": -0.38440221548080444
+        },
+        {
+          "feature_name": "payment_method_risk",
+          "ap2_path": "payment.method_risk",
+          "shap_value": -0.3195320665836334
+        },
+        {
+          "feature_name": "time_since_last_purchase",
+          "ap2_path": "customer.time_since_last_purchase",
+          "shap_value": -0.16926229000091553
+        }
+      ],
+      "base_value": -3.3935773372650146
+    }
+  }
+}

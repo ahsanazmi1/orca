@@ -1,0 +1,38 @@
+{
+    "ap2_version": "0.1.0",
+    "intent": {
+        "actor": "human",
+        "intent_type": "purchase",
+        "channel": "web",
+        "agent_presence": "none",
+        "timestamps": {
+            "created": "2024-01-15T16:20:00Z",
+            "expires": "2024-01-15T17:20:00Z"
+        }
+    },
+    "cart": {
+        "items": [
+            {
+                "id": "item_003",
+                "name": "Cryptocurrency Purchase",
+                "quantity": 1,
+                "unit_price": "500.00",
+                "total_price": "500.00"
+            }
+        ],
+        "amount": "500.00",
+        "currency": "USD",
+        "mcc": "6012",
+        "geo": {
+            "country": "US",
+            "ip_country": "US"
+        }
+    },
+    "payment": {
+        "instrument_ref": "card_amex_****9012",
+        "modality": "immediate",
+        "auth_requirements": [
+            "pin"
+        ]
+    }
+}

@@ -8,14 +8,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- ML risk stub for Azure ML integration
-- LLM explanations using Azure OpenAI
-- Debug UI for decision analysis and debugging
-- Azure scaffolding for cloud-native deployment
-- Feature flags for RULES_ONLY and RULES_PLUS_AI modes
-- Environment variable configuration for Azure services
-- Enhanced ML risk assessment capabilities
-- Advanced feature engineering pipeline
+- **AP2 Contract Support**: AP2-compliant decision contracts with structured mandates
+- **Real ML Model System**: XGBoost model with calibration, SHAP support, and feature drift guard
+- **Model Versioning**: ML model versioning with semantic versioning and artifact management
+- **Decision Signing**: Verifiable credential proofs and receipt hashing for audit trails
+- **Legacy Adapter**: Backward compatibility adapter for legacy contract migration
+- **Feature Mapping**: AP2 field path mapping for ML features and explanations
+- **Content Type Headers**: AP2 content type (`application/vnd.ocn.ap2+json; version=1`) for REST APIs
+- **Migration Guide**: Comprehensive migration documentation and best practices
+- **Round-trip Tests**: Legacy ↔ AP2 conversion tests preserving semantics
+- **ML risk stub for Azure ML integration**
+- **LLM explanations using Azure OpenAI**
+- **Debug UI for decision analysis and debugging**
+- **Azure scaffolding for cloud-native deployment**
+- **Feature flags for RULES_ONLY and RULES_PLUS_AI modes**
+- **Environment variable configuration for Azure services**
+- **Enhanced ML risk assessment capabilities**
+- **Advanced feature engineering pipeline**
 
 ### Changed
 - Enhanced decision engine with AI/LLM explainability

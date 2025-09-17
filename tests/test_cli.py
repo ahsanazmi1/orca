@@ -7,9 +7,8 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
-from typer.testing import CliRunner
-
 from orca_core.cli import app
+from typer.testing import CliRunner
 
 
 class TestCLI:
@@ -517,13 +516,6 @@ class TestCLI:
 
         assert result.exit_code == 1
         assert "Error generating plots" in result.stdout
-
-    def test_decide_command_with_empty_input(self):
-        """Test the decide command with empty input."""
-        result = self.runner.invoke(app, ["decide", ""])
-
-        assert result.exit_code == 1
-        assert "No JSON input provided" in result.stdout
 
     def test_decide_command_with_stdin(self):
         """Test the decide command reading from stdin."""

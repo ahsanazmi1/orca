@@ -1,0 +1,30 @@
+{
+    "cart_total": 29.99,
+    "currency": "USD",
+    "rail": "ACH",
+    "channel": "online",
+    "features": {
+        "amount": 29.99,
+        "velocity_24h": 0.0,
+        "velocity_7d": 1.0,
+        "cross_border": 0.0,
+        "location_mismatch": 0.0,
+        "payment_method_risk": 0.1,
+        "chargebacks_12m": 0.0,
+        "customer_age_days": 1095.0,
+        "loyalty_score": 0.9,
+        "time_since_last_purchase": 30.0
+    },
+    "context": {
+        "customer_id": "cust_22222",
+        "location_country": "US",
+        "ip_country": "US",
+        "mcc": "7372",
+        "auth_requirements": [
+            "pin"
+        ],
+        "trace_id": "trace_004",
+        "processing_time_ms": 41.3,
+        "model": "rules_only"
+    }
+}

@@ -1,0 +1,44 @@
+{
+    "cart_total": 319.98,
+    "currency": "USD",
+    "rail": "Card",
+    "channel": "online",
+    "features": {
+        "velocity_24h": 4.0,
+        "risk_score": 0.65,
+        "customer_age_days": 365,
+        "avg_transaction_amount": 150.25,
+        "chargeback_rate": 0.02
+    },
+    "context": {
+        "customer_id": "cust_premium_123",
+        "merchant_id": "merchant_premium_001",
+        "session_id": "sess_abc123",
+        "ip_address": "192.168.1.100",
+        "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)",
+        "location": {
+            "country": "US",
+            "region": "NY",
+            "city": "New York",
+            "latitude": 40.7128,
+            "longitude": -74.0060
+        },
+        "customer": {
+            "loyalty_tier": "PLATINUM",
+            "chargebacks_12m": 0,
+            "account_age_days": 365,
+            "verification_status": "verified"
+        },
+        "merchant": {
+            "category": "electronics",
+            "risk_tier": "low",
+            "processing_volume_30d": 50000.00
+        },
+        "transaction": {
+            "is_recurring": false,
+            "is_installment": false,
+            "has_discount": false,
+            "shipping_method": "express"
+        }
+    }
+}

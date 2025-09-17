@@ -1,7 +1,6 @@
 """Unit tests for Week 2 Rules + Rails rail and channel rules."""
 
 import pytest
-
 from orca_core.engine import evaluate_rules
 from orca_core.models import DecisionRequest
 

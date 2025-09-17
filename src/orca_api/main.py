@@ -7,13 +7,12 @@ from typing import Any
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import ORJSONResponse
-from pydantic import BaseModel, Field, ValidationError
-
 from orca_core.config import get_settings
 from orca_core.engine import evaluate_rules
 from orca_core.explanations import generate_human_explanation
 from orca_core.llm.explain import get_llm_explainer, is_llm_configured
 from orca_core.models import DecisionRequest, DecisionResponse
+from pydantic import BaseModel, Field, ValidationError
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

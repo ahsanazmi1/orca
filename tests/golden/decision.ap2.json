@@ -1,0 +1,148 @@
+{
+    "ap2_version": "0.1.0",
+    "intent": {
+        "actor": "human",
+        "intent_type": "purchase",
+        "channel": "web",
+        "agent_presence": "assisted",
+        "timestamps": {
+            "created": "2024-01-15T14:30:00Z",
+            "expires": "2024-01-15T15:30:00Z",
+            "last_updated": "2024-01-15T14:30:00Z"
+        },
+        "nonce": "123e4567-e89b-12d3-a456-426614174000",
+        "metadata": {
+            "session_id": "sess_abc123",
+            "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)",
+            "ip_address": "192.168.1.100"
+        }
+    },
+    "cart": {
+        "items": [
+            {
+                "id": "prod_789",
+                "name": "Premium Wireless Earbuds",
+                "description": "High-end wireless earbuds with active noise cancellation",
+                "quantity": 1,
+                "unit_price": 299.99,
+                "total_price": 299.99,
+                "category": "Electronics",
+                "sku": "PWE-001-BLK"
+            },
+            {
+                "id": "prod_101",
+                "name": "Protective Case",
+                "description": "Silicone protective case for earbuds",
+                "quantity": 1,
+                "unit_price": 19.99,
+                "total_price": 19.99,
+                "category": "Accessories",
+                "sku": "PC-003-SIL"
+            }
+        ],
+        "amount": 319.98,
+        "currency": "USD",
+        "mcc": "5733",
+        "geo": {
+            "country": "US",
+            "region": "NY",
+            "city": "New York",
+            "latitude": 40.7128,
+            "longitude": -74.0060,
+            "timezone": "America/New_York"
+        },
+        "risk_flags": [
+            "medium"
+        ],
+        "metadata": {
+            "cart_id": "cart_xyz789",
+            "discount_applied": false,
+            "shipping_method": "express"
+        }
+    },
+    "payment": {
+        "instrument_ref": "card_4111111111111111",
+        "modality": "immediate",
+        "constraints": {
+            "max_amount": 1000.00,
+            "allowed_currencies": [
+                "USD"
+            ],
+            "merchant_whitelist": [
+                "merchant_premium_001"
+            ]
+        },
+        "routing_hints": [
+            {
+                "processor": "stripe",
+                "priority": 1,
+                "constraints": {
+                    "region": "US",
+                    "card_types": [
+                        "visa",
+                        "mastercard",
+                        "amex"
+                    ]
+                }
+            }
+        ],
+        "auth_requirements": [
+            "pin",
+            "biometric"
+        ],
+        "metadata": {
+            "payment_id": "pay_premium_123",
+            "merchant_id": "merchant_premium_001",
+            "transaction_type": "ecommerce",
+            "recurring": false,
+            "card_brand": "visa",
+            "card_last4": "1111"
+        }
+    },
+    "decision": {
+        "result": "REVIEW",
+        "risk_score": 0.65,
+        "reasons": [
+            {
+                "code": "high_ticket",
+                "detail": "Transaction amount $319.98 exceeds high-value threshold of $300.00"
+            },
+            {
+                "code": "velocity_flag",
+                "detail": "Customer has made 4 transactions in the last 24 hours"
+            }
+        ],
+        "actions": [
+            {
+                "type": "manual_review",
+                "to": "review_queue_high_value",
+                "detail": "Route to specialized high-value transaction review team"
+            },
+            {
+                "type": "step_up_auth",
+                "detail": "Require additional authentication for high-value transaction"
+            }
+        ],
+        "meta": {
+            "model": "ml_ensemble",
+            "trace_id": "trace_decision_456",
+            "processing_time_ms": 125.5,
+            "version": "0.1.0"
+        }
+    },
+    "signing": {
+        "vc_proof": null,
+        "receipt_hash": null
+    },
+    "metadata": {
+        "contract_id": "contract_789",
+        "created_at": "2024-01-15T14:30:00Z",
+        "environment": "production",
+        "compliance_region": "US",
+        "audit_trail": {
+            "decision_engine_version": "0.1.0",
+            "rules_version": "1.2.3",
+            "ml_model_version": "2.1.0"
+        }
+    }
+}

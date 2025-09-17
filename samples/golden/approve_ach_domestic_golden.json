@@ -1,0 +1,139 @@
+{
+  "ap2_version": "0.1.0",
+  "intent": {
+    "actor": "human",
+    "intent_type": "purchase",
+    "channel": "web",
+    "agent_presence": "none",
+    "timestamps": {
+      "created": "2024-01-15 09:15:00+00:00",
+      "expires": "2024-01-15 10:15:00+00:00"
+    },
+    "nonce": "25978522-9832-4183-923d-396628cfc3ca",
+    "metadata": null
+  },
+  "cart": {
+    "items": [
+      {
+        "id": "item_004",
+        "name": "Monthly Software Subscription",
+        "description": null,
+        "quantity": 1,
+        "unit_price": "29.99",
+        "total_price": "29.99",
+        "category": null,
+        "sku": null
+      }
+    ],
+    "amount": "29.99",
+    "currency": "USD",
+    "mcc": "7372",
+    "geo": {
+      "country": "US",
+      "region": null,
+      "city": null,
+      "latitude": null,
+      "longitude": null,
+      "timezone": null
+    },
+    "risk_flags": [],
+    "metadata": null
+  },
+  "payment": {
+    "instrument_ref": "ach_checking_****3456",
+    "instrument_token": null,
+    "modality": "deferred",
+    "constraints": null,
+    "routing_hints": [],
+    "auth_requirements": [
+      "pin"
+    ],
+    "metadata": null
+  },
+  "decision": {
+    "result": "APPROVE",
+    "risk_score": 0.22000000000000003,
+    "reasons": [
+      {
+        "code": "high_ticket",
+        "detail": "Transaction amount $29.99 within approved threshold"
+      }
+    ],
+    "actions": [
+      {
+        "type": "process_payment",
+        "to": null,
+        "detail": "Process payment normally"
+      }
+    ],
+    "meta": {
+      "model": "xgboost",
+      "model_version": "1.0.0",
+      "model_sha256": "293297e4785c4857",
+      "model_trained_on": "2024-01-01",
+      "trace_id": "25cbc5fd-76f4-4304-9a4f-8a473290f8c3",
+      "processing_time_ms": null,
+      "version": "0.1.0",
+      "rules_evaluated": [],
+      "feature_snapshot": {}
+    }
+  },
+  "signing": {
+    "vc_proof": null,
+    "receipt_hash": null
+  },
+  "ml_prediction": {
+    "risk_score": 0.0,
+    "key_signals": [
+      {
+        "feature_name": "amount",
+        "ap2_path": "cart.amount",
+        "value": 29.99,
+        "importance": 0.03689694404602051,
+        "contribution": 0.0
+      },
+      {
+        "feature_name": "velocity_24h",
+        "ap2_path": "velocity.24h",
+        "value": 1.0,
+        "importance": 0.09366224706172943,
+        "contribution": 0.0
+      },
+      {
+        "feature_name": "velocity_7d",
+        "ap2_path": "velocity.7d",
+        "value": 3.0,
+        "importance": 0.04688887670636177,
+        "contribution": 0.0
+      },
+      {
+        "feature_name": "cross_border",
+        "ap2_path": "cart.geo.cross_border",
+        "value": 0.0,
+        "importance": 0.11325960606336594,
+        "contribution": 0.0
+      },
+      {
+        "feature_name": "location_mismatch",
+        "ap2_path": "cart.geo.location_mismatch",
+        "value": 0.0,
+        "importance": 0.12296979874372482,
+        "contribution": 0.0
+      }
+    ],
+    "model_meta": {
+      "model_version": "1.0.0",
+      "model_sha256": "293297e4785c4857",
+      "trained_on": "2024-01-01",
+      "thresholds": {
+        "amount": 500.0,
+        "velocity_24h": 3.0,
+        "cross_border": 0.5,
+        "location_mismatch": 0.5,
+        "payment_method_risk": 0.7,
+        "chargebacks_12m": 1.0
+      },
+      "feature_count": 10
+    }
+  }
+}

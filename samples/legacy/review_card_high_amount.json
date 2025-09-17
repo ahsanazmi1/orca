@@ -1,0 +1,31 @@
+{
+    "cart_total": 2499.00,
+    "currency": "USD",
+    "rail": "Card",
+    "channel": "online",
+    "features": {
+        "amount": 2499.00,
+        "velocity_24h": 1.0,
+        "velocity_7d": 2.0,
+        "cross_border": 0.0,
+        "location_mismatch": 0.0,
+        "payment_method_risk": 0.3,
+        "chargebacks_12m": 0.0,
+        "customer_age_days": 365.0,
+        "loyalty_score": 0.6,
+        "time_since_last_purchase": 7.0
+    },
+    "context": {
+        "customer_id": "cust_67890",
+        "location_country": "US",
+        "ip_country": "US",
+        "mcc": "5732",
+        "auth_requirements": [
+            "pin",
+            "biometric"
+        ],
+        "trace_id": "trace_002",
+        "processing_time_ms": 52.1,
+        "model": "rules_only"
+    }
+}

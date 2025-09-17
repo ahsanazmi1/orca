@@ -9,6 +9,8 @@ repos:
       - id: check-added-large-files
       - id: check-merge-conflict
       - id: debug-statements
+      - id: detect-aws-credentials
+        args: [--allow-missing-credentials]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.1.6

@@ -1,1 +1,1 @@
-"""Tests for Orca Core package."""
+"""Tests for Orca."""

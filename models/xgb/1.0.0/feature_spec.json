@@ -1,0 +1,38 @@
+{
+  "feature_names": [
+    "amount",
+    "velocity_24h",
+    "velocity_7d",
+    "cross_border",
+    "location_mismatch",
+    "payment_method_risk",
+    "chargebacks_12m",
+    "customer_age_days",
+    "loyalty_score",
+    "time_since_last_purchase"
+  ],
+  "defaults": {
+    "amount": 100.0,
+    "velocity_24h": 1.0,
+    "velocity_7d": 5.0,
+    "cross_border": 0.0,
+    "location_mismatch": 0.0,
+    "payment_method_risk": 0.3,
+    "chargebacks_12m": 0.0,
+    "customer_age_days": 365.0,
+    "loyalty_score": 0.5,
+    "time_since_last_purchase": 7.0
+  },
+  "ap2_mappings": {
+    "amount": "cart.amount",
+    "velocity_24h": "velocity.24h",
+    "velocity_7d": "velocity.7d",
+    "cross_border": "cart.geo.cross_border",
+    "location_mismatch": "cart.geo.location_mismatch",
+    "payment_method_risk": "payment.method_risk",
+    "chargebacks_12m": "customer.chargebacks_12m",
+    "customer_age_days": "customer.age_days",
+    "loyalty_score": "customer.loyalty_score",
+    "time_since_last_purchase": "customer.time_since_last_purchase"
+  }
+}

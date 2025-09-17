@@ -1,0 +1,16 @@
+name: Bug report
+description: File a bug
+labels: ["bug"]
+body:
+  - type: textarea
+    attributes:
+      label: What happened?
+      description: Describe the bug and expected behavior
+  - type: textarea
+    attributes:
+      label: Reproduction
+      description: Steps to reproduce
+  - type: textarea
+    attributes:
+      label: Environment
+      description: OS, Python version, etc.

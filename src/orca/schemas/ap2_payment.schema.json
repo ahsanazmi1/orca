@@ -1,0 +1,96 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://orca.ai/schemas/ap2_payment.schema.json",
+    "title": "AP2 Payment Mandate Schema",
+    "description": "Schema for AP2 Payment Mandate - defines payment instrument and processing requirements",
+    "type": "object",
+    "properties": {
+        "instrument_ref": {
+            "type": "string",
+            "description": "Payment instrument reference"
+        },
+        "instrument_token": {
+            "type": "string",
+            "description": "Payment instrument token"
+        },
+        "modality": {
+            "type": "string",
+            "enum": [
+                "immediate",
+                "deferred",
+                "recurring",
+                "installment"
+            ],
+            "description": "Payment processing modality"
+        },
+        "constraints": {
+            "type": "object",
+            "description": "Payment constraints",
+            "additionalProperties": true
+        },
+        "routing_hints": {
+            "type": "array",
+            "description": "Payment routing hints",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "processor": {
+                        "type": "string",
+                        "description": "Payment processor identifier"
+                    },
+                    "priority": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 10,
+                        "description": "Routing priority (1=highest)"
+                    },
+                    "constraints": {
+                        "type": "object",
+                        "description": "Additional routing constraints",
+                        "additionalProperties": true
+                    }
+                },
+                "required": [
+                    "processor",
+                    "priority"
+                ],
+                "additionalProperties": false
+            }
+        },
+        "auth_requirements": {
+            "type": "array",
+            "description": "Authentication requirements",
+            "items": {
+                "type": "string",
+                "enum": [
+                    "none",
+                    "pin",
+                    "biometric",
+                    "two_factor",
+                    "multi_factor"
+                ]
+            }
+        },
+        "metadata": {
+            "type": "object",
+            "description": "Additional metadata",
+            "additionalProperties": true
+        }
+    },
+    "required": [
+        "modality"
+    ],
+    "additionalProperties": false,
+    "anyOf": [
+        {
+            "required": [
+                "instrument_ref"
+            ]
+        },
+        {
+            "required": [
+                "instrument_token"
+            ]
+        }
+    ]
+}

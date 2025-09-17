@@ -1,0 +1,87 @@
+{
+  "model_type": "xgboost",
+  "version": "1.0.0",
+  "feature_names": [
+    "amount",
+    "cart_total",
+    "velocity_24h",
+    "velocity_7d",
+    "velocity_30d",
+    "customer_age_days",
+    "loyalty_score",
+    "chargebacks_12m",
+    "time_since_last_purchase",
+    "cross_border",
+    "location_mismatch",
+    "high_ip_distance",
+    "payment_method_risk",
+    "card_bin_risk",
+    "hour_of_day",
+    "day_of_week",
+    "is_weekend",
+    "is_holiday",
+    "amount_velocity_ratio",
+    "risk_velocity_interaction",
+    "location_velocity_interaction"
+  ],
+  "training_metrics": {
+    "auc_score": 0.9625019195331695,
+    "log_loss": 0.21889138274125702,
+    "classification_report": {
+      "0": {
+        "precision": 0.9207443142660234,
+        "recall": 0.9488636363636364,
+        "f1-score": 0.9345925148653376,
+        "support": 1408.0
+      },
+      "1": {
+        "precision": 0.8688524590163934,
+        "recall": 0.8057432432432432,
+        "f1-score": 0.8361086765994742,
+        "support": 592.0
+      },
+      "accuracy": 0.9065,
+      "macro avg": {
+        "precision": 0.8947983866412084,
+        "recall": 0.8773034398034398,
+        "f1-score": 0.8853505957324059,
+        "support": 2000.0
+      },
+      "weighted avg": {
+        "precision": 0.905384325112133,
+        "recall": 0.9065,
+        "f1-score": 0.905441298738642,
+        "support": 2000.0
+      }
+    },
+    "feature_importance": {
+      "amount": 0.010438107885420322,
+      "cart_total": 0.007674701511859894,
+      "velocity_24h": 0.07692302763462067,
+      "velocity_7d": 0.007276112213730812,
+      "velocity_30d": 0.00646864902228117,
+      "customer_age_days": 0.005311807617545128,
+      "loyalty_score": 0.022077146917581558,
+      "chargebacks_12m": 0.20410554111003876,
+      "time_since_last_purchase": 0.005480178631842136,
+      "cross_border": 0.1214580237865448,
+      "location_mismatch": 0.22561505436897278,
+      "high_ip_distance": 0.006419959012418985,
+      "payment_method_risk": 0.004968500696122646,
+      "card_bin_risk": 0.00531591335311532,
+      "hour_of_day": 0.0,
+      "day_of_week": 0.0,
+      "is_weekend": 0.0,
+      "is_holiday": 0.0,
+      "amount_velocity_ratio": 0.005779361817985773,
+      "risk_velocity_interaction": 0.021549033001065254,
+      "location_velocity_interaction": 0.2631389796733856
+    },
+    "n_features": 21,
+    "n_samples_train": 8000,
+    "n_samples_test": 2000,
+    "training_date": "2025-09-15T21:01:13.806441"
+  },
+  "created_at": "2025-09-15T21:01:13.811178",
+  "feature_extractor_version": "1.0.0"
+}

@@ -1,0 +1,381 @@
+{
+  "results": [
+    {
+      "file": "fixtures/requests/high_risk_decline.json",
+      "timestamp": "2025-09-15T22:17:58.778084",
+      "input": {
+        "cart_total": 220.0,
+        "currency": "USD",
+        "features": {
+          "velocity_24h": 2
+        },
+        "context": {
+          "channel": "ecom",
+          "location_ip_country": "US",
+          "billing_country": "US",
+          "customer": {
+            "loyalty_tier": "NONE",
+            "chargebacks_12m": 1
+          }
+        }
+      },
+      "output": {
+        "decision": "REVIEW",
+        "reasons": [
+          "CHARGEBACK_HISTORY: Customer has 1 chargeback(s) in last 12 months"
+        ],
+        "actions": [
+          "ROUTE_TO_REVIEW"
+        ],
+        "meta": {
+          "risk_score": 0.35,
+          "rules_evaluated": [
+            "CHARGEBACK_HISTORY"
+          ],
+          "timestamp": "2025-09-15 22:17:58.777977",
+          "transaction_id": "txn_9d10273352cb4879",
+          "rail": "Card",
+          "channel": "online",
+          "cart_total": 220.0,
+          "ai": {
+            "risk_score": 0.35,
+            "reason_codes": [
+              "BASELINE"
+            ],
+            "version": "stub-0.1.0",
+            "model_type": "stub",
+            "ml_version": "stub-0.1.0"
+          }
+        },
+        "status": "ROUTE",
+        "meta_structured": {
+          "timestamp": "2025-09-15 22:17:58.777977",
+          "transaction_id": "txn_9d10273352cb4879",
+          "rail": "Card",
+          "channel": "online",
+          "cart_total": 220.0,
+          "risk_score": 0.35,
+          "rules_evaluated": [
+            "CHARGEBACK_HISTORY"
+          ],
+          "approved_amount": null
+        },
+        "signals_triggered": [
+          "CHARGEBACK_HISTORY"
+        ],
+        "explanation": "Transaction decision: REVIEW",
+        "explanation_human": "We made this decision based on CHARGEBACK_HISTORY: Customer has 1 chargeback(s) in last 12 months. More detail coming soon.",
+        "routing_hint": "PROCESS_NORMALLY",
+        "transaction_id": "txn_9d10273352cb4879",
+        "cart_total": 220.0,
+        "timestamp": "2025-09-15 22:17:58.777977",
+        "rail": "Card"
+      }
+    },
+    {
+      "file": "fixtures/requests/high_ticket_review.json",
+      "timestamp": "2025-09-15T22:17:58.778337",
+      "input": {
+        "cart_total": 750.0,
+        "currency": "USD",
+        "features": {
+          "velocity_24h": 1
+        },
+        "context": {
+          "channel": "ecom",
+          "location_ip_country": "US",
+          "billing_country": "US",
+          "customer": {
+            "loyalty_tier": "SILVER",
+            "chargebacks_12m": 0
+          }
+        }
+      },
+      "output": {
+        "decision": "REVIEW",
+        "reasons": [
+          "HIGH_TICKET: Cart total $750.00 exceeds $500.00 threshold"
+        ],
+        "actions": [
+          "ROUTE_TO_REVIEW"
+        ],
+        "meta": {
+          "risk_score": 0.35,
+          "rules_evaluated": [
+            "HIGH_TICKET"
+          ],
+          "timestamp": "2025-09-15 22:17:58.778323",
+          "transaction_id": "txn_a28a8fc21a264edb",
+          "rail": "Card",
+          "channel": "online",
+          "cart_total": 750.0,
+          "ai": {
+            "risk_score": 0.35,
+            "reason_codes": [
+              "BASELINE"
+            ],
+            "version": "stub-0.1.0",
+            "model_type": "stub",
+            "ml_version": "stub-0.1.0"
+          }
+        },
+        "status": "ROUTE",
+        "meta_structured": {
+          "timestamp": "2025-09-15 22:17:58.778323",
+          "transaction_id": "txn_a28a8fc21a264edb",
+          "rail": "Card",
+          "channel": "online",
+          "cart_total": 750.0,
+          "risk_score": 0.35,
+          "rules_evaluated": [
+            "HIGH_TICKET"
+          ],
+          "approved_amount": null
+        },
+        "signals_triggered": [
+          "HIGH_TICKET"
+        ],
+        "explanation": "Transaction decision: REVIEW",
+        "explanation_human": "Under review: High-value card transaction requires additional verification. Please check your email for next steps.",
+        "routing_hint": "PROCESS_NORMALLY",
+        "transaction_id": "txn_a28a8fc21a264edb",
+        "cart_total": 750.0,
+        "timestamp": "2025-09-15 22:17:58.778323",
+        "rail": "Card"
+      }
+    },
+    {
+      "file": "fixtures/requests/location_mismatch_review.json",
+      "timestamp": "2025-09-15T22:17:58.778501",
+      "input": {
+        "cart_total": 200.0,
+        "currency": "USD",
+        "features": {
+          "velocity_24h": 1,
+          "high_ip_distance": true
+        },
+        "context": {
+          "channel": "ecom",
+          "location_ip_country": "GB",
+          "billing_country": "US",
+          "customer": {
+            "loyalty_tier": "GOLD",
+            "chargebacks_12m": 0
+          }
+        }
+      },
+      "output": {
+        "decision": "REVIEW",
+        "reasons": [
+          "LOCATION_MISMATCH: IP country 'GB' differs from billing country 'US'",
+          "HIGH_IP_DISTANCE: Transaction originates from high-risk IP distance",
+          "LOYALTY_BOOST: Customer has GOLD loyalty tier"
+        ],
+        "actions": [
+          "ROUTE_TO_REVIEW",
+          "ROUTE_TO_REVIEW",
+          "LOYALTY_BOOST"
+        ],
+        "meta": {
+          "risk_score": 0.35,
+          "rules_evaluated": [
+            "LOCATION_MISMATCH",
+            "HIGH_IP_DISTANCE",
+            "LOYALTY_BOOST"
+          ],
+          "timestamp": "2025-09-15 22:17:58.778480",
+          "transaction_id": "txn_49c4cbdb39a743c1",
+          "rail": "Card",
+          "channel": "online",
+          "cart_total": 200.0,
+          "ai": {
+            "risk_score": 0.35,
+            "reason_codes": [
+              "BASELINE"
+            ],
+            "version": "stub-0.1.0",
+            "model_type": "stub",
+            "ml_version": "stub-0.1.0"
+          }
+        },
+        "status": "ROUTE",
+        "meta_structured": {
+          "timestamp": "2025-09-15 22:17:58.778480",
+          "transaction_id": "txn_49c4cbdb39a743c1",
+          "rail": "Card",
+          "channel": "online",
+          "cart_total": 200.0,
+          "risk_score": 0.35,
+          "rules_evaluated": [
+            "LOCATION_MISMATCH",
+            "HIGH_IP_DISTANCE",
+            "LOYALTY_BOOST"
+          ],
+          "approved_amount": null
+        },
+        "signals_triggered": [
+          "LOCATION_MISMATCH",
+          "HIGH_IP_DISTANCE",
+          "LOYALTY_BOOST"
+        ],
+        "explanation": "Transaction decision: REVIEW",
+        "explanation_human": "Under review: Location differs from billing address. Additionally: we made this decision based on location_mismatch: ip country 'gb' differs from billing country 'us', high_ip_distance: transaction originates from high-risk ip distance, loyalty_boost: customer has gold loyalty tier. more detail coming soon.; under review: loyalty tier verification required.",
+        "routing_hint": "PROCESS_NORMALLY",
+        "transaction_id": "txn_49c4cbdb39a743c1",
+        "cart_total": 200.0,
+        "timestamp": "2025-09-15 22:17:58.778480",
+        "rail": "Card"
+      }
+    },
+    {
+      "file": "fixtures/requests/low_ticket_ok.json",
+      "timestamp": "2025-09-15T22:17:58.778646",
+      "input": {
+        "cart_total": 125.0,
+        "currency": "USD",
+        "features": {
+          "velocity_24h": 1
+        },
+        "context": {
+          "channel": "ecom",
+          "location_ip_country": "US",
+          "billing_country": "US",
+          "customer": {
+            "loyalty_tier": "GOLD",
+            "chargebacks_12m": 0
+          }
+        }
+      },
+      "output": {
+        "decision": "APPROVE",
+        "reasons": [
+          "LOYALTY_BOOST: Customer has GOLD loyalty tier"
+        ],
+        "actions": [
+          "LOYALTY_BOOST"
+        ],
+        "meta": {
+          "risk_score": 0.35,
+          "rules_evaluated": [
+            "LOYALTY_BOOST"
+          ],
+          "timestamp": "2025-09-15 22:17:58.778633",
+          "transaction_id": "txn_a6ad983c143441fe",
+          "rail": "Card",
+          "channel": "online",
+          "cart_total": 125.0,
+          "ai": {
+            "risk_score": 0.35,
+            "reason_codes": [
+              "BASELINE"
+            ],
+            "version": "stub-0.1.0",
+            "model_type": "stub",
+            "ml_version": "stub-0.1.0"
+          }
+        },
+        "status": "APPROVE",
+        "meta_structured": {
+          "timestamp": "2025-09-15 22:17:58.778633",
+          "transaction_id": "txn_a6ad983c143441fe",
+          "rail": "Card",
+          "channel": "online",
+          "cart_total": 125.0,
+          "risk_score": 0.35,
+          "rules_evaluated": [
+            "LOYALTY_BOOST"
+          ],
+          "approved_amount": null
+        },
+        "signals_triggered": [
+          "LOYALTY_BOOST"
+        ],
+        "explanation": "Transaction approved for $125.00. Cart total within approved limits.",
+        "explanation_human": "Approved: Customer loyalty tier benefits applied.",
+        "routing_hint": "PROCESS_NORMALLY",
+        "transaction_id": "txn_a6ad983c143441fe",
+        "cart_total": 125.0,
+        "timestamp": "2025-09-15 22:17:58.778633",
+        "rail": "Card"
+      }
+    },
+    {
+      "file": "fixtures/requests/velocity_review.json",
+      "timestamp": "2025-09-15T22:17:58.778784",
+      "input": {
+        "cart_total": 180.0,
+        "currency": "USD",
+        "features": {
+          "velocity_24h": 4
+        },
+        "context": {
+          "channel": "ecom",
+          "location_ip_country": "US",
+          "billing_country": "US",
+          "customer": {
+            "loyalty_tier": "NONE",
+            "chargebacks_12m": 0
+          }
+        }
+      },
+      "output": {
+        "decision": "REVIEW",
+        "reasons": [
+          "VELOCITY_FLAG: 24h velocity 4.0 exceeds 3.0 threshold"
+        ],
+        "actions": [
+          "ROUTE_TO_REVIEW"
+        ],
+        "meta": {
+          "risk_score": 0.44999999999999996,
+          "rules_evaluated": [
+            "VELOCITY"
+          ],
+          "timestamp": "2025-09-15 22:17:58.778774",
+          "transaction_id": "txn_5470bb7bfeba457e",
+          "rail": "Card",
+          "channel": "online",
+          "cart_total": 180.0,
+          "ai": {
+            "risk_score": 0.44999999999999996,
+            "reason_codes": [
+              "VELOCITY"
+            ],
+            "version": "stub-0.1.0",
+            "model_type": "stub",
+            "ml_version": "stub-0.1.0"
+          }
+        },
+        "status": "ROUTE",
+        "meta_structured": {
+          "timestamp": "2025-09-15 22:17:58.778774",
+          "transaction_id": "txn_5470bb7bfeba457e",
+          "rail": "Card",
+          "channel": "online",
+          "cart_total": 180.0,
+          "risk_score": 0.44999999999999996,
+          "rules_evaluated": [
+            "VELOCITY"
+          ],
+          "approved_amount": null
+        },
+        "signals_triggered": [
+          "VELOCITY"
+        ],
+        "explanation": "Transaction decision: REVIEW",
+        "explanation_human": "Under review: Unusual transaction frequency detected. Please wait 1 hour before trying again.",
+        "routing_hint": "PROCESS_NORMALLY",
+        "transaction_id": "txn_5470bb7bfeba457e",
+        "cart_total": 180.0,
+        "timestamp": "2025-09-15 22:17:58.778774",
+        "rail": "Card"
+      }
+    }
+  ],
+  "summary": {
+    "total_files": 5,
+    "successful_files": 5,
+    "failed_files": 0,
+    "timestamp": "2025-09-15T22:17:58.778865"
+  }
+}

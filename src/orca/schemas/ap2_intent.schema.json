@@ -1,0 +1,93 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://orca.ai/schemas/ap2_intent.schema.json",
+    "title": "AP2 Intent Mandate Schema",
+    "description": "Schema for AP2 Intent Mandate - defines actor's intent and context",
+    "type": "object",
+    "properties": {
+        "actor": {
+            "type": "string",
+            "enum": [
+                "human",
+                "agent",
+                "system"
+            ],
+            "description": "Type of actor expressing intent"
+        },
+        "intent_type": {
+            "type": "string",
+            "enum": [
+                "purchase",
+                "refund",
+                "transfer",
+                "subscription",
+                "donation",
+                "investment"
+            ],
+            "description": "Type of intent being expressed"
+        },
+        "channel": {
+            "type": "string",
+            "enum": [
+                "web",
+                "mobile",
+                "api",
+                "voice",
+                "chat",
+                "pos"
+            ],
+            "description": "Communication channel"
+        },
+        "agent_presence": {
+            "type": "string",
+            "enum": [
+                "none",
+                "assisted",
+                "autonomous"
+            ],
+            "description": "Level of agent involvement"
+        },
+        "timestamps": {
+            "type": "object",
+            "description": "Relevant timestamps",
+            "properties": {
+                "created": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "When the intent was created"
+                },
+                "expires": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "When the intent expires"
+                }
+            },
+            "required": [
+                "created",
+                "expires"
+            ],
+            "additionalProperties": {
+                "type": "string",
+                "format": "date-time"
+            }
+        },
+        "nonce": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier for this intent"
+        },
+        "metadata": {
+            "type": "object",
+            "description": "Additional metadata",
+            "additionalProperties": true
+        }
+    },
+    "required": [
+        "actor",
+        "intent_type",
+        "channel",
+        "agent_presence",
+        "timestamps"
+    ],
+    "additionalProperties": false
+}

@@ -1,0 +1,154 @@
+{
+  "ap2_version": "0.1.0",
+  "intent": {
+    "actor": "human",
+    "intent_type": "purchase",
+    "channel": "web",
+    "agent_presence": "none",
+    "timestamps": {
+      "created": "2024-01-15 20:45:00+00:00",
+      "expires": "2024-01-15 21:45:00+00:00"
+    },
+    "nonce": "0f89ce37-7f71-4197-a72b-4732cf8347ed",
+    "metadata": null
+  },
+  "cart": {
+    "items": [
+      {
+        "id": "item_shap",
+        "name": "High-Risk Electronics Bundle",
+        "description": null,
+        "quantity": 1,
+        "unit_price": "1500.00",
+        "total_price": "1500.00",
+        "category": null,
+        "sku": null
+      }
+    ],
+    "amount": "1500.00",
+    "currency": "USD",
+    "mcc": "5732",
+    "geo": {
+      "country": "US",
+      "region": null,
+      "city": null,
+      "latitude": null,
+      "longitude": null,
+      "timezone": null
+    },
+    "risk_flags": [],
+    "metadata": null
+  },
+  "payment": {
+    "instrument_ref": "card_visa_****9999",
+    "instrument_token": null,
+    "modality": "immediate",
+    "constraints": null,
+    "routing_hints": [],
+    "auth_requirements": [
+      "pin",
+      "biometric"
+    ],
+    "metadata": null
+  },
+  "decision": {
+    "result": "REVIEW",
+    "risk_score": 0.16799999999999998,
+    "reasons": [
+      {
+        "code": "high_ticket",
+        "detail": "Transaction amount $1500.00 exceeds $500.0 threshold"
+      },
+      {
+        "code": "online_verification",
+        "detail": "Online card transaction requires additional verification"
+      }
+    ],
+    "actions": [
+      {
+        "type": "manual_review",
+        "to": null,
+        "detail": "Transaction requires review"
+      },
+      {
+        "type": "step_up_auth",
+        "to": null,
+        "detail": "Card verification required"
+      },
+      {
+        "type": "process_payment",
+        "to": null,
+        "detail": "Biometric authentication verified"
+      }
+    ],
+    "meta": {
+      "model": "xgboost",
+      "model_version": "1.0.0",
+      "model_sha256": "293297e4785c4857",
+      "model_trained_on": "2024-01-01",
+      "trace_id": "402f8adb-a9c1-4373-8dbf-55c62c84b2e5",
+      "processing_time_ms": null,
+      "version": "0.1.0",
+      "rules_evaluated": [],
+      "feature_snapshot": {}
+    }
+  },
+  "signing": {
+    "vc_proof": null,
+    "receipt_hash": null
+  },
+  "ml_prediction": {
+    "risk_score": 0.0,
+    "key_signals": [
+      {
+        "feature_name": "amount",
+        "ap2_path": "cart.amount",
+        "value": 1500.0,
+        "importance": 0.03689694404602051,
+        "contribution": 0.0
+      },
+      {
+        "feature_name": "velocity_24h",
+        "ap2_path": "velocity.24h",
+        "value": 1.0,
+        "importance": 0.09366224706172943,
+        "contribution": 0.0
+      },
+      {
+        "feature_name": "velocity_7d",
+        "ap2_path": "velocity.7d",
+        "value": 3.0,
+        "importance": 0.04688887670636177,
+        "contribution": 0.0
+      },
+      {
+        "feature_name": "cross_border",
+        "ap2_path": "cart.geo.cross_border",
+        "value": 0.0,
+        "importance": 0.11325960606336594,
+        "contribution": 0.0
+      },
+      {
+        "feature_name": "location_mismatch",
+        "ap2_path": "cart.geo.location_mismatch",
+        "value": 0.0,
+        "importance": 0.12296979874372482,
+        "contribution": 0.0
+      }
+    ],
+    "model_meta": {
+      "model_version": "1.0.0",
+      "model_sha256": "293297e4785c4857",
+      "trained_on": "2024-01-01",
+      "thresholds": {
+        "amount": 500.0,
+        "velocity_24h": 3.0,
+        "cross_border": 0.5,
+        "location_mismatch": 0.5,
+        "payment_method_risk": 0.7,
+        "chargebacks_12m": 1.0
+      },
+      "feature_count": 10
+    }
+  }
+}

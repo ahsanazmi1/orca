@@ -8,7 +8,6 @@ from typing import Any
 from unittest.mock import patch
 
 import streamlit as st
-
 from orca_core.core.explainer import explain_decision
 from orca_core.engine import evaluate_rules
 from orca_core.models import DecisionRequest

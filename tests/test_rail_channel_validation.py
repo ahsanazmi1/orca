@@ -1,9 +1,8 @@
 """Schema validation tests for Week 2 Rules + Rails rail and channel enums."""
 
 import pytest
-from pydantic import ValidationError
-
 from orca_core.models import DecisionRequest, DecisionResponse
+from pydantic import ValidationError
 
 
 class TestRailChannelValidation:
