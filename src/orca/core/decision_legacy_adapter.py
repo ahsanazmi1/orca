@@ -57,6 +57,7 @@ class DecisionLegacyAdapter:
                 "created": datetime.now(UTC),
                 "expires": datetime.now(UTC).replace(hour=23, minute=59, second=59),
             },
+            metadata={},  # Default empty metadata
         )
 
         # Create cart mandate from legacy request
@@ -67,6 +68,9 @@ class DecisionLegacyAdapter:
                 quantity=1,
                 unit_price=Decimal(str(legacy_request.cart_total)),
                 total_price=Decimal(str(legacy_request.cart_total)),
+                description="Legacy item from legacy request",
+                category="general",
+                sku="legacy_001",
             )
         ]
 
@@ -74,6 +78,9 @@ class DecisionLegacyAdapter:
             items=cart_items,
             amount=Decimal(str(legacy_request.cart_total)),
             currency=legacy_request.currency,
+            mcc="0000",  # Default MCC
+            geo=None,  # No geo information in legacy
+            metadata={},  # Default empty metadata
         )
 
         # Create payment mandate from legacy request
@@ -81,6 +88,9 @@ class DecisionLegacyAdapter:
             instrument_ref=f"legacy_{uuid4().hex[:8]}",
             modality=_map_legacy_rail_to_modality(legacy_request.rail),
             auth_requirements=[AuthRequirement.NONE],  # Default assumption
+            instrument_token=None,  # No token in legacy
+            constraints={},  # Default empty constraints
+            metadata={},  # Default empty metadata
         )
 
         # Create default decision outcome (will be filled by decision engine)
@@ -93,6 +103,10 @@ class DecisionLegacyAdapter:
                 model="rules_only",  # Use valid model type
                 trace_id=str(uuid4()),
                 version="0.1.0",
+                processing_time_ms=0,  # Default processing time
+                model_version="0.1.0",  # Default model version
+                model_sha256="",  # Default empty hash
+                model_trained_on="",  # Default empty training date
             ),
         )
 
@@ -119,10 +133,10 @@ class DecisionLegacyAdapter:
         legacy_decision = _map_ap2_result_to_legacy(ap2_contract.decision.result)
 
         # Extract reasons as strings
-        legacy_reasons = [reason.code for reason in ap2_contract.decision.reasons]
+        legacy_reasons = [str(reason.code) for reason in ap2_contract.decision.reasons]
 
         # Extract actions as strings
-        legacy_actions = [action.type for action in ap2_contract.decision.actions]
+        legacy_actions = [str(action.type) for action in ap2_contract.decision.actions]
 
         # Build legacy metadata
         legacy_meta = {
@@ -145,6 +159,9 @@ class DecisionLegacyAdapter:
             reasons=legacy_reasons,
             actions=legacy_actions,
             meta=legacy_meta,
+            explanation="",  # Default empty explanation
+            explanation_human="",  # Default empty human explanation
+            routing_hint="",  # Default empty routing hint
         )
 
         # Add enhanced fields if requested
@@ -171,13 +188,13 @@ class DecisionLegacyAdapter:
 
         # Convert legacy reasons to AP2 reasons
         ap2_reasons = [
-            DecisionReason(code=reason, detail=f"Legacy reason: {reason}")
+            DecisionReason(code=reason, detail=f"Legacy reason: {reason}")  # type: ignore[arg-type]
             for reason in legacy_response.reasons
         ]
 
         # Convert legacy actions to AP2 actions
         ap2_actions = [
-            DecisionAction(type=action, detail=f"Legacy action: {action}")
+            DecisionAction(type=action, detail=f"Legacy action: {action}", to="")  # type: ignore[arg-type]
             for action in legacy_response.actions
         ]
 
@@ -185,7 +202,7 @@ class DecisionLegacyAdapter:
         risk_score = legacy_response.meta.get("risk_score", 0.0)
 
         # Update the decision outcome
-        ap2_contract.decision.result = ap2_result
+        ap2_contract.decision.result = ap2_result  # type: ignore[assignment]
         ap2_contract.decision.risk_score = risk_score
         ap2_contract.decision.reasons = ap2_reasons
         ap2_contract.decision.actions = ap2_actions

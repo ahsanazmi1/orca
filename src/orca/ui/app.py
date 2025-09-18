@@ -36,12 +36,12 @@ from ..mandates.ap2_types import (
 class AP2OrcaUI:
     """AP2-compliant Streamlit UI for Orca Core."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the AP2 Orca UI."""
         self.setup_page_config()
         self.initialize_session_state()
 
-    def setup_page_config(self):
+    def setup_page_config(self) -> None:
         """Configure Streamlit page settings."""
         st.set_page_config(
             page_title="Orca Core AP2 Decision Engine",
@@ -50,7 +50,7 @@ class AP2OrcaUI:
             initial_sidebar_state="expanded",
         )
 
-    def initialize_session_state(self):
+    def initialize_session_state(self) -> None:
         """Initialize session state variables."""
         if "ap2_contract" not in st.session_state:
             st.session_state.ap2_contract = None
@@ -65,12 +65,12 @@ class AP2OrcaUI:
         if "receipt_hash_only" not in st.session_state:
             st.session_state.receipt_hash_only = False
 
-    def render_header(self):
+    def render_header(self) -> None:
         """Render the main header."""
         st.title("🐋 Orca Core AP2 Decision Engine")
         st.markdown("AP2-compliant decision engine with verifiable credentials and receipt hashing")
 
-    def render_sidebar(self):
+    def render_sidebar(self) -> None:
         """Render the sidebar with configuration options."""
         st.sidebar.header("Configuration")
 
@@ -112,7 +112,7 @@ class AP2OrcaUI:
         if st.sidebar.button("Load Golden File"):
             self.load_golden_file()
 
-    def load_sample_contract(self):
+    def load_sample_contract(self) -> None:
         """Load a sample AP2 contract."""
         try:
             # Create sample contract
@@ -125,6 +125,7 @@ class AP2OrcaUI:
                     "created": datetime.now(UTC),
                     "expires": datetime.now(UTC).replace(hour=23, minute=59, second=59),
                 },
+                metadata={},  # Default empty metadata
             )
 
             cart = CartMandate(
@@ -135,18 +136,32 @@ class AP2OrcaUI:
                         quantity=1,
                         unit_price=Decimal("100.00"),
                         total_price=Decimal("100.00"),
+                        description="Sample product for testing",
+                        category="software",
+                        sku="sample_001",
                     )
                 ],
                 amount=Decimal("100.00"),
                 currency="USD",
                 mcc="5733",
-                geo=GeoLocation(country="US"),
+                geo=GeoLocation(
+                    country="US",
+                    region="",  # Default empty region
+                    city="",  # Default empty city
+                    latitude=0.0,  # Default latitude
+                    longitude=0.0,  # Default longitude
+                    timezone="UTC",  # Default timezone
+                ),
+                metadata={},  # Default empty metadata
             )
 
             payment = PaymentMandate(
                 instrument_ref="sample_card_123456789",
                 modality=PaymentModality.IMMEDIATE,
                 auth_requirements=[AuthRequirement.PIN],
+                instrument_token=None,  # No token for sample
+                constraints={},  # Default empty constraints
+                metadata={},  # Default empty metadata
             )
 
             from ..core.decision_contract import create_ap2_decision_contract
@@ -167,7 +182,7 @@ class AP2OrcaUI:
         except Exception as e:
             st.error(f"❌ Error loading sample contract: {e}")
 
-    def load_golden_file(self):
+    def load_golden_file(self) -> None:
         """Load the golden AP2 file."""
         try:
             golden_file = Path("tests/golden/decision.ap2.json")
@@ -184,7 +199,7 @@ class AP2OrcaUI:
         except Exception as e:
             st.error(f"❌ Error loading golden file: {e}")
 
-    def render_ap2_input_section(self):
+    def render_ap2_input_section(self) -> None:
         """Render the AP2 input section."""
         st.header("📥 AP2 Decision Request")
 
@@ -223,7 +238,7 @@ class AP2OrcaUI:
                 else:
                     st.warning("⚠️ Please validate AP2 contract first")
 
-    def render_ap2_panes(self):
+    def render_ap2_panes(self) -> None:
         """Render collapsible AP2 mandate panes."""
         if not st.session_state.ap2_contract:
             st.info("👆 Please load or validate an AP2 contract first")
@@ -295,7 +310,7 @@ class AP2OrcaUI:
                 if contract.payment.routing_hints:
                     st.write("**Routing Hints:**", contract.payment.routing_hints)
 
-    def process_decision(self):
+    def process_decision(self) -> None:
         """Process the AP2 decision through the rules engine."""
         try:
             contract = st.session_state.ap2_contract
@@ -323,7 +338,7 @@ class AP2OrcaUI:
         except Exception as e:
             st.error(f"❌ Error processing decision: {e}")
 
-    def render_decision_result(self):
+    def render_decision_result(self) -> None:
         """Render the decision result section."""
         if not st.session_state.decision_result:
             return
@@ -361,7 +376,7 @@ class AP2OrcaUI:
             st.subheader("💬 Human-Readable Explanation")
             st.info(st.session_state.explanation)
 
-    def render_signature_receipt_section(self):
+    def render_signature_receipt_section(self) -> None:
         """Render the signature and receipt section."""
         if not st.session_state.ap2_contract or not st.session_state.ap2_contract.signing:
             return
@@ -393,7 +408,7 @@ class AP2OrcaUI:
             else:
                 st.info("ℹ️ No receipt hash generated")
 
-    def render_output_section(self):
+    def render_output_section(self) -> None:
         """Render the output section with copy functionality."""
         if not st.session_state.ap2_contract:
             return
@@ -435,7 +450,7 @@ class AP2OrcaUI:
                     mime="application/json",
                 )
 
-    def render_status_section(self):
+    def render_status_section(self) -> None:
         """Render the status section."""
         st.sidebar.header("Status")
 
@@ -456,7 +471,7 @@ class AP2OrcaUI:
         else:
             st.sidebar.warning("⚠️ AP2 Contract: Not loaded")
 
-    def run(self):
+    def run(self) -> None:
         """Run the Streamlit app."""
         self.render_header()
         self.render_sidebar()
@@ -470,7 +485,7 @@ class AP2OrcaUI:
         self.render_output_section()
 
 
-def main():
+def main() -> None:
     """Main entry point for the Streamlit app."""
     app = AP2OrcaUI()
     app.run()

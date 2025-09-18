@@ -332,7 +332,8 @@ def create_sample(
         modality_map = {
             "immediate": PaymentModality.IMMEDIATE,
             "deferred": PaymentModality.DEFERRED,
-            "real_time": PaymentModality.REAL_TIME,
+            "recurring": PaymentModality.RECURRING,
+            "installment": PaymentModality.INSTALLMENT,
         }
 
         if channel not in channel_map:
@@ -360,6 +361,7 @@ def create_sample(
                 "created": datetime.now(UTC),
                 "expires": datetime.now(UTC).replace(hour=23, minute=59, second=59),
             },
+            metadata={},  # Default empty metadata
         )
 
         cart = CartMandate(
@@ -370,18 +372,32 @@ def create_sample(
                     quantity=1,
                     unit_price=Decimal(str(amount)),
                     total_price=Decimal(str(amount)),
+                    description="Sample product for testing",
+                    category="software",
+                    sku="sample_001",
                 )
             ],
             amount=Decimal(str(amount)),
             currency=currency,
             mcc="5733",  # Software stores
-            geo=GeoLocation(country=country),
+            geo=GeoLocation(
+                country=country,
+                region="",  # Default empty region
+                city="",  # Default empty city
+                latitude=0.0,  # Default latitude
+                longitude=0.0,  # Default longitude
+                timezone="UTC",  # Default timezone
+            ),
+            metadata={},  # Default empty metadata
         )
 
         payment = PaymentMandate(
             instrument_ref="sample_card_123456789",
             modality=modality_map[modality],
             auth_requirements=[AuthRequirement.PIN],
+            instrument_token=None,  # No token for sample
+            constraints={},  # Default empty constraints
+            metadata={},  # Default empty metadata
         )
 
         # Create AP2 contract

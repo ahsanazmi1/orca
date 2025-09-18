@@ -166,10 +166,13 @@ class AP2RulesEngine:
             trace_id=ap2_contract.decision.meta.trace_id,
             version="0.1.0",
             model_version=get_ml_model_version(),
+            processing_time_ms=0,  # Default processing time
+            model_sha256="",  # Default empty hash
+            model_trained_on="",  # Default empty training date
         )
 
         decision_outcome = DecisionOutcome(
-            result=final_decision,
+            result=final_decision,  # type: ignore[arg-type]
             risk_score=risk_score,
             reasons=all_reasons,
             actions=all_actions,
