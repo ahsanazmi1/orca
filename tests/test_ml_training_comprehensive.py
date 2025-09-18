@@ -63,8 +63,8 @@ class TestXGBoostTrainer:
 
         # Check that features are extracted properly
         assert len(X.columns) > 0
-        assert all(isinstance(val, (int, float)) for val in X.values.flatten())
-        assert all(isinstance(val, (int, float)) for val in y)
+        assert all(isinstance(val, int | float) for val in X.values.flatten())
+        assert all(isinstance(val, int | float) for val in y)
 
         # Check that we have both positive and negative samples
         assert 0 in y.values
@@ -83,7 +83,7 @@ class TestXGBoostTrainer:
         assert "context" in sample
 
         # Check data types
-        assert isinstance(sample["cart_total"], (int, float))
+        assert isinstance(sample["cart_total"], int | float)
         assert isinstance(sample["currency"], str)
         assert isinstance(sample["rail"], str)
         assert isinstance(sample["channel"], str)
@@ -502,7 +502,7 @@ class TestXGBoostTrainer:
 
         # All values should be numeric
         for value in features.values():
-            assert isinstance(value, (int, float))
+            assert isinstance(value, int | float)
 
     def test_metadata_consistency(self):
         """Test that metadata is consistent across saves."""
@@ -666,7 +666,7 @@ class TestXGBoostTrainerEdgeCases:
             "extract_features",
             side_effect=Exception("Feature extraction failed"),
         ):
-            with pytest.raises(Exception):
+            with pytest.raises(RuntimeError):
                 trainer.generate_synthetic_data(n_samples=10)
 
     def test_model_training_error_recovery(self):
@@ -678,7 +678,7 @@ class TestXGBoostTrainerEdgeCases:
         with patch(
             "orca_core.ml.train_xgb.xgb.XGBClassifier", side_effect=Exception("XGBoost failed")
         ):
-            with pytest.raises(Exception):
+            with pytest.raises(RuntimeError):
                 trainer.train_model(X, y)
 
     def test_calibration_error_handling(self):
@@ -691,7 +691,7 @@ class TestXGBoostTrainerEdgeCases:
             "orca_core.ml.train_xgb.CalibratedClassifierCV",
             side_effect=Exception("Calibration failed"),
         ):
-            with pytest.raises(Exception):
+            with pytest.raises(RuntimeError):
                 trainer.train_model(X, y)
 
 

@@ -323,7 +323,7 @@ class TestEndToEndWorkflows:
     def test_error_handling_integration(self):
         """Test error handling across the system."""
         # Test with invalid request data
-        with pytest.raises(Exception):
+        with pytest.raises(ValueError):
             invalid_request = DecisionRequest(
                 cart_total="invalid",
                 currency="USD",
