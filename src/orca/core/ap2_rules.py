@@ -4,7 +4,6 @@ This module contains rules that operate on AP2 mandates and produce
 structured decision outcomes with canonical reason and action codes.
 """
 
-
 from ..mandates.ap2_types import PaymentModality
 from .decision_contract import (
     AP2DecisionContract,

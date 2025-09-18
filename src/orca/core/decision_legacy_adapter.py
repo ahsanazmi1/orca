@@ -40,7 +40,7 @@ class DecisionLegacyAdapter:
 
     @staticmethod
     def legacy_request_to_ap2_contract(
-        legacy_request: LegacyDecisionRequest | dict[str, Any]
+        legacy_request: LegacyDecisionRequest | dict[str, Any],
     ) -> AP2DecisionContract:
         """Convert legacy decision request to AP2 decision contract."""
 

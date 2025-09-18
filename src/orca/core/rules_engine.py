@@ -4,7 +4,6 @@ This module provides the rules engine that consumes AP2 mandates and produces
 structured decision outcomes with reasons and actions.
 """
 
-
 from .decision_contract import (
     AP2DecisionContract,
     DecisionAction,

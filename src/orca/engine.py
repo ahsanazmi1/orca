@@ -57,5 +57,3 @@ def decide(features: dict[str, Any]) -> Decision:
                 "explain": "Standard amount approved with standard routing",
             },
         )
-
-

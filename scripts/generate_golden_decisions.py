@@ -81,15 +81,21 @@ def generate_golden_decision(ap2_file: Path, output_file: Path, enable_shap: boo
             "actions": [action.model_dump() for action in decision_outcome.actions],
             "meta": {
                 "model": "xgboost" if ml_result else "rules_only",
-                "model_version": ml_result.get("model_meta", {}).get("model_version", "1.0.0")
-                if ml_result
-                else "1.0.0",
-                "model_sha256": ml_result.get("model_meta", {}).get("model_sha256", "abc123def456")
-                if ml_result
-                else "rules-only",
-                "model_trained_on": ml_result.get("model_meta", {}).get("trained_on", "2024-01-01")
-                if ml_result
-                else "deterministic",
+                "model_version": (
+                    ml_result.get("model_meta", {}).get("model_version", "1.0.0")
+                    if ml_result
+                    else "1.0.0"
+                ),
+                "model_sha256": (
+                    ml_result.get("model_meta", {}).get("model_sha256", "abc123def456")
+                    if ml_result
+                    else "rules-only"
+                ),
+                "model_trained_on": (
+                    ml_result.get("model_meta", {}).get("trained_on", "2024-01-01")
+                    if ml_result
+                    else "deterministic"
+                ),
                 "trace_id": decision_outcome.meta.trace_id,
                 "processing_time_ms": decision_outcome.meta.processing_time_ms,
                 "version": decision_outcome.meta.version,

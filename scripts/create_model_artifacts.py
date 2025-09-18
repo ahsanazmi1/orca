@@ -79,7 +79,8 @@ def train_model():
 
     # Get feature importance (convert numpy types to Python types)
     feature_importance = {
-        name: float(importance) for name, importance in zip(X.columns, model.feature_importances_, strict=True)
+        name: float(importance)
+        for name, importance in zip(X.columns, model.feature_importances_, strict=True)
     }
 
     # Create metadata

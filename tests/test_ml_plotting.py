@@ -367,9 +367,7 @@ def test_plot_precision_recall_curve_with_save():
             temp_path = temp_file.name
 
         try:
-            plotter.plot_precision_recall_curve(
-                y_true, y_scores, "Test Model", save_path=temp_path
-            )
+            plotter.plot_precision_recall_curve(y_true, y_scores, "Test Model", save_path=temp_path)
             mock_plt.savefig.assert_called_with(temp_path, dpi=300, bbox_inches="tight")
         finally:
             if os.path.exists(temp_path):

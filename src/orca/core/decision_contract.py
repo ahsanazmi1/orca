@@ -135,9 +135,7 @@ class LegacyDecisionResponse(BaseModel):
         default_factory=list, description="List of triggered signals/rules"
     )
     explanation: str | None = Field(None, description="Human-readable explanation")
-    explanation_human: str | None = Field(
-        None, description="Enhanced human-readable explanation"
-    )
+    explanation_human: str | None = Field(None, description="Enhanced human-readable explanation")
     routing_hint: str | None = Field(None, description="Routing instruction")
 
 

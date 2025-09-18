@@ -118,9 +118,7 @@ class RoutingHint(BaseModel):
 
     processor: str = Field(..., description="Payment processor identifier")
     priority: int = Field(..., ge=1, le=10, description="Routing priority (1=highest)")
-    constraints: dict[str, Any] | None = Field(
-        None, description="Additional routing constraints"
-    )
+    constraints: dict[str, Any] | None = Field(None, description="Additional routing constraints")
 
 
 class IntentMandate(BaseModel):

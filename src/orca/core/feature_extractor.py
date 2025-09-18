@@ -75,7 +75,7 @@ class AP2FeatureExtractor:
 
         # velocity_24h, velocity_7d - from cart (using defaults for now)
         features["velocity_24h"] = 1.0  # Default value
-        features["velocity_7d"] = 1.0   # Default value
+        features["velocity_7d"] = 1.0  # Default value
 
         # cross_border - from cart geo
         features["cross_border"] = 0.0  # Default value

@@ -189,7 +189,9 @@ class ModelRegistry:
 
         # Apply calibration (use raw features, not scaled)
         if self.calibrator is not None:
-            calibrated_score = self.calibrator.predict_proba(raw_feature_vector.reshape(1, -1))[0, 1]
+            calibrated_score = self.calibrator.predict_proba(raw_feature_vector.reshape(1, -1))[
+                0, 1
+            ]
         else:
             calibrated_score = raw_score  # Fallback to raw score
 
@@ -207,17 +209,17 @@ class ModelRegistry:
             "risk_score": float(calibrated_score),
             "key_signals": key_signals,
             "model_meta": {
-                "model_version": self.metadata.get("version", "unknown")
-                if self.metadata
-                else "unknown",
+                "model_version": (
+                    self.metadata.get("version", "unknown") if self.metadata else "unknown"
+                ),
                 "model_sha256": self._get_model_hash(),
-                "trained_on": self.metadata.get("trained_on", "unknown")
-                if self.metadata
-                else "unknown",
+                "trained_on": (
+                    self.metadata.get("trained_on", "unknown") if self.metadata else "unknown"
+                ),
                 "thresholds": self.metadata.get("thresholds", {}) if self.metadata else {},
-                "feature_count": len(self.feature_spec.get("feature_names", []))
-                if self.feature_spec
-                else 0,
+                "feature_count": (
+                    len(self.feature_spec.get("feature_names", [])) if self.feature_spec else 0
+                ),
             },
             "shap_values": shap_values,
         }
@@ -391,22 +393,22 @@ class ModelRegistry:
 
         return {
             "status": "loaded",
-            "model_version": self.metadata.get("version", "unknown")
-            if self.metadata
-            else "unknown",
+            "model_version": (
+                self.metadata.get("version", "unknown") if self.metadata else "unknown"
+            ),
             "model_sha256": self._get_model_hash(),
-            "trained_on": self.metadata.get("trained_on", "unknown")
-            if self.metadata
-            else "unknown",
-            "feature_count": len(self.feature_spec.get("feature_names", []))
-            if self.feature_spec
-            else 0,
+            "trained_on": (
+                self.metadata.get("trained_on", "unknown") if self.metadata else "unknown"
+            ),
+            "feature_count": (
+                len(self.feature_spec.get("feature_names", [])) if self.feature_spec else 0
+            ),
             "has_scaler": self.scaler is not None,
             "has_calibrator": self.calibrator is not None,
             "thresholds": self.metadata.get("thresholds", {}) if self.metadata else {},
-            "feature_names": self.feature_spec.get("feature_names", [])[:10]
-            if self.feature_spec
-            else [],  # First 10
+            "feature_names": (
+                self.feature_spec.get("feature_names", [])[:10] if self.feature_spec else []
+            ),  # First 10
         }
 
     def list_versions(self) -> list[str]:
