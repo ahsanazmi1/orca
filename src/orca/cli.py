@@ -75,7 +75,7 @@ def decide_file(
                 console.print("[green]✅ AP2 contract validation successful[/green]")
         except Exception as e:
             console.print(f"[red]❌ AP2 contract validation failed: {e}[/red]")
-            raise typer.Exit(1) from e
+            raise typer.Exit(1)
 
         if validate_only:
             console.print("[green]✅ AP2 contract is valid[/green]")
@@ -134,7 +134,7 @@ def decide_file(
             import traceback
 
             console.print(f"[red]Traceback: {traceback.format_exc()}[/red]")
-        raise typer.Exit(1) from e
+        raise typer.Exit(1)
 
 
 @app.command()
@@ -174,7 +174,7 @@ def decide_stdin(
                 console.print("[green]✅ AP2 contract validation successful[/green]")
         except Exception as e:
             console.print(f"[red]❌ AP2 contract validation failed: {e}[/red]")
-            raise typer.Exit(1) from e
+            raise typer.Exit(1)
 
         if validate_only:
             console.print("[green]✅ AP2 contract is valid[/green]")
@@ -227,7 +227,7 @@ def decide_stdin(
             import traceback
 
             console.print(f"[red]Traceback: {traceback.format_exc()}[/red]")
-        raise typer.Exit(1) from e
+        raise typer.Exit(1)
 
 
 @app.command()
@@ -273,7 +273,7 @@ def validate(
 
         except Exception as e:
             console.print(f"[red]❌ AP2 contract validation failed: {e}[/red]")
-            raise typer.Exit(1) from e
+            raise typer.Exit(1)
 
     except Exception as e:
         console.print(f"[red]❌ Error validating file: {e}[/red]")
@@ -281,7 +281,7 @@ def validate(
             import traceback
 
             console.print(f"[red]Traceback: {traceback.format_exc()}[/red]")
-        raise typer.Exit(1) from e
+        raise typer.Exit(1)
 
 
 @app.command()
@@ -394,7 +394,7 @@ def create_sample(
 
     except Exception as e:
         console.print(f"[red]❌ Error creating sample file: {e}[/red]")
-        raise typer.Exit(1) from e
+        raise typer.Exit(1)
 
 
 @app.command()
@@ -426,7 +426,7 @@ def explain(
                 console.print("[green]✅ AP2 contract validation successful[/green]")
         except Exception as e:
             console.print(f"[red]❌ AP2 contract validation failed: {e}[/red]")
-            raise typer.Exit(1) from e
+            raise typer.Exit(1)
 
         # Generate explanation
         if verbose:
@@ -452,7 +452,7 @@ def explain(
             import traceback
 
             console.print(f"[red]Traceback: {traceback.format_exc()}[/red]")
-        raise typer.Exit(1) from e
+        raise typer.Exit(1)
 
 
 def main() -> None:
