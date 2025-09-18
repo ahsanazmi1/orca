@@ -74,6 +74,8 @@ class TestAP2CLIIntegration:
     def run_cli_command(self, args: list, input_data: str = None) -> subprocess.CompletedProcess:
         """Run a CLI command and return the result."""
         cmd = ["python", "-m", self.cli_module] + args
+        env = os.environ.copy()
+        env["PYTHONPATH"] = str(Path.cwd())
 
         if input_data:
             return subprocess.run(
@@ -82,6 +84,7 @@ class TestAP2CLIIntegration:
                 text=True,
                 capture_output=True,
                 cwd=Path.cwd(),
+                env=env,
             )
         else:
             return subprocess.run(
@@ -89,6 +92,7 @@ class TestAP2CLIIntegration:
                 capture_output=True,
                 text=True,
                 cwd=Path.cwd(),
+                env=env,
             )
 
     def test_validate_command_valid_file(self):
