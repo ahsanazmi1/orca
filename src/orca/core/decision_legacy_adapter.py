@@ -188,13 +188,13 @@ class DecisionLegacyAdapter:
 
         # Convert legacy reasons to AP2 reasons
         ap2_reasons = [
-            DecisionReason(code=reason, detail=f"Legacy reason: {reason}")
+            DecisionReason(code=reason, detail=f"Legacy reason: {reason}")  # type: ignore[arg-type]
             for reason in legacy_response.reasons
         ]
 
         # Convert legacy actions to AP2 actions
         ap2_actions = [
-            DecisionAction(type=action, detail=f"Legacy action: {action}", to="")
+            DecisionAction(type=action, detail=f"Legacy action: {action}", to="")  # type: ignore[arg-type]
             for action in legacy_response.actions
         ]
 

@@ -172,7 +172,7 @@ class AP2RulesEngine:
         )
 
         decision_outcome = DecisionOutcome(
-            result=final_decision,
+            result=final_decision,  # type: ignore[arg-type]
             risk_score=risk_score,
             reasons=all_reasons,
             actions=all_actions,
