@@ -370,7 +370,10 @@ class TestEndToEndWorkflows:
         """Test memory usage across the system."""
         import os
 
-        import psutil
+        try:
+            import psutil
+        except ImportError:
+            pytest.skip("psutil not available for memory monitoring")
 
         process = psutil.Process(os.getpid())
         initial_memory = process.memory_info().rss
