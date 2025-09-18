@@ -9,7 +9,7 @@
       "created": "2024-01-15 12:00:00+00:00",
       "expires": "2024-01-15 13:00:00+00:00"
     },
-    "nonce": "b199cc4f-9798-4753-8bec-5904b04248d0",
+    "nonce": "66bb6e27-fe97-fab1-7a1d-c8da901e999d",
     "metadata": null
   },
   "cart": {
@@ -82,8 +82,8 @@
       "model_version": "1.0.0",
       "model_sha256": "4c8b4f96c5dce7b9",
       "model_trained_on": "2024-01-01",
-      "trace_id": "d9e477bb-f93b-4a6f-b91f-c3701891108e",
-      "processing_time_ms": null,
+      "trace_id": "golden-trace-review_agent_present_kiosk",
+      "processing_time_ms": 0.0,
       "version": "0.1.0",
       "rules_evaluated": [],
       "feature_snapshot": {}

@@ -9,7 +9,7 @@
       "created": "2024-01-15 09:15:00+00:00",
       "expires": "2024-01-15 10:15:00+00:00"
     },
-    "nonce": "55fae5a3-4ae5-4c9f-b587-513fd6cce1b4",
+    "nonce": "8035cdd7-51ef-b048-5bfd-72da302af9d9",
     "metadata": null
   },
   "cart": {
@@ -71,8 +71,8 @@
       "model_version": "1.0.0",
       "model_sha256": "4c8b4f96c5dce7b9",
       "model_trained_on": "2024-01-01",
-      "trace_id": "cebbe7a1-0e8c-4ddd-bb8b-d70edfd4aaa4",
-      "processing_time_ms": null,
+      "trace_id": "golden-trace-approve_ach_domestic",
+      "processing_time_ms": 0.0,
       "version": "0.1.0",
       "rules_evaluated": [],
       "feature_snapshot": {}
