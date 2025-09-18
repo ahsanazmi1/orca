@@ -9,13 +9,13 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from orca_core.config import ORCA_DECISION_MODE, decision_mode, get_settings, is_ai_enabled
-from orca_core.engine import evaluate_rules
-from orca_core.llm.explain import get_llm_explainer
-from orca_core.ml.features import FeatureExtractor
-from orca_core.ml.model import predict_risk
-from orca_core.ml.train_xgb import XGBoostTrainer
-from orca_core.models import DecisionRequest, DecisionResponse
+from src.orca_core.config import ORCA_DECISION_MODE, decision_mode, get_settings, is_ai_enabled
+from src.orca_core.engine import evaluate_rules
+from src.orca_core.llm.explain import get_llm_explainer
+from src.orca_core.ml.features import FeatureExtractor
+from src.orca_core.ml.model import predict_risk
+from src.orca_core.ml.train_xgb import XGBoostTrainer
+from src.orca_core.models import DecisionRequest, DecisionResponse
 
 
 class TestEndToEndWorkflows:
@@ -119,7 +119,7 @@ class TestEndToEndWorkflows:
             },
         ):
             # Clear the singleton to force recreation with new env vars
-            import orca_core.llm.explain as explain_module
+            import src.orca_core.llm.explain as explain_module
 
             explain_module._explainer = None
 
@@ -152,7 +152,7 @@ class TestEndToEndWorkflows:
                 del os.environ[var]
 
         # Clear the singleton to force recreation with cleared env vars
-        import orca_core.llm.explain as explain_module
+        import src.orca_core.llm.explain as explain_module
 
         explain_module._explainer = None
 

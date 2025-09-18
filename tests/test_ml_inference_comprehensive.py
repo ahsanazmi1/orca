@@ -14,7 +14,7 @@ from unittest.mock import MagicMock, patch
 import numpy as np
 import pytest
 
-from orca_core.ml.xgb_infer import (
+from src.orca_core.ml.xgb_infer import (
     XGBoostInference,
     get_xgb_inference,
     get_xgb_model_info,
@@ -99,7 +99,7 @@ class TestXGBoostInference:
             json.dump(metadata, f)
 
         # Mock joblib.load to return mock objects
-        with patch("orca_core.ml.xgb_infer.joblib.load") as mock_load:
+        with patch("src.orca_core.ml.xgb_infer.joblib.load") as mock_load:
             mock_model = MagicMock()
             mock_calibrator = MagicMock()
             mock_scaler = MagicMock()
@@ -132,7 +132,7 @@ class TestXGBoostInference:
             json.dump(metadata, f)
 
         # Mock joblib.load to raise error
-        with patch("orca_core.ml.xgb_infer.joblib.load", side_effect=Exception("Load failed")):
+        with patch("src.orca_core.ml.xgb_infer.joblib.load", side_effect=Exception("Load failed")):
             result = self.inference._load_model()
 
             assert result is False
@@ -154,7 +154,7 @@ class TestXGBoostInference:
         with open(metadata_path, "w") as f:
             f.write("invalid json")
 
-        with patch("orca_core.ml.xgb_infer.joblib.load") as mock_load:
+        with patch("src.orca_core.ml.xgb_infer.joblib.load") as mock_load:
             mock_load.return_value = MagicMock()
 
             result = self.inference._load_model()

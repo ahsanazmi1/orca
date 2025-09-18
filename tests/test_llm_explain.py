@@ -6,7 +6,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from orca_core.llm.explain import (
+from src.orca_core.llm.explain import (
     AzureOpenAIClient,
     ExplanationRequest,
     ExplanationResponse,
@@ -88,7 +88,7 @@ class TestAzureOpenAIClient:
                 "AZURE_OPENAI_DEPLOYMENT": "gpt-4",
             },
         ):
-            with patch("orca_core.llm.explain.AzureOpenAI") as mock_openai:
+            with patch("src.orca_core.llm.explain.AzureOpenAI") as mock_openai:
                 client = AzureOpenAIClient()
 
                 assert client.is_configured
@@ -115,7 +115,7 @@ class TestAzureOpenAIClient:
             with pytest.raises(ValueError, match="Azure OpenAI not configured"):
                 client.generate_explanation(request)
 
-    @patch("orca_core.llm.explain.validate_llm_explanation")
+    @patch("src.orca_core.llm.explain.validate_llm_explanation")
     def test_generate_explanation_success(self, mock_validate):
         """Test successful explanation generation."""
         # Mock the validation to pass
@@ -130,7 +130,7 @@ class TestAzureOpenAIClient:
                 "AZURE_OPENAI_API_KEY": "test-key",
             },
         ):
-            with patch("orca_core.llm.explain.AzureOpenAI") as mock_openai:
+            with patch("src.orca_core.llm.explain.AzureOpenAI") as mock_openai:
                 # Mock the API response
                 mock_response = Mock()
                 mock_response.choices = [Mock()]
@@ -173,11 +173,11 @@ class TestAzureOpenAIClient:
                 assert "azure_openai" in response.model_provenance["provider"]
                 assert response.model_provenance["request_id"] == "test-id"
 
-    @patch("orca_core.llm.explain.validate_llm_explanation")
+    @patch("src.orca_core.llm.explain.validate_llm_explanation")
     def test_generate_explanation_guardrails_failure(self, mock_validate):
         """Test explanation generation with guardrails failure."""
         # Import the ValidationResult enum to use the actual value
-        from orca_core.llm.guardrails import ValidationResult
+        from src.orca_core.llm.guardrails import ValidationResult
 
         # Mock the validation to fail
         mock_validate.return_value = Mock(
@@ -195,7 +195,7 @@ class TestAzureOpenAIClient:
                 "AZURE_OPENAI_API_KEY": "test-key",
             },
         ):
-            with patch("orca_core.llm.explain.AzureOpenAI") as mock_openai:
+            with patch("src.orca_core.llm.explain.AzureOpenAI") as mock_openai:
                 # Mock the API response
                 mock_response = Mock()
                 mock_response.choices = [Mock()]
@@ -232,7 +232,7 @@ class TestAzureOpenAIClient:
                 assert "Transaction approved" in response.explanation
                 assert response.model_provenance["fallback_mode"] is True
 
-    @patch("orca_core.llm.explain.validate_llm_explanation")
+    @patch("src.orca_core.llm.explain.validate_llm_explanation")
     def test_generate_explanation_json_error(self, mock_validate):
         """Test explanation generation with JSON parsing error."""
         # Mock the validation to pass
@@ -247,7 +247,7 @@ class TestAzureOpenAIClient:
                 "AZURE_OPENAI_API_KEY": "test-key",
             },
         ):
-            with patch("orca_core.llm.explain.AzureOpenAI") as mock_openai:
+            with patch("src.orca_core.llm.explain.AzureOpenAI") as mock_openai:
                 # Mock the API response with invalid JSON
                 mock_response = Mock()
                 mock_response.choices = [Mock()]
@@ -409,7 +409,7 @@ class TestLLMExplainer:
                 "AZURE_OPENAI_API_KEY": "test-key",
             },
         ):
-            with patch("orca_core.llm.explain.AzureOpenAI"):
+            with patch("src.orca_core.llm.explain.AzureOpenAI"):
                 explainer = LLMExplainer()
 
                 assert explainer.is_available
@@ -434,7 +434,7 @@ class TestLLMExplainer:
             assert response.confidence == 0.0
             assert response.model_provenance["status"] == "503_service_unavailable"
 
-    @patch("orca_core.llm.explain.validate_llm_explanation")
+    @patch("src.orca_core.llm.explain.validate_llm_explanation")
     def test_explain_decision_success(self, mock_validate):
         """Test successful decision explanation."""
         # Mock the validation to pass
@@ -449,7 +449,7 @@ class TestLLMExplainer:
                 "AZURE_OPENAI_API_KEY": "test-key",
             },
         ):
-            with patch("orca_core.llm.explain.AzureOpenAI") as mock_openai:
+            with patch("src.orca_core.llm.explain.AzureOpenAI") as mock_openai:
                 # Mock the API response
                 mock_response = Mock()
                 mock_response.choices = [Mock()]
@@ -494,7 +494,7 @@ class TestLLMExplainer:
                 "AZURE_OPENAI_API_KEY": "test-key",
             },
         ):
-            with patch("orca_core.llm.explain.AzureOpenAI") as mock_openai:
+            with patch("src.orca_core.llm.explain.AzureOpenAI") as mock_openai:
                 # Mock client to raise exception
                 mock_client = Mock()
                 mock_client.chat.completions.create.side_effect = Exception("API Error")
@@ -542,7 +542,7 @@ class TestLLMExplainer:
                 "AZURE_OPENAI_DEPLOYMENT": "gpt-4",
             },
         ):
-            with patch("orca_core.llm.explain.AzureOpenAI"):
+            with patch("src.orca_core.llm.explain.AzureOpenAI"):
                 explainer = LLMExplainer()
                 status = explainer.get_configuration_status()
 
@@ -579,15 +579,15 @@ class TestGlobalFunctions:
     def test_is_llm_configured(self):
         """Test is_llm_configured function."""
         # Reset global singleton
-        import orca_core.llm.explain
+        import src.orca_core.llm.explain
 
-        orca_core.llm.explain._explainer = None
+        src.orca_core.llm.explain._explainer = None
 
         with patch.dict(os.environ, {}, clear=True):
             assert not is_llm_configured()
 
         # Reset global singleton again
-        orca_core.llm.explain._explainer = None
+        src.orca_core.llm.explain._explainer = None
 
         with patch.dict(
             os.environ,
@@ -596,22 +596,22 @@ class TestGlobalFunctions:
                 "AZURE_OPENAI_API_KEY": "test-key",
             },
         ):
-            with patch("orca_core.llm.explain.AzureOpenAI"):
+            with patch("src.orca_core.llm.explain.AzureOpenAI"):
                 assert is_llm_configured()
 
     def test_get_llm_configuration_status(self):
         """Test get_llm_configuration_status function."""
         # Reset global singleton
-        import orca_core.llm.explain
+        import src.orca_core.llm.explain
 
-        orca_core.llm.explain._explainer = None
+        src.orca_core.llm.explain._explainer = None
 
         with patch.dict(os.environ, {}, clear=True):
             status = get_llm_configuration_status()
             assert status["status"] == "not_configured"
 
         # Reset global singleton again
-        orca_core.llm.explain._explainer = None
+        src.orca_core.llm.explain._explainer = None
 
         with patch.dict(
             os.environ,
@@ -620,6 +620,6 @@ class TestGlobalFunctions:
                 "AZURE_OPENAI_API_KEY": "test-key",
             },
         ):
-            with patch("orca_core.llm.explain.AzureOpenAI"):
+            with patch("src.orca_core.llm.explain.AzureOpenAI"):
                 status = get_llm_configuration_status()
                 assert status["status"] == "configured"

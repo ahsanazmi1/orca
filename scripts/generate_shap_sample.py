@@ -2,19 +2,19 @@
 
 import json
 import os
+import sys
 from pathlib import Path
+from typing import Any
 
 # Set environment variable for SHAP
 os.environ["ORCA_ENABLE_SHAP"] = "true"
 
-import sys
-
 sys.path.append(".")
 
-from src.orca.ml.predict_risk import predict_with_shap
+from src.orca.ml.predict_risk import predict_with_shap  # noqa: E402
 
 
-def generate_shap_sample():
+def generate_shap_sample() -> None:
     """Generate a SHAP-enabled sample with realistic features."""
     print("🔍 Generating SHAP-enabled sample...")
 
@@ -36,7 +36,7 @@ def generate_shap_sample():
     result = predict_with_shap(features)
 
     # Create SHAP sample structure
-    shap_sample = {
+    shap_sample: dict[str, Any] = {
         "scenario": "high_risk_complex",
         "description": "High-risk transaction with multiple risk factors for SHAP analysis",
         "features": features,
@@ -58,7 +58,7 @@ def generate_shap_sample():
         }
 
         # Get top 5 SHAP contributions
-        shap_contributions = []
+        shap_contributions: list[dict[str, Any]] = []
         feature_names = shap_values.get("feature_names", [])
         shap_vals = shap_values.get("shap_values", [])
 
@@ -94,7 +94,6 @@ def generate_shap_sample():
         json.dump(shap_sample, f, indent=2, default=str)
 
     print(f"💾 Saved SHAP sample to {output_file}")
-    return shap_sample
 
 
 if __name__ == "__main__":

@@ -2,6 +2,7 @@
 
 import json
 from pathlib import Path
+from typing import Any
 
 import joblib
 import numpy as np
@@ -49,11 +50,13 @@ def create_sample_data(n_samples: int = 1000) -> tuple[pd.DataFrame, pd.Series]:
     return df, target
 
 
-def train_model():
+def train_model() -> Path:
     """Train XGBoost model and create artifacts."""
     print("🚀 Creating XGBoost model artifacts...")
 
     # Create sample data
+    X: pd.DataFrame
+    y: pd.Series
     X, y = create_sample_data(2000)
 
     # Split data
@@ -84,7 +87,7 @@ def train_model():
     }
 
     # Create metadata
-    metadata = {
+    metadata: dict[str, Any] = {
         "version": "1.0.0",
         "trained_on": "2024-01-01",
         "feature_names": list(X.columns),

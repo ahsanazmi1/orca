@@ -1,5 +1,5 @@
 """
-Tests for orca_core.ml.plotting module.
+Tests for src.orca_core.ml.plotting module.
 """
 
 import os
@@ -8,7 +8,7 @@ from unittest.mock import Mock, patch
 
 import numpy as np
 
-from orca_core.ml.plotting import MLPlotter, plot_xgb_model_evaluation
+from src.orca_core.ml.plotting import MLPlotter, plot_xgb_model_evaluation
 
 
 class TestMLPlotter:
@@ -22,8 +22,8 @@ class TestMLPlotter:
         plotter = MLPlotter(model_dir="custom_models")
         assert plotter.model_dir == "custom_models"
 
-    @patch("orca_core.ml.plotting.plt")
-    @patch("orca_core.ml.plotting.sns")
+    @patch("src.orca_core.ml.plotting.plt")
+    @patch("src.orca_core.ml.plotting.sns")
     def test_setup_style(self, mock_sns, mock_plt):
         """Test setup_style method."""
         plotter = MLPlotter()
@@ -32,7 +32,7 @@ class TestMLPlotter:
         mock_plt.style.use.assert_called_with("seaborn-v0_8")
         mock_sns.set_palette.assert_called_with("husl")
 
-    @patch("orca_core.ml.plotting.plt")
+    @patch("src.orca_core.ml.plotting.plt")
     def test_plot_roc_curve(self, mock_plt):
         """Test plot_roc_curve method."""
         # Setup mock
@@ -53,7 +53,7 @@ class TestMLPlotter:
         mock_ax.plot.assert_called()
         mock_ax.set_title.assert_called()
 
-    @patch("orca_core.ml.plotting.plt")
+    @patch("src.orca_core.ml.plotting.plt")
     def test_plot_precision_recall_curve(self, mock_plt):
         """Test plot_precision_recall_curve method."""
         # Setup mock
@@ -74,8 +74,8 @@ class TestMLPlotter:
         mock_ax.plot.assert_called()
         mock_ax.set_title.assert_called()
 
-    @patch("orca_core.ml.plotting.plt")
-    @patch("orca_core.ml.plotting.sns")
+    @patch("src.orca_core.ml.plotting.plt")
+    @patch("src.orca_core.ml.plotting.sns")
     def test_plot_confusion_matrix(self, mock_sns, mock_plt):
         """Test plot_confusion_matrix method."""
         # Setup mock
@@ -96,7 +96,7 @@ class TestMLPlotter:
         mock_plt.subplots.assert_called_once()
         mock_sns.heatmap.assert_called_once()
 
-    @patch("orca_core.ml.plotting.plt")
+    @patch("src.orca_core.ml.plotting.plt")
     def test_plot_calibration_curve(self, mock_plt):
         """Test plot_calibration_curve method."""
         # Setup mock
@@ -115,7 +115,7 @@ class TestMLPlotter:
         assert result == mock_fig
         mock_plt.subplots.assert_called_once()
 
-    @patch("orca_core.ml.plotting.plt")
+    @patch("src.orca_core.ml.plotting.plt")
     def test_plot_feature_importance(self, mock_plt):
         """Test plot_feature_importance method."""
         # Setup mock
@@ -144,8 +144,8 @@ class TestMLPlotter:
         mock_plt.subplots.assert_called_once()
         mock_ax.barh.assert_called_once()
 
-    @patch("orca_core.ml.plotting.plt")
-    @patch("orca_core.ml.plotting.sns")
+    @patch("src.orca_core.ml.plotting.plt")
+    @patch("src.orca_core.ml.plotting.sns")
     def test_generate_model_report(self, mock_sns, mock_plt):
         """Test generate_model_report method."""
         # Setup mock
@@ -187,11 +187,11 @@ class TestMLPlotter:
             assert "feature_importance" in result
 
 
-@patch("orca_core.ml.plotting.os.path.exists")
-@patch("orca_core.ml.plotting.joblib.load")
+@patch("src.orca_core.ml.plotting.os.path.exists")
+@patch("src.orca_core.ml.plotting.joblib.load")
 @patch("builtins.open")
 @patch("json.load")
-@patch("orca_core.ml.plotting.plt")
+@patch("src.orca_core.ml.plotting.plt")
 def test_plot_xgb_model_evaluation_no_model(
     mock_plt, mock_json_load, mock_open, mock_joblib_load, mock_exists
 ):
@@ -205,7 +205,7 @@ def test_plot_xgb_model_evaluation_no_model(
 
 def test_plot_model_comparison():
     """Test plot_model_comparison method."""
-    with patch("orca_core.ml.plotting.plt") as mock_plt:
+    with patch("src.orca_core.ml.plotting.plt") as mock_plt:
         # Mock matplotlib components
         mock_fig = Mock()
         mock_ax = Mock()
@@ -244,7 +244,7 @@ def test_plot_model_comparison():
 
 def test_plot_model_comparison_with_save():
     """Test plot_model_comparison method with save_path."""
-    with patch("orca_core.ml.plotting.plt") as mock_plt:
+    with patch("src.orca_core.ml.plotting.plt") as mock_plt:
         # Mock matplotlib components
         mock_fig = Mock()
         mock_ax = Mock()
@@ -272,12 +272,12 @@ def test_plot_model_comparison_with_save():
             assert result == mock_fig
 
 
-@patch("orca_core.ml.plotting.os.path.exists")
-@patch("orca_core.ml.plotting.joblib.load")
+@patch("src.orca_core.ml.plotting.os.path.exists")
+@patch("src.orca_core.ml.plotting.joblib.load")
 @patch("builtins.open")
 @patch("json.load")
-@patch("orca_core.ml.plotting.plt")
-@patch("orca_core.ml.plotting.sns")
+@patch("src.orca_core.ml.plotting.plt")
+@patch("src.orca_core.ml.plotting.sns")
 def test_plot_xgb_model_evaluation_with_model(
     mock_sns, mock_plt, mock_json_load, mock_open, mock_joblib_load, mock_exists
 ):
@@ -328,7 +328,7 @@ def test_plot_xgb_model_evaluation_with_model(
 
 def test_plot_roc_curve_with_save():
     """Test plot_roc_curve with save functionality."""
-    with patch("orca_core.ml.plotting.plt") as mock_plt:
+    with patch("src.orca_core.ml.plotting.plt") as mock_plt:
         mock_fig = Mock()
         mock_ax = Mock()
         mock_plt.subplots.return_value = (mock_fig, mock_ax)
@@ -352,7 +352,7 @@ def test_plot_roc_curve_with_save():
 
 def test_plot_precision_recall_curve_with_save():
     """Test plot_precision_recall_curve with save functionality."""
-    with patch("orca_core.ml.plotting.plt") as mock_plt:
+    with patch("src.orca_core.ml.plotting.plt") as mock_plt:
         mock_fig = Mock()
         mock_ax = Mock()
         mock_plt.subplots.return_value = (mock_fig, mock_ax)
@@ -376,7 +376,7 @@ def test_plot_precision_recall_curve_with_save():
 
 def test_mlplotter_main_execution():
     """Test the main execution block."""
-    with patch("orca_core.ml.plotting.plot_xgb_model_evaluation") as mock_plot_func:
+    with patch("src.orca_core.ml.plotting.plot_xgb_model_evaluation") as mock_plot_func:
         # Test successful execution
         mock_plot_func.return_value = {
             "roc_curve": "/path/to/roc.png",
@@ -384,7 +384,7 @@ def test_mlplotter_main_execution():
         }
 
         # Import the module to trigger main execution
-        import orca_core.ml.plotting
+        import src.orca_core.ml.plotting
 
         # Test failed execution
         mock_plot_func.return_value = {}
@@ -392,4 +392,4 @@ def test_mlplotter_main_execution():
         # Re-import to test the failure case
         import importlib
 
-        importlib.reload(orca_core.ml.plotting)
+        importlib.reload(src.orca_core.ml.plotting)

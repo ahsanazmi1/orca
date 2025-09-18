@@ -4,7 +4,7 @@ Comprehensive tests for CLI batch functionality.
 
 from unittest.mock import patch
 
-from orca_core.cli import decide_batch
+from src.orca_core.cli import decide_batch
 
 
 class TestDecideBatch:
@@ -39,7 +39,7 @@ class TestDecideBatch:
         assert "Evaluate decision requests" in docstring
         assert "JSON files" in docstring
 
-    @patch("orca_core.cli.app")
+    @patch("src.orca_core.cli.app")
     def test_decide_batch_registered_with_app(self, mock_app):
         """Test that decide_batch is registered with the typer app."""
         # This test verifies the function is properly decorated

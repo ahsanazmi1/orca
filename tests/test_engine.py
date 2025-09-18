@@ -1,6 +1,6 @@
 """Tests for Orca engine."""
 
-from orca.engine import decide
+from src.orca.engine import decide
 
 
 def test_low_amount_approves() -> None:

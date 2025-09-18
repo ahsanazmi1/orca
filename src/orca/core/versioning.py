@@ -66,7 +66,7 @@ class VersionManager:
         try:
             v = version.parse(version_str)
             ap2_v = version.parse(self.ap2_version)
-            return v >= ap2_v
+            return bool(v >= ap2_v)
         except version.InvalidVersion:
             return False
 
@@ -82,7 +82,7 @@ class VersionManager:
         try:
             v = version.parse(version_str)
             legacy_v = version.parse(self.legacy_version)
-            return v < legacy_v
+            return bool(v < legacy_v)
         except version.InvalidVersion:
             return True  # Assume legacy if can't parse
 

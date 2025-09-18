@@ -14,5 +14,3 @@ body:
     attributes:
       label: Environment
       description: OS, Python version, etc.
-
-

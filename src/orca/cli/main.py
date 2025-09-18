@@ -32,7 +32,7 @@ from ..mandates.ap2_types import (
 )
 
 app = typer.Typer(help="Orca Core AP2 Decision Engine CLI")
-console = Console()
+console = Console(force_terminal=False, no_color=True)
 
 
 def write_output_with_headers(

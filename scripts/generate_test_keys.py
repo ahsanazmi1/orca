@@ -83,7 +83,7 @@ def create_key_info(
     }
 
 
-def main():
+def main() -> bool:
     """Generate test keys for local development."""
     print("🔐 Generating test cryptographic keys for local development...")
     print("⚠️  WARNING: These are TEST keys only. Never use for production!")

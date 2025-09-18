@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from orca_core.core.ml_hooks import RiskPredictionModel, get_model, predict_risk, train_model
+from src.orca_core.core.ml_hooks import RiskPredictionModel, get_model, predict_risk, train_model
 
 
 class TestMLHooks:

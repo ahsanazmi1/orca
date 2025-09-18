@@ -94,15 +94,17 @@ class TestAP2FeatureExtractor:
         # Extract features
         features = extract_features_from_ap2(contract)
 
-        # Verify key features
+        # Verify key features that the model actually expects
         assert features["amount"] == 100.0
-        assert features["cart_total"] == 100.0
-        assert features["currency_risk"] == 0.1  # USD
-        assert features["mcc_risk"] == 0.1  # Electronics
-        assert features["modality_risk"] == 0.1  # Immediate
-        assert features["actor_risk"] == 0.1  # Human
-        assert features["channel_risk"] == 0.2  # Web
-        assert features["geo_risk_score"] == 0.1  # US
+        assert features["velocity_24h"] == 1.0  # Default value
+        assert features["velocity_7d"] == 1.0  # Default value
+        assert features["cross_border"] == 0.0  # Default value
+        assert features["location_mismatch"] == 0.0  # Default value
+        assert features["payment_method_risk"] == 0.2  # PIN auth requirement
+        assert features["chargebacks_12m"] == 0.0  # Default value
+        assert features["customer_age_days"] == 365.0  # Default value
+        assert features["loyalty_score"] == 0.0  # Default value
+        assert features["time_since_last_purchase"] == 0.0  # Default value
 
     def test_extract_features_from_legacy_data(self):
         """Test feature extraction from legacy data."""

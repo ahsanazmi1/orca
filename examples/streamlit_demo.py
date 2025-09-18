@@ -4,7 +4,7 @@ import json
 
 import streamlit as st
 
-from orca.engine import decide
+from src.orca.engine import decide
 
 st.title("Orca — Open Checkout Agent (Demo)")
 

@@ -3,7 +3,7 @@
 import os
 from unittest.mock import patch
 
-from orca_core.config import (
+from src.orca_core.config import (
     ORCA_DECISION_MODE,
     OrcaSettings,
     decision_mode,

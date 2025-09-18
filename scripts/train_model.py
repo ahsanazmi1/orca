@@ -12,7 +12,7 @@ import pandas as pd  # noqa: E402
 from sklearn.metrics import classification_report, roc_auc_score  # noqa: E402
 from sklearn.model_selection import train_test_split  # noqa: E402
 
-from orca_core.core.ml_hooks import train_model  # noqa: E402
+from src.orca_core.core.ml_hooks import train_model  # noqa: E402
 
 
 def generate_sample_data(n_samples: int = 1000) -> tuple[pd.DataFrame, pd.Series]:
@@ -92,7 +92,7 @@ def main() -> None:
 
     # Evaluate model
     print("\n📊 Evaluating model performance...")
-    from orca_core.core.ml_hooks import get_model
+    from src.orca_core.core.ml_hooks import get_model
 
     model = get_model()
 

@@ -2,8 +2,8 @@
 
 import pytest
 
-from orca_core.engine import evaluate_rules
-from orca_core.models import DecisionRequest
+from src.orca_core.engine import evaluate_rules
+from src.orca_core.models import DecisionRequest
 
 
 class TestCardRules:

@@ -2,7 +2,7 @@
 
 from fastapi.testclient import TestClient
 
-from orca_api.main import app
+from src.orca_api.main import app
 
 # Create test client
 client = TestClient(app)

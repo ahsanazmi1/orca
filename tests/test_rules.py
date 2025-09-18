@@ -1,7 +1,7 @@
 """Tests for the rules system."""
 
-from orca_core.models import DecisionRequest
-from orca_core.rules import HighTicketRule, RuleRegistry, VelocityRule
+from src.orca_core.models import DecisionRequest
+from src.orca_core.rules import HighTicketRule, RuleRegistry, VelocityRule
 
 
 class TestHighTicketRule:

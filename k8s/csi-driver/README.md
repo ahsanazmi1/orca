@@ -305,5 +305,3 @@ Secrets can be updated in Azure Key Vault without restarting pods:
 - Set up alerts for failed secret access
 - Monitor CSI driver pod health
 - Track secret rotation events
-
-

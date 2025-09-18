@@ -209,7 +209,7 @@ def test_explain_nlg() -> bool:
     return success
 
 
-def main():
+def main() -> bool:
     """Run all CI job tests."""
     print("🚀 Testing CI Jobs Locally")
     print("=" * 60)

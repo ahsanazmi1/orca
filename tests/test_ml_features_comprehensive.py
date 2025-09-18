@@ -10,7 +10,7 @@ from unittest.mock import patch
 
 import numpy as np
 
-from orca_core.ml.features import FeatureExtractor, extract_features, get_feature_extractor
+from src.orca_core.ml.features import FeatureExtractor, extract_features, get_feature_extractor
 
 
 class TestFeatureExtractor:
@@ -245,7 +245,7 @@ class TestFeatureExtractor:
         extractor = FeatureExtractor()
         request_data = {}
 
-        with patch("orca_core.ml.features.datetime") as mock_datetime:
+        with patch("src.orca_core.ml.features.datetime") as mock_datetime:
             mock_now = datetime(2024, 1, 15, 14, 30)  # Monday, 2:30 PM
             mock_datetime.now.return_value = mock_now
 
@@ -261,7 +261,7 @@ class TestFeatureExtractor:
         extractor = FeatureExtractor()
         request_data = {}
 
-        with patch("orca_core.ml.features.datetime") as mock_datetime:
+        with patch("src.orca_core.ml.features.datetime") as mock_datetime:
             mock_now = datetime(2024, 1, 13, 10, 0)  # Saturday, 10:00 AM
             mock_datetime.now.return_value = mock_now
 

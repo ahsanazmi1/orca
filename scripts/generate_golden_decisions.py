@@ -3,12 +3,13 @@
 import json
 import sys
 from pathlib import Path
+from typing import Any
 
 sys.path.append(".")
 
-from src.orca.core.decision_contract import AP2DecisionContract
-from src.orca.core.rules_engine import evaluate_ap2_rules
-from src.orca.ml.predict_risk import load_model_version, predict_risk
+from src.orca.core.decision_contract import AP2DecisionContract  # noqa: E402
+from src.orca.core.rules_engine import evaluate_ap2_rules  # noqa: E402
+from src.orca.ml.predict_risk import load_model_version, predict_risk  # noqa: E402
 
 
 def generate_golden_decision(ap2_file: Path, output_file: Path, enable_shap: bool = False) -> None:
@@ -24,7 +25,15 @@ def generate_golden_decision(ap2_file: Path, output_file: Path, enable_shap: boo
 
     from src.orca.core.decision_contract import DecisionMeta, DecisionOutcome
 
-    decision_meta = DecisionMeta(model="rules_only", trace_id=str(uuid4()), version="0.1.0")
+    decision_meta = DecisionMeta(
+        model="rules_only",
+        trace_id=str(uuid4()),
+        version="0.1.0",
+        processing_time_ms=0.0,
+        model_version="0.1.0",
+        model_sha256="",
+        model_trained_on="",
+    )
 
     decision_outcome = DecisionOutcome(
         result="APPROVE", risk_score=0.0, reasons=[], actions=[], meta=decision_meta
@@ -69,7 +78,7 @@ def generate_golden_decision(ap2_file: Path, output_file: Path, enable_shap: boo
         ml_result = None
 
     # Create golden decision structure
-    golden_decision = {
+    golden_decision: dict[str, Any] = {
         "ap2_version": ap2_contract.ap2_version,
         "intent": ap2_contract.intent.model_dump(),
         "cart": ap2_contract.cart.model_dump(),
@@ -125,7 +134,7 @@ def generate_golden_decision(ap2_file: Path, output_file: Path, enable_shap: boo
     print(f"✅ Generated {output_file.name}")
 
 
-def main():
+def main() -> None:
     """Generate golden decisions for all AP2 samples."""
     samples_dir = Path("samples/ap2")
     golden_dir = Path("samples/golden")

@@ -9,7 +9,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from typer.testing import CliRunner
 
-from orca_core.cli import app
+from src.orca_core.cli import app
 
 
 class TestCLI:
@@ -211,7 +211,7 @@ class TestCLI:
         assert "Decision Mode" in result.stdout
         assert "AI Enabled" in result.stdout
 
-    @patch("orca_core.cli.XGBoostTrainer")
+    @patch("src.orca_core.cli.XGBoostTrainer")
     def test_train_xgb_command(self, mock_trainer):
         """Test the train-xgb command."""
         mock_instance = MagicMock()
@@ -232,7 +232,7 @@ class TestCLI:
         assert "Log Loss: 0.4500" in result.stdout
         assert "Top 5 Most Important Features" in result.stdout
 
-    @patch("orca_core.cli.XGBoostTrainer")
+    @patch("src.orca_core.cli.XGBoostTrainer")
     def test_train_xgb_command_failure(self, mock_trainer):
         """Test the train-xgb command with training failure."""
         mock_instance = MagicMock()
@@ -244,7 +244,7 @@ class TestCLI:
         assert result.exit_code == 1
         assert "Training failed" in result.stdout
 
-    @patch("orca_core.cli.get_model_info")
+    @patch("src.orca_core.cli.get_model_info")
     def test_model_info_command(self, mock_get_model_info):
         """Test the model-info command."""
         mock_get_model_info.return_value = {
@@ -263,7 +263,7 @@ class TestCLI:
         assert "Model Type: xgboost" in result.stdout
         assert "Version: 1.0.0" in result.stdout
 
-    @patch("orca_core.cli.get_model_info")
+    @patch("src.orca_core.cli.get_model_info")
     def test_model_info_command_stub_model(self, mock_get_model_info):
         """Test the model-info command with stub model."""
         mock_get_model_info.return_value = {
@@ -281,7 +281,7 @@ class TestCLI:
         assert "Model Type: stub" in result.stdout
         assert "Description: Stub model for testing" in result.stdout
 
-    @patch("orca_core.cli.get_model_info")
+    @patch("src.orca_core.cli.get_model_info")
     def test_model_info_command_failure(self, mock_get_model_info):
         """Test the model-info command with failure."""
         mock_get_model_info.side_effect = Exception("Model info failed")
@@ -448,8 +448,8 @@ class TestCLI:
         assert result.exit_code == 1
         assert "Invalid explain value" in result.stdout
 
-    @patch("orca_core.core.ml_hooks.train_model")
-    @patch("orca_core.core.ml_hooks.get_model")
+    @patch("src.orca_core.core.ml_hooks.train_model")
+    @patch("src.orca_core.core.ml_hooks.get_model")
     def test_train_command(self, mock_get_model, mock_train_model):
         """Test the train command."""
         mock_model = MagicMock()
@@ -482,7 +482,7 @@ class TestCLI:
         finally:
             os.unlink(temp_file)
 
-    @patch("orca_core.cli.plot_xgb_model_evaluation")
+    @patch("src.orca_core.cli.plot_xgb_model_evaluation")
     def test_generate_plots_command(self, mock_plot):
         """Test the generate-plots command."""
         mock_plot.return_value = {
@@ -498,7 +498,7 @@ class TestCLI:
         assert "Generating ML model evaluation plots" in result.stdout
         assert "Model evaluation plots generated successfully" in result.stdout
 
-    @patch("orca_core.cli.plot_xgb_model_evaluation")
+    @patch("src.orca_core.cli.plot_xgb_model_evaluation")
     def test_generate_plots_command_failure(self, mock_plot):
         """Test the generate-plots command with failure."""
         mock_plot.return_value = None
@@ -508,7 +508,7 @@ class TestCLI:
         assert result.exit_code == 1
         assert "Failed to generate evaluation plots" in result.stdout
 
-    @patch("orca_core.cli.plot_xgb_model_evaluation")
+    @patch("src.orca_core.cli.plot_xgb_model_evaluation")
     def test_generate_plots_command_exception(self, mock_plot):
         """Test the generate-plots command with exception."""
         mock_plot.side_effect = Exception("Plot generation failed")

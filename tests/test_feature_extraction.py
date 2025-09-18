@@ -1,6 +1,6 @@
 """Tests for feature extraction module."""
 
-from orca_core.core.feature_extraction import extract_features
+from src.orca_core.core.feature_extraction import extract_features
 
 
 class TestFeatureExtraction:

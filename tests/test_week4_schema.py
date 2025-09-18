@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from orca_core.engine import evaluate_rules
-from orca_core.models import DecisionMeta, DecisionRequest, DecisionResponse
+from src.orca_core.engine import evaluate_rules
+from src.orca_core.models import DecisionMeta, DecisionRequest, DecisionResponse
 
 
 class TestWeek4Schema:

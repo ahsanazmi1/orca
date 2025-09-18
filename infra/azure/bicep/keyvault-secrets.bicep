@@ -210,5 +210,3 @@ resource orcaExplainEnabledSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01'
 // Outputs
 output keyVaultName string = keyVaultName
 output keyVaultUri string = keyVault.properties.vaultUri
-
-

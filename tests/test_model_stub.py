@@ -1,6 +1,6 @@
 """Tests for ML model stub implementation."""
 
-from orca_core.ml.model import get_model_info, predict_risk
+from src.orca_core.ml.model import get_model_info, predict_risk
 
 
 class TestPredictRisk:

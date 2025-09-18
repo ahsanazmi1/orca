@@ -7,8 +7,8 @@ ML inference, and decision generation.
 
 from unittest.mock import MagicMock, patch
 
-from orca_core.engine import determine_routing_hint, evaluate_rules, generate_explanation
-from orca_core.models import DecisionRequest
+from src.orca_core.engine import determine_routing_hint, evaluate_rules, generate_explanation
+from src.orca_core.models import DecisionRequest
 
 
 class TestDetermineRoutingHint:
@@ -274,14 +274,14 @@ class TestEvaluateRules:
             cart_total=100.0, currency="USD", rail="Card", channel="online", features={}, context={}
         )
 
-    @patch("orca_core.engine.get_settings")
-    @patch("orca_core.engine.decision_mode")
-    @patch("orca_core.engine.is_ai_enabled")
-    @patch("orca_core.engine.predict_risk")
-    @patch("orca_core.engine.run_rules")
-    @patch("orca_core.engine.is_llm_configured")
-    @patch("orca_core.engine.explain_decision_llm")
-    @patch("orca_core.engine.generate_human_explanation")
+    @patch("src.orca_core.engine.get_settings")
+    @patch("src.orca_core.engine.decision_mode")
+    @patch("src.orca_core.engine.is_ai_enabled")
+    @patch("src.orca_core.engine.predict_risk")
+    @patch("src.orca_core.engine.run_rules")
+    @patch("src.orca_core.engine.is_llm_configured")
+    @patch("src.orca_core.engine.explain_decision_llm")
+    @patch("src.orca_core.engine.generate_human_explanation")
     def test_evaluate_rules_approve_basic(
         self,
         mock_human_explanation,
@@ -324,14 +324,14 @@ class TestEvaluateRules:
         assert response.cart_total == 100.0
         assert response.rail == "Card"
 
-    @patch("orca_core.engine.get_settings")
-    @patch("orca_core.engine.decision_mode")
-    @patch("orca_core.engine.is_ai_enabled")
-    @patch("orca_core.engine.predict_risk")
-    @patch("orca_core.engine.run_rules")
-    @patch("orca_core.engine.is_llm_configured")
-    @patch("orca_core.engine.explain_decision_llm")
-    @patch("orca_core.engine.generate_human_explanation")
+    @patch("src.orca_core.engine.get_settings")
+    @patch("src.orca_core.engine.decision_mode")
+    @patch("src.orca_core.engine.is_ai_enabled")
+    @patch("src.orca_core.engine.predict_risk")
+    @patch("src.orca_core.engine.run_rules")
+    @patch("src.orca_core.engine.is_llm_configured")
+    @patch("src.orca_core.engine.explain_decision_llm")
+    @patch("src.orca_core.engine.generate_human_explanation")
     def test_evaluate_rules_decline_high_risk(
         self,
         mock_human_explanation,
@@ -372,14 +372,14 @@ class TestEvaluateRules:
         assert "BLOCK" in response.actions
         assert response.meta.get("risk_score") == 0.85
 
-    @patch("orca_core.engine.get_settings")
-    @patch("orca_core.engine.decision_mode")
-    @patch("orca_core.engine.is_ai_enabled")
-    @patch("orca_core.engine.predict_risk")
-    @patch("orca_core.engine.run_rules")
-    @patch("orca_core.engine.is_llm_configured")
-    @patch("orca_core.engine.explain_decision_llm")
-    @patch("orca_core.engine.generate_human_explanation")
+    @patch("src.orca_core.engine.get_settings")
+    @patch("src.orca_core.engine.decision_mode")
+    @patch("src.orca_core.engine.is_ai_enabled")
+    @patch("src.orca_core.engine.predict_risk")
+    @patch("src.orca_core.engine.run_rules")
+    @patch("src.orca_core.engine.is_llm_configured")
+    @patch("src.orca_core.engine.explain_decision_llm")
+    @patch("src.orca_core.engine.generate_human_explanation")
     def test_evaluate_rules_route_review_hint(
         self,
         mock_human_explanation,
@@ -419,14 +419,14 @@ class TestEvaluateRules:
         assert "HIGH_AMOUNT" in response.reasons
         assert "REVIEW" in response.actions
 
-    @patch("orca_core.engine.get_settings")
-    @patch("orca_core.engine.decision_mode")
-    @patch("orca_core.engine.is_ai_enabled")
-    @patch("orca_core.engine.predict_risk")
-    @patch("orca_core.engine.run_rules")
-    @patch("orca_core.engine.is_llm_configured")
-    @patch("orca_core.engine.explain_decision_llm")
-    @patch("orca_core.engine.generate_human_explanation")
+    @patch("src.orca_core.engine.get_settings")
+    @patch("src.orca_core.engine.decision_mode")
+    @patch("src.orca_core.engine.is_ai_enabled")
+    @patch("src.orca_core.engine.predict_risk")
+    @patch("src.orca_core.engine.run_rules")
+    @patch("src.orca_core.engine.is_llm_configured")
+    @patch("src.orca_core.engine.explain_decision_llm")
+    @patch("src.orca_core.engine.generate_human_explanation")
     def test_evaluate_rules_with_llm_explanation(
         self,
         mock_human_explanation,
@@ -475,14 +475,14 @@ class TestEvaluateRules:
         assert response.meta["ai"]["llm_explanation"]["explanation"] == "AI-generated explanation"
         assert response.meta["ai"]["llm_explanation"]["confidence"] == 0.95
 
-    @patch("orca_core.engine.get_settings")
-    @patch("orca_core.engine.decision_mode")
-    @patch("orca_core.engine.is_ai_enabled")
-    @patch("orca_core.engine.predict_risk")
-    @patch("orca_core.engine.run_rules")
-    @patch("orca_core.engine.is_llm_configured")
-    @patch("orca_core.engine.explain_decision_llm")
-    @patch("orca_core.engine.generate_human_explanation")
+    @patch("src.orca_core.engine.get_settings")
+    @patch("src.orca_core.engine.decision_mode")
+    @patch("src.orca_core.engine.is_ai_enabled")
+    @patch("src.orca_core.engine.predict_risk")
+    @patch("src.orca_core.engine.run_rules")
+    @patch("src.orca_core.engine.is_llm_configured")
+    @patch("src.orca_core.engine.explain_decision_llm")
+    @patch("src.orca_core.engine.generate_human_explanation")
     def test_evaluate_rules_llm_explanation_error(
         self,
         mock_human_explanation,
@@ -524,14 +524,14 @@ class TestEvaluateRules:
         assert "ai" in response.meta
         assert "llm_explanation" not in response.meta["ai"]
 
-    @patch("orca_core.engine.get_settings")
-    @patch("orca_core.engine.decision_mode")
-    @patch("orca_core.engine.is_ai_enabled")
-    @patch("orca_core.engine.predict_risk")
-    @patch("orca_core.engine.run_rules")
-    @patch("orca_core.engine.is_llm_configured")
-    @patch("orca_core.engine.explain_decision_llm")
-    @patch("orca_core.engine.generate_human_explanation")
+    @patch("src.orca_core.engine.get_settings")
+    @patch("src.orca_core.engine.decision_mode")
+    @patch("src.orca_core.engine.is_ai_enabled")
+    @patch("src.orca_core.engine.predict_risk")
+    @patch("src.orca_core.engine.run_rules")
+    @patch("src.orca_core.engine.is_llm_configured")
+    @patch("src.orca_core.engine.explain_decision_llm")
+    @patch("src.orca_core.engine.generate_human_explanation")
     def test_evaluate_rules_duplicate_reasons_removal(
         self,
         mock_human_explanation,
@@ -570,14 +570,14 @@ class TestEvaluateRules:
         assert response.reasons.count("REASON1") == 1
         assert response.reasons.count("REASON2") == 1
 
-    @patch("orca_core.engine.get_settings")
-    @patch("orca_core.engine.decision_mode")
-    @patch("orca_core.engine.is_ai_enabled")
-    @patch("orca_core.engine.predict_risk")
-    @patch("orca_core.engine.run_rules")
-    @patch("orca_core.engine.is_llm_configured")
-    @patch("orca_core.engine.explain_decision_llm")
-    @patch("orca_core.engine.generate_human_explanation")
+    @patch("src.orca_core.engine.get_settings")
+    @patch("src.orca_core.engine.decision_mode")
+    @patch("src.orca_core.engine.is_ai_enabled")
+    @patch("src.orca_core.engine.predict_risk")
+    @patch("src.orca_core.engine.run_rules")
+    @patch("src.orca_core.engine.is_llm_configured")
+    @patch("src.orca_core.engine.explain_decision_llm")
+    @patch("src.orca_core.engine.generate_human_explanation")
     def test_evaluate_rules_no_reasons_default(
         self,
         mock_human_explanation,
@@ -619,14 +619,14 @@ class TestEvaluateRules:
         assert "Send confirmation" in response.actions
         assert response.meta_structured.approved_amount == 100.0
 
-    @patch("orca_core.engine.get_settings")
-    @patch("orca_core.engine.decision_mode")
-    @patch("orca_core.engine.is_ai_enabled")
-    @patch("orca_core.engine.predict_risk")
-    @patch("orca_core.engine.run_rules")
-    @patch("orca_core.engine.is_llm_configured")
-    @patch("orca_core.engine.explain_decision_llm")
-    @patch("orca_core.engine.generate_human_explanation")
+    @patch("src.orca_core.engine.get_settings")
+    @patch("src.orca_core.engine.decision_mode")
+    @patch("src.orca_core.engine.is_ai_enabled")
+    @patch("src.orca_core.engine.predict_risk")
+    @patch("src.orca_core.engine.run_rules")
+    @patch("src.orca_core.engine.is_llm_configured")
+    @patch("src.orca_core.engine.explain_decision_llm")
+    @patch("src.orca_core.engine.generate_human_explanation")
     def test_evaluate_rules_metadata_structure(
         self,
         mock_human_explanation,
@@ -678,14 +678,14 @@ class TestEvaluateRules:
         assert response.meta_structured.channel == "online"
         assert response.meta_structured.cart_total == 100.0
 
-    @patch("orca_core.engine.get_settings")
-    @patch("orca_core.engine.decision_mode")
-    @patch("orca_core.engine.is_ai_enabled")
-    @patch("orca_core.engine.predict_risk")
-    @patch("orca_core.engine.run_rules")
-    @patch("orca_core.engine.is_llm_configured")
-    @patch("orca_core.engine.explain_decision_llm")
-    @patch("orca_core.engine.generate_human_explanation")
+    @patch("src.orca_core.engine.get_settings")
+    @patch("src.orca_core.engine.decision_mode")
+    @patch("src.orca_core.engine.is_ai_enabled")
+    @patch("src.orca_core.engine.predict_risk")
+    @patch("src.orca_core.engine.run_rules")
+    @patch("src.orca_core.engine.is_llm_configured")
+    @patch("src.orca_core.engine.explain_decision_llm")
+    @patch("src.orca_core.engine.generate_human_explanation")
     def test_evaluate_rules_signals_triggered(
         self,
         mock_human_explanation,
@@ -724,14 +724,14 @@ class TestEvaluateRules:
         assert "RULE1" in response.signals_triggered
         assert "RULE2" in response.signals_triggered
 
-    @patch("orca_core.engine.get_settings")
-    @patch("orca_core.engine.decision_mode")
-    @patch("orca_core.engine.is_ai_enabled")
-    @patch("orca_core.engine.predict_risk")
-    @patch("orca_core.engine.run_rules")
-    @patch("orca_core.engine.is_llm_configured")
-    @patch("orca_core.engine.explain_decision_llm")
-    @patch("orca_core.engine.generate_human_explanation")
+    @patch("src.orca_core.engine.get_settings")
+    @patch("src.orca_core.engine.decision_mode")
+    @patch("src.orca_core.engine.is_ai_enabled")
+    @patch("src.orca_core.engine.predict_risk")
+    @patch("src.orca_core.engine.run_rules")
+    @patch("src.orca_core.engine.is_llm_configured")
+    @patch("src.orca_core.engine.explain_decision_llm")
+    @patch("src.orca_core.engine.generate_human_explanation")
     def test_evaluate_rules_high_risk_signals(
         self,
         mock_human_explanation,
@@ -770,14 +770,14 @@ class TestEvaluateRules:
         assert "RULE1" in response.signals_triggered
         assert "HIGH_RISK" in response.signals_triggered
 
-    @patch("orca_core.engine.get_settings")
-    @patch("orca_core.engine.decision_mode")
-    @patch("orca_core.engine.is_ai_enabled")
-    @patch("orca_core.engine.predict_risk")
-    @patch("orca_core.engine.run_rules")
-    @patch("orca_core.engine.is_llm_configured")
-    @patch("orca_core.engine.explain_decision_llm")
-    @patch("orca_core.engine.generate_human_explanation")
+    @patch("src.orca_core.engine.get_settings")
+    @patch("src.orca_core.engine.decision_mode")
+    @patch("src.orca_core.engine.is_ai_enabled")
+    @patch("src.orca_core.engine.predict_risk")
+    @patch("src.orca_core.engine.run_rules")
+    @patch("src.orca_core.engine.is_llm_configured")
+    @patch("src.orca_core.engine.explain_decision_llm")
+    @patch("src.orca_core.engine.generate_human_explanation")
     def test_evaluate_rules_routing_hint(
         self,
         mock_human_explanation,
@@ -824,14 +824,14 @@ class TestEvaluateRules:
 
         assert response.routing_hint == "ROUTE_TO_VISA_NETWORK"
 
-    @patch("orca_core.engine.get_settings")
-    @patch("orca_core.engine.decision_mode")
-    @patch("orca_core.engine.is_ai_enabled")
-    @patch("orca_core.engine.predict_risk")
-    @patch("orca_core.engine.run_rules")
-    @patch("orca_core.engine.is_llm_configured")
-    @patch("orca_core.engine.explain_decision_llm")
-    @patch("orca_core.engine.generate_human_explanation")
+    @patch("src.orca_core.engine.get_settings")
+    @patch("src.orca_core.engine.decision_mode")
+    @patch("src.orca_core.engine.is_ai_enabled")
+    @patch("src.orca_core.engine.predict_risk")
+    @patch("src.orca_core.engine.run_rules")
+    @patch("src.orca_core.engine.is_llm_configured")
+    @patch("src.orca_core.engine.explain_decision_llm")
+    @patch("src.orca_core.engine.generate_human_explanation")
     def test_evaluate_rules_explanations(
         self,
         mock_human_explanation,
@@ -869,14 +869,14 @@ class TestEvaluateRules:
         assert response.explanation is not None
         assert response.explanation_human == "Human explanation"
 
-    @patch("orca_core.engine.get_settings")
-    @patch("orca_core.engine.decision_mode")
-    @patch("orca_core.engine.is_ai_enabled")
-    @patch("orca_core.engine.predict_risk")
-    @patch("orca_core.engine.run_rules")
-    @patch("orca_core.engine.is_llm_configured")
-    @patch("orca_core.engine.explain_decision_llm")
-    @patch("orca_core.engine.generate_human_explanation")
+    @patch("src.orca_core.engine.get_settings")
+    @patch("src.orca_core.engine.decision_mode")
+    @patch("src.orca_core.engine.is_ai_enabled")
+    @patch("src.orca_core.engine.predict_risk")
+    @patch("src.orca_core.engine.run_rules")
+    @patch("src.orca_core.engine.is_llm_configured")
+    @patch("src.orca_core.engine.explain_decision_llm")
+    @patch("src.orca_core.engine.generate_human_explanation")
     def test_evaluate_rules_backward_compatibility(
         self,
         mock_human_explanation,
@@ -917,14 +917,14 @@ class TestEvaluateRules:
         assert response.timestamp is not None
         assert response.rail == "Card"
 
-    @patch("orca_core.engine.get_settings")
-    @patch("orca_core.engine.decision_mode")
-    @patch("orca_core.engine.is_ai_enabled")
-    @patch("orca_core.engine.predict_risk")
-    @patch("orca_core.engine.run_rules")
-    @patch("orca_core.engine.is_llm_configured")
-    @patch("orca_core.engine.explain_decision_llm")
-    @patch("orca_core.engine.generate_human_explanation")
+    @patch("src.orca_core.engine.get_settings")
+    @patch("src.orca_core.engine.decision_mode")
+    @patch("src.orca_core.engine.is_ai_enabled")
+    @patch("src.orca_core.engine.predict_risk")
+    @patch("src.orca_core.engine.run_rules")
+    @patch("src.orca_core.engine.is_llm_configured")
+    @patch("src.orca_core.engine.explain_decision_llm")
+    @patch("src.orca_core.engine.generate_human_explanation")
     def test_evaluate_rules_ai_mode(
         self,
         mock_human_explanation,
@@ -964,14 +964,14 @@ class TestEvaluateRules:
         assert response.meta["ai"]["model_type"] == "xgboost"
         assert response.meta["ai"]["version"] == "1.0.0"
 
-    @patch("orca_core.engine.get_settings")
-    @patch("orca_core.engine.decision_mode")
-    @patch("orca_core.engine.is_ai_enabled")
-    @patch("orca_core.engine.predict_risk")
-    @patch("orca_core.engine.run_rules")
-    @patch("orca_core.engine.is_llm_configured")
-    @patch("orca_core.engine.explain_decision_llm")
-    @patch("orca_core.engine.generate_human_explanation")
+    @patch("src.orca_core.engine.get_settings")
+    @patch("src.orca_core.engine.decision_mode")
+    @patch("src.orca_core.engine.is_ai_enabled")
+    @patch("src.orca_core.engine.predict_risk")
+    @patch("src.orca_core.engine.run_rules")
+    @patch("src.orca_core.engine.is_llm_configured")
+    @patch("src.orca_core.engine.explain_decision_llm")
+    @patch("src.orca_core.engine.generate_human_explanation")
     def test_evaluate_rules_rules_only_mode(
         self,
         mock_human_explanation,

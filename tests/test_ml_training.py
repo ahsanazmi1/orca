@@ -8,8 +8,8 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from orca_core.ml.features import FeatureExtractor
-from orca_core.ml.train_xgb import XGBoostTrainer
+from src.orca_core.ml.features import FeatureExtractor
+from src.orca_core.ml.train_xgb import XGBoostTrainer
 
 
 class TestXGBoostTrainer:

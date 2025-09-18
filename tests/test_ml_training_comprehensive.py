@@ -15,7 +15,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from orca_core.ml.train_xgb import XGBoostTrainer
+from src.orca_core.ml.train_xgb import XGBoostTrainer
 
 
 class TestXGBoostTrainer:
@@ -666,7 +666,7 @@ class TestXGBoostTrainerEdgeCases:
             "extract_features",
             side_effect=Exception("Feature extraction failed"),
         ):
-            with pytest.raises(RuntimeError):
+            with pytest.raises(Exception, match="Feature extraction failed"):
                 trainer.generate_synthetic_data(n_samples=10)
 
     def test_model_training_error_recovery(self):
@@ -676,9 +676,9 @@ class TestXGBoostTrainerEdgeCases:
 
         # Mock XGBoost to raise error
         with patch(
-            "orca_core.ml.train_xgb.xgb.XGBClassifier", side_effect=Exception("XGBoost failed")
+            "src.orca_core.ml.train_xgb.xgb.XGBClassifier", side_effect=Exception("XGBoost failed")
         ):
-            with pytest.raises(RuntimeError):
+            with pytest.raises(Exception, match="XGBoost failed"):
                 trainer.train_model(X, y)
 
     def test_calibration_error_handling(self):
@@ -688,18 +688,18 @@ class TestXGBoostTrainerEdgeCases:
 
         # Mock calibration to raise error
         with patch(
-            "orca_core.ml.train_xgb.CalibratedClassifierCV",
+            "src.orca_core.ml.train_xgb.CalibratedClassifierCV",
             side_effect=Exception("Calibration failed"),
         ):
-            with pytest.raises(RuntimeError):
+            with pytest.raises(Exception, match="Calibration failed"):
                 trainer.train_model(X, y)
 
 
 def test_main_function():
     """Test the main function in train_xgb module."""
-    from orca_core.ml.train_xgb import main
+    from src.orca_core.ml.train_xgb import main
 
-    with patch("orca_core.ml.train_xgb.XGBoostTrainer") as mock_trainer_class:
+    with patch("src.orca_core.ml.train_xgb.XGBoostTrainer") as mock_trainer_class:
         mock_trainer = Mock()
         mock_trainer.train_and_save.return_value = {
             "auc_score": 0.85,

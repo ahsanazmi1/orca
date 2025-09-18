@@ -7,7 +7,7 @@ explanations, including JSON validation, hallucination detection, and content va
 
 import json
 
-from orca_core.llm.guardrails import GuardrailResult, LLMGuardrails, ValidationResult
+from src.orca_core.llm.guardrails import GuardrailResult, LLMGuardrails, ValidationResult
 
 
 class TestValidationResult:

@@ -6,7 +6,7 @@ from pathlib import Path
 
 sys.path.append(".")
 
-from src.orca.core.decision_contract import AP2DecisionContract, LegacyDecisionRequest
+from src.orca.core.decision_contract import AP2DecisionContract, LegacyDecisionRequest  # noqa: E402
 
 
 def validate_ap2_sample(file_path: Path) -> tuple[bool, str]:
@@ -20,7 +20,15 @@ def validate_ap2_sample(file_path: Path) -> tuple[bool, str]:
 
         from src.orca.core.decision_contract import DecisionMeta, DecisionOutcome
 
-        decision_meta = DecisionMeta(model="rules_only", trace_id=str(uuid4()), version="0.1.0")
+        decision_meta = DecisionMeta(
+            model="rules_only",
+            trace_id=str(uuid4()),
+            version="0.1.0",
+            processing_time_ms=0.0,
+            model_version="0.1.0",
+            model_sha256="",
+            model_trained_on="",
+        )
 
         decision_outcome = DecisionOutcome(
             result="APPROVE", risk_score=0.0, reasons=[], actions=[], meta=decision_meta
@@ -80,7 +88,7 @@ def validate_golden_sample(file_path: Path) -> tuple[bool, str]:
         return False, f"Validation error: {e}"
 
 
-def main():
+def main() -> bool:
     """Validate all sample files."""
     print("🔍 Validating sample files...")
 

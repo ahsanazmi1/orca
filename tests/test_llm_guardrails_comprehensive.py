@@ -2,7 +2,7 @@
 
 import json
 
-from orca_core.llm.guardrails import (
+from src.orca_core.llm.guardrails import (
     GuardrailResult,
     LLMGuardrails,
     ValidationResult,

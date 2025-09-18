@@ -21,5 +21,3 @@ pytest -q
 ## Commit & PR
 - **Conventional commits** preferred (`feat:`, `fix:`, `docs:`, `refactor:`, `chore:`)
 - **Link to an issue**; include before/after when UI/behavior changes
-
-

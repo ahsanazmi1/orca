@@ -211,5 +211,3 @@ jobs:
         name: security-report
         path: bandit-report.json
         retention-days: 30
-
-

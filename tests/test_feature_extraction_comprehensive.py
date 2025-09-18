@@ -5,7 +5,7 @@ This module tests the core feature extraction functionality that processes
 raw request data into standardized features for ML models and rule evaluation.
 """
 
-from orca_core.core.feature_extraction import extract_features
+from src.orca_core.core.feature_extraction import extract_features
 
 
 class TestFeatureExtraction:

@@ -12,7 +12,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from typing import Any  # noqa: E402
 
-from orca_core.ml.model import get_model_info, predict_risk  # noqa: E402
+from src.orca_core.ml.model import get_model_info, predict_risk  # noqa: E402
 
 
 def create_sample_data() -> list[dict[str, Any]]:

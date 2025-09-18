@@ -4,9 +4,10 @@ import json
 import os
 import sys
 from pathlib import Path
+from typing import Any
 
 
-def test_golden_snapshots():
+def test_golden_snapshots() -> bool:
     """Test golden snapshots validation."""
     print("\n🔍 Testing Golden Snapshots...")
 
@@ -26,7 +27,7 @@ def test_golden_snapshots():
     return True
 
 
-def test_feature_spec():
+def test_feature_spec() -> bool:
     """Test feature specification validation."""
     print("\n🔍 Testing Feature Specification...")
 
@@ -43,7 +44,7 @@ def test_feature_spec():
     return True
 
 
-def test_shap_snapshots():
+def test_shap_snapshots() -> bool:
     """Test SHAP snapshots generation."""
     print("\n🔍 Testing SHAP Snapshots...")
 
@@ -87,7 +88,7 @@ def test_shap_snapshots():
         return False
 
 
-def test_explain_nlg():
+def test_explain_nlg() -> bool:
     """Test explain NLG field validation."""
     print("\n🔍 Testing Explain NLG...")
 
@@ -96,7 +97,7 @@ def test_explain_nlg():
 
     valid_fields = set()
 
-    def extract_fields(obj, prefix=""):
+    def extract_fields(obj: Any, prefix: str = "") -> None:
         if isinstance(obj, dict):
             for key, value in obj.items():
                 current_path = f"{prefix}.{key}" if prefix else key
@@ -115,7 +116,7 @@ def test_explain_nlg():
     return True
 
 
-def main():
+def main() -> bool:
     """Run all CI job tests."""
     print("🚀 Testing CI Jobs (Simple Version)")
     print("=" * 50)

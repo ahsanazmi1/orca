@@ -312,6 +312,10 @@ class AP2OrcaUI:
 
     def process_decision(self) -> None:
         """Process the AP2 decision through the rules engine."""
+        if not st.session_state.ap2_contract:
+            st.warning("⚠️ Please load or validate an AP2 contract first")
+            return
+
         try:
             contract = st.session_state.ap2_contract
 

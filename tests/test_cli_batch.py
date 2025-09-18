@@ -10,7 +10,7 @@ import pandas as pd
 import pytest
 from typer.testing import CliRunner
 
-from orca_core.cli import app
+from src.orca_core.cli import app
 
 
 class TestCLIBatchMode:
@@ -437,7 +437,7 @@ class TestCLICommands:
 
     def test_train_xgb_command(self):
         """Test train-xgb command."""
-        with patch("orca_core.cli.XGBoostTrainer") as mock_trainer_class:
+        with patch("src.orca_core.cli.XGBoostTrainer") as mock_trainer_class:
             mock_trainer = MagicMock()
             mock_trainer.train_and_save.return_value = {
                 "auc_score": 0.85,
@@ -587,7 +587,7 @@ class TestCLICommands:
 
     def test_generate_plots_command(self):
         """Test generate-plots command."""
-        with patch("orca_core.cli.plot_xgb_model_evaluation") as mock_plot:
+        with patch("src.orca_core.cli.plot_xgb_model_evaluation") as mock_plot:
             mock_plot.return_value = {"roc_curve": "test.png"}
 
             result = self.runner.invoke(

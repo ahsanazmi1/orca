@@ -238,42 +238,65 @@ class TestAP2StreamlitUISmoke:
 
                     # Verify environment variables were set
                     assert os.environ.get("ORCA_SIGN_DECISIONS") == "true"
-                    assert os.environ.get("ORCA_RECEIPT_HASH_ONLY") == "false"
+                    # The checkbox mock returns True, so receipt_hash_only will be "true"
+                    assert os.environ.get("ORCA_RECEIPT_HASH_ONLY") == "true"
 
     def test_ui_component_rendering(self):
         """Test that UI components can be rendered without errors."""
-        with patch.object(st, "session_state", MagicMock()):
-            with patch.object(st, "title"):
-                with patch.object(st, "markdown"):
-                    with patch.object(st, "header"):
-                        with patch.object(st, "subheader"):
-                            with patch.object(st, "sidebar"):
-                                with patch.object(st, "radio"):
-                                    with patch.object(st, "checkbox"):
-                                        with patch.object(st, "button"):
-                                            with patch.object(st, "text_area"):
-                                                with patch.object(st, "columns"):
-                                                    with patch.object(st, "expander"):
-                                                        with patch.object(st, "table"):
-                                                            with patch.object(st, "metric"):
-                                                                with patch.object(st, "code"):
-                                                                    with patch.object(
-                                                                        st, "download_button"
-                                                                    ):
-                                                                        # Test that all render methods can be called
-                                                                        try:
-                                                                            self.ui.render_header()
-                                                                            self.ui.render_sidebar()
-                                                                            self.ui.render_ap2_input_section()
-                                                                            self.ui.render_ap2_panes()
-                                                                            self.ui.render_decision_result()
-                                                                            self.ui.render_signature_receipt_section()
-                                                                            self.ui.render_output_section()
-                                                                            self.ui.render_status_section()
-                                                                        except Exception as e:
-                                                                            pytest.fail(
-                                                                                f"UI rendering failed: {e}"
-                                                                            )
+        # Create a mock session state with proper data
+        mock_session_state = MagicMock()
+        mock_session_state.ap2_contract = None
+        mock_session_state.decision_result = None
+        mock_session_state.explanation = None
+        mock_session_state.signing_enabled = False
+        mock_session_state.receipt_hash_only = False
+        mock_session_state.legacy_json = False
+
+        # Mock all Streamlit components to avoid rendering issues
+        with patch.object(st, "session_state", mock_session_state):
+            # Mock all Streamlit components
+            st_patches = [
+                patch.object(st, "title"),
+                patch.object(st, "markdown"),
+                patch.object(st, "header"),
+                patch.object(st, "subheader"),
+                patch.object(st, "sidebar"),
+                patch.object(st, "radio"),
+                patch.object(st, "checkbox"),
+                patch.object(st, "button"),
+                patch.object(st, "text_area"),
+                patch.object(st, "columns", side_effect=lambda n: [MagicMock() for _ in range(n)]),
+                patch.object(st, "expander"),
+                patch.object(st, "table"),
+                patch.object(st, "metric"),
+                patch.object(st, "code"),
+                patch.object(st, "download_button"),
+                patch.object(st, "success"),
+                patch.object(st, "error"),
+                patch.object(st, "warning"),
+                patch.object(st, "info"),
+            ]
+
+            # Apply all patches
+            for patch_obj in st_patches:
+                patch_obj.start()
+
+            try:
+                # Test that all render methods can be called without errors
+                self.ui.render_header()
+                self.ui.render_sidebar()
+                self.ui.render_ap2_input_section()
+                self.ui.render_ap2_panes()
+                self.ui.render_decision_result()
+                self.ui.render_signature_receipt_section()
+                self.ui.render_output_section()
+                self.ui.render_status_section()
+            except Exception as e:
+                pytest.fail(f"UI rendering failed: {e}")
+            finally:
+                # Clean up patches
+                for patch_obj in st_patches:
+                    patch_obj.stop()
 
     def test_ui_run_method(self):
         """Test that the main run method can be called."""
@@ -297,7 +320,7 @@ class TestAP2StreamlitUISmoke:
                     with patch("src.orca.ui.app.CartMandate"):
                         with patch("src.orca.ui.app.PaymentMandate"):
                             with patch(
-                                "src.orca.ui.app.create_ap2_decision_contract"
+                                "src.orca.core.decision_contract.create_ap2_decision_contract"
                             ) as mock_create:
                                 mock_contract = MagicMock()
                                 mock_create.return_value = mock_contract
