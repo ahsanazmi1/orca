@@ -203,6 +203,8 @@ jobs:
       - name: Verify model artifacts exist
         run: |
           echo "🔍 Verifying frozen model artifacts..."
+          python -c "
+          from pathlib import Path
           model_dir = Path('models/xgb/1.0.0')
           required_files = ['model.json', 'calibrator.pkl', 'scaler.pkl', 'feature_spec.json', 'metadata.json']
 
@@ -214,6 +216,7 @@ jobs:
               print(f'✅ {file_name}: {file_path.stat().st_size} bytes')
 
           print('✅ All model artifacts present')
+          "
 
       - name: Test inference determinism
         run: |
