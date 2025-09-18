@@ -23,7 +23,7 @@ class AP2FeatureExtractor:
         # Only extract features that the model expects
         self.feature_names = [
             "amount",
-            "velocity_24h", 
+            "velocity_24h",
             "velocity_7d",
             "cross_border",
             "location_mismatch",
@@ -69,35 +69,35 @@ class AP2FeatureExtractor:
     def _extract_model_features(self, ap2_contract: AP2DecisionContract) -> dict[str, float]:
         """Extract only the features the model expects."""
         features = {}
-        
+
         # amount - from cart
         features["amount"] = float(ap2_contract.cart.amount)
-        
+
         # velocity_24h, velocity_7d - from cart (using defaults for now)
         features["velocity_24h"] = 1.0  # Default value
         features["velocity_7d"] = 1.0   # Default value
-        
+
         # cross_border - from cart geo
         features["cross_border"] = 0.0  # Default value
-        
+
         # location_mismatch - from cart geo
         features["location_mismatch"] = 0.0  # Default value
-        
+
         # payment_method_risk - from payment
         features["payment_method_risk"] = 0.2  # Default value
-        
+
         # chargebacks_12m - customer data (default)
         features["chargebacks_12m"] = 0.0  # Default value
-        
+
         # customer_age_days - customer data (default)
         features["customer_age_days"] = 365.0  # Default value
-        
+
         # loyalty_score - customer data (default)
         features["loyalty_score"] = 0.0  # Default value
-        
+
         # time_since_last_purchase - customer data (default)
         features["time_since_last_purchase"] = 0.0  # Default value
-        
+
         return features
 
     def extract_features_from_legacy(self, legacy_data: dict[str, Any]) -> dict[str, float]:

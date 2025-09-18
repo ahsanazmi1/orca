@@ -24,7 +24,6 @@ class TestRealMLPrediction:
         # Clear any existing model registry
         from src.orca.ml.model_registry import _model_registry
 
-        global _model_registry
         _model_registry = None
 
     def test_model_loading(self):

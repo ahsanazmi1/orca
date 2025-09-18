@@ -164,7 +164,7 @@ class ModelRegistry:
 
         # Convert features to model input
         feature_vector = self._features_to_vector(features)
-        
+
         # Store raw features for calibration
         raw_feature_vector = feature_vector.copy()
 
