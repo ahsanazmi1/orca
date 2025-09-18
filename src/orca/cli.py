@@ -321,13 +321,15 @@ def create_sample(
 
         if channel not in channel_map:
             console.print(
-                f"[red]Error: Invalid channel '{channel}'. Must be one of: {list(channel_map.keys())}[/red]"
+                f"[red]Error: Invalid channel '{channel}'. "
+                f"Must be one of: {list(channel_map.keys())}[/red]"
             )
             raise typer.Exit(1)
 
         if modality not in modality_map:
             console.print(
-                f"[red]Error: Invalid modality '{modality}'. Must be one of: {list(modality_map.keys())}[/red]"
+                f"[red]Error: Invalid modality '{modality}'. "
+                f"Must be one of: {list(modality_map.keys())}[/red]"
             )
             raise typer.Exit(1)
 

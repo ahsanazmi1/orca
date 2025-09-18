@@ -84,7 +84,8 @@ def generate_shap_sample():
         print("\n🔍 Top 5 SHAP Contributions:")
         for i, contrib in enumerate(shap_contributions[:5], 1):
             print(
-                f"  {i}. {contrib['feature_name']}: {contrib['shap_value']:.3f} (value: {contrib['feature_value']})"
+                f"  {i}. {contrib['feature_name']}: {contrib['shap_value']:.3f} "
+                f"(value: {contrib['feature_value']})"
             )
 
     # Save SHAP sample
