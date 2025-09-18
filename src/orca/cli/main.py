@@ -62,9 +62,8 @@ def write_output_with_headers(
 @app.command()
 def decide_file(
     input_file: Path = typer.Argument(..., help="Path to AP2 JSON input file"),
-    output_file: Path | None = typer.Option(
-        None, "--output", "-o", help="Path to output file (default: stdout)"
-    ),
+    output_file: Path
+    | None = typer.Option(None, "--output", "-o", help="Path to output file (default: stdout)"),
     legacy_json: bool = typer.Option(False, "--legacy-json", help="Output in legacy JSON format"),
     explain: bool = typer.Option(False, "--explain", help="Include human-readable explanation"),
     validate_only: bool = typer.Option(

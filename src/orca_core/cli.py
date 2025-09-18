@@ -695,9 +695,7 @@ def train(
 
         y = pd.Series((risk_score > 0.5).astype(int))
 
-        console.print(
-            f"[green]✅ Generated {len(X)} samples with {y.sum()} high-risk cases[/green]"
-        )
+        console.print(f"[green]✅ Generated {len(X)} samples with {y.sum()} high-risk cases[/green]")
 
         # Train model
         console.print("[blue]🚀 Training Random Forest model...[/blue]")

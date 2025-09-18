@@ -19,11 +19,12 @@ def generate_golden_decision(ap2_file: Path, output_file: Path, enable_shap: boo
     # Load AP2 contract
     with open(ap2_file) as f:
         ap2_data = json.load(f)
-    
+
     # Set deterministic nonce for golden files
     if "intent" in ap2_data:
         # Generate a deterministic UUID based on the filename
         import hashlib
+
         filename_hash = hashlib.md5(ap2_file.stem.encode()).hexdigest()
         deterministic_uuid = f"{filename_hash[:8]}-{filename_hash[8:12]}-{filename_hash[12:16]}-{filename_hash[16:20]}-{filename_hash[20:32]}"
         ap2_data["intent"]["nonce"] = deterministic_uuid
@@ -33,7 +34,7 @@ def generate_golden_decision(ap2_file: Path, output_file: Path, enable_shap: boo
 
     # Use deterministic values for golden files
     deterministic_trace_id = f"golden-trace-{ap2_file.stem}"
-    
+
     decision_meta = DecisionMeta(
         model="rules_only",
         trace_id=deterministic_trace_id,
