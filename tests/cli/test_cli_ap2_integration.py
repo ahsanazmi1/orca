@@ -76,7 +76,10 @@ class TestAP2CLIIntegration:
         cmd = ["python", "-m", self.cli_module] + args
         env = os.environ.copy()
         env["PYTHONPATH"] = str(Path.cwd())
-        env["NO_COLOR"] = "1"  # Disable colors to avoid ANSI escape codes
+        # Disable colors to avoid ANSI escape codes
+        env["NO_COLOR"] = "1"
+        env["FORCE_COLOR"] = "0"
+        env["TERM"] = "dumb"
 
         if input_data:
             return subprocess.run(
