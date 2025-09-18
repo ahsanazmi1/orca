@@ -5,7 +5,7 @@ decision engine with AP2 intent, cart, and payment mandates.
 """
 
 import os
-from typing import Any, Literal, Optional, Union
+from typing import Any, Literal
 from uuid import uuid4
 
 from pydantic import BaseModel, Field
@@ -53,8 +53,8 @@ class DecisionAction(BaseModel):
     """Structured decision action with type and target."""
 
     type: ActionCode = Field(..., description="Canonical action code")
-    to: Optional[str] = Field(None, description="Target for routing actions")
-    detail: Optional[str] = Field(None, description="Additional action detail")
+    to: str | None = Field(None, description="Target for routing actions")
+    detail: str | None = Field(None, description="Additional action detail")
 
 
 class DecisionMeta(BaseModel):
@@ -64,11 +64,11 @@ class DecisionMeta(BaseModel):
     trace_id: str = Field(
         default_factory=lambda: str(uuid4()), description="Unique trace identifier"
     )
-    processing_time_ms: Optional[float] = Field(None, description="Processing time in milliseconds")
+    processing_time_ms: float | None = Field(None, description="Processing time in milliseconds")
     version: str = Field(default="0.1.0", description="Decision engine version")
-    model_version: Optional[str] = Field(None, description="ML model version used for decision")
-    model_sha256: Optional[str] = Field(None, description="ML model SHA256 hash")
-    model_trained_on: Optional[str] = Field(None, description="ML model training date")
+    model_version: str | None = Field(None, description="ML model version used for decision")
+    model_sha256: str | None = Field(None, description="ML model SHA256 hash")
+    model_trained_on: str | None = Field(None, description="ML model training date")
 
 
 class DecisionOutcome(BaseModel):
@@ -84,8 +84,8 @@ class DecisionOutcome(BaseModel):
 class SigningInfo(BaseModel):
     """Signing and receipt information for AP2 compliance."""
 
-    vc_proof: Optional[dict[str, Any]] = Field(None, description="Verifiable credential proof")
-    receipt_hash: Optional[str] = Field(None, description="Receipt hash for audit trail")
+    vc_proof: dict[str, Any] | None = Field(None, description="Verifiable credential proof")
+    receipt_hash: str | None = Field(None, description="Receipt hash for audit trail")
 
 
 class AP2DecisionContract(BaseModel):
@@ -107,7 +107,7 @@ class AP2DecisionContract(BaseModel):
     )
 
     # Additional metadata
-    metadata: Optional[dict[str, Any]] = Field(None, description="Additional contract metadata")
+    metadata: dict[str, Any] | None = Field(None, description="Additional contract metadata")
 
 
 # Legacy decision models for backward compatibility
@@ -134,11 +134,11 @@ class LegacyDecisionResponse(BaseModel):
     signals_triggered: list[str] = Field(
         default_factory=list, description="List of triggered signals/rules"
     )
-    explanation: Optional[str] = Field(None, description="Human-readable explanation")
-    explanation_human: Optional[str] = Field(
+    explanation: str | None = Field(None, description="Human-readable explanation")
+    explanation_human: str | None = Field(
         None, description="Enhanced human-readable explanation"
     )
-    routing_hint: Optional[str] = Field(None, description="Routing instruction")
+    routing_hint: str | None = Field(None, description="Routing instruction")
 
 
 # Helper functions for creating AP2 decision contracts
@@ -151,9 +151,9 @@ def create_ap2_decision_contract(
     reasons: list[DecisionReason],
     actions: list[DecisionAction],
     model: ModelType = "rules_only",
-    trace_id: Optional[str] = None,
-    processing_time_ms: Optional[float] = None,
-    metadata: Optional[dict[str, Any]] = None,
+    trace_id: str | None = None,
+    processing_time_ms: float | None = None,
+    metadata: dict[str, Any] | None = None,
 ) -> AP2DecisionContract:
     """Create an AP2 decision contract with the given parameters."""
 
@@ -191,7 +191,7 @@ def create_decision_reason(code: ReasonCode, detail: str) -> DecisionReason:
 
 
 def create_decision_action(
-    action_type: ActionCode, to: Optional[str] = None, detail: Optional[str] = None
+    action_type: ActionCode, to: str | None = None, detail: str | None = None
 ) -> DecisionAction:
     """Create a decision action with type and optional target/detail."""
     return DecisionAction(type=action_type, to=to, detail=detail)
@@ -209,7 +209,7 @@ def ap2_contract_from_json(json_str: str) -> AP2DecisionContract:
 
 
 # Validation helpers
-def validate_ap2_contract(data: Union[dict[str, Any], str]) -> AP2DecisionContract:
+def validate_ap2_contract(data: dict[str, Any] | str) -> AP2DecisionContract:
     """Validate and create an AP2 decision contract from data."""
     if isinstance(data, str):
         import json

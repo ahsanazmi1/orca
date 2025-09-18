@@ -7,7 +7,7 @@ including IntentMandate, CartMandate, and PaymentMandate types with validation.
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum
-from typing import Any, Optional, Union
+from typing import Any
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field, field_validator, model_validator
@@ -84,12 +84,12 @@ class CartItem(BaseModel):
 
     id: str = Field(..., description="Unique item identifier")
     name: str = Field(..., description="Item name")
-    description: Optional[str] = Field(None, description="Item description")
+    description: str | None = Field(None, description="Item description")
     quantity: int = Field(..., ge=1, description="Item quantity")
     unit_price: Decimal = Field(..., ge=0, description="Unit price")
     total_price: Decimal = Field(..., ge=0, description="Total price for this item")
-    category: Optional[str] = Field(None, description="Item category")
-    sku: Optional[str] = Field(None, description="Stock keeping unit")
+    category: str | None = Field(None, description="Item category")
+    sku: str | None = Field(None, description="Stock keeping unit")
 
     @field_validator("total_price")
     @classmethod
@@ -106,11 +106,11 @@ class GeoLocation(BaseModel):
     """Geographic location information."""
 
     country: str = Field(..., description="Country code (ISO 3166-1 alpha-2)")
-    region: Optional[str] = Field(None, description="Region/state")
-    city: Optional[str] = Field(None, description="City")
-    latitude: Optional[float] = Field(None, ge=-90, le=90, description="Latitude")
-    longitude: Optional[float] = Field(None, ge=-180, le=180, description="Longitude")
-    timezone: Optional[str] = Field(None, description="Timezone identifier")
+    region: str | None = Field(None, description="Region/state")
+    city: str | None = Field(None, description="City")
+    latitude: float | None = Field(None, ge=-90, le=90, description="Latitude")
+    longitude: float | None = Field(None, ge=-180, le=180, description="Longitude")
+    timezone: str | None = Field(None, description="Timezone identifier")
 
 
 class RoutingHint(BaseModel):
@@ -118,7 +118,7 @@ class RoutingHint(BaseModel):
 
     processor: str = Field(..., description="Payment processor identifier")
     priority: int = Field(..., ge=1, le=10, description="Routing priority (1=highest)")
-    constraints: Optional[dict[str, Any]] = Field(
+    constraints: dict[str, Any] | None = Field(
         None, description="Additional routing constraints"
     )
 
@@ -132,7 +132,7 @@ class IntentMandate(BaseModel):
     agent_presence: AgentPresence = Field(..., description="Level of agent involvement")
     timestamps: dict[str, datetime] = Field(..., description="Relevant timestamps")
     nonce: UUID = Field(default_factory=uuid4, description="Unique identifier for this intent")
-    metadata: Optional[dict[str, Any]] = Field(None, description="Additional metadata")
+    metadata: dict[str, Any] | None = Field(None, description="Additional metadata")
 
     @field_validator("timestamps")
     @classmethod
@@ -159,10 +159,10 @@ class CartMandate(BaseModel):
     items: list[CartItem] = Field(..., min_length=1, description="Cart items")
     amount: Decimal = Field(..., ge=0, description="Total cart amount")
     currency: str = Field(..., min_length=3, max_length=3, description="Currency code (ISO 4217)")
-    mcc: Optional[str] = Field(None, description="Merchant category code")
-    geo: Optional[GeoLocation] = Field(None, description="Geographic location")
+    mcc: str | None = Field(None, description="Merchant category code")
+    geo: GeoLocation | None = Field(None, description="Geographic location")
     risk_flags: list[RiskFlag] = Field(default_factory=list, description="Risk assessment flags")
-    metadata: Optional[dict[str, Any]] = Field(None, description="Additional metadata")
+    metadata: dict[str, Any] | None = Field(None, description="Additional metadata")
 
     @field_validator("amount")
     @classmethod
@@ -186,17 +186,17 @@ class CartMandate(BaseModel):
 class PaymentMandate(BaseModel):
     """AP2 Payment Mandate - Defines payment instrument and processing requirements."""
 
-    instrument_ref: Optional[str] = Field(None, description="Payment instrument reference")
-    instrument_token: Optional[str] = Field(None, description="Payment instrument token")
+    instrument_ref: str | None = Field(None, description="Payment instrument reference")
+    instrument_token: str | None = Field(None, description="Payment instrument token")
     modality: PaymentModality = Field(..., description="Payment processing modality")
-    constraints: Optional[dict[str, Any]] = Field(None, description="Payment constraints")
+    constraints: dict[str, Any] | None = Field(None, description="Payment constraints")
     routing_hints: list[RoutingHint] = Field(
         default_factory=list, description="Payment routing hints"
     )
     auth_requirements: list[AuthRequirement] = Field(
         default_factory=list, description="Authentication requirements"
     )
-    metadata: Optional[dict[str, Any]] = Field(None, description="Additional metadata")
+    metadata: dict[str, Any] | None = Field(None, description="Additional metadata")
 
     @model_validator(mode="after")
     def validate_instrument_required(self) -> "PaymentMandate":
@@ -207,7 +207,7 @@ class PaymentMandate(BaseModel):
 
 
 # Validation helper functions
-def validate_intent(data: Union[dict[str, Any], str]) -> IntentMandate:
+def validate_intent(data: dict[str, Any] | str) -> IntentMandate:
     """Validate and create an IntentMandate from JSON data."""
     if isinstance(data, str):
         import json
@@ -219,7 +219,7 @@ def validate_intent(data: Union[dict[str, Any], str]) -> IntentMandate:
     return IntentMandate(**data_dict)
 
 
-def validate_cart(data: Union[dict[str, Any], str]) -> CartMandate:
+def validate_cart(data: dict[str, Any] | str) -> CartMandate:
     """Validate and create a CartMandate from JSON data."""
     if isinstance(data, str):
         import json
@@ -231,7 +231,7 @@ def validate_cart(data: Union[dict[str, Any], str]) -> CartMandate:
     return CartMandate(**data_dict)
 
 
-def validate_payment(data: Union[dict[str, Any], str]) -> PaymentMandate:
+def validate_payment(data: dict[str, Any] | str) -> PaymentMandate:
     """Validate and create a PaymentMandate from JSON data."""
     if isinstance(data, str):
         import json

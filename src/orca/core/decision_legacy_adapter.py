@@ -7,7 +7,7 @@ and legacy decision request/response formats for backward compatibility.
 import json
 from datetime import UTC, datetime
 from decimal import Decimal
-from typing import Any, Optional, Union
+from typing import Any
 from uuid import uuid4
 
 from ..mandates.ap2_types import (
@@ -40,7 +40,7 @@ class DecisionLegacyAdapter:
 
     @staticmethod
     def legacy_request_to_ap2_contract(
-        legacy_request: Union[LegacyDecisionRequest, dict[str, Any]]
+        legacy_request: LegacyDecisionRequest | dict[str, Any]
     ) -> AP2DecisionContract:
         """Convert legacy decision request to AP2 decision contract."""
 
@@ -159,7 +159,7 @@ class DecisionLegacyAdapter:
     @staticmethod
     def update_ap2_contract_with_legacy_response(
         ap2_contract: AP2DecisionContract,
-        legacy_response: Union[LegacyDecisionResponse, dict[str, Any]],
+        legacy_response: LegacyDecisionResponse | dict[str, Any],
     ) -> AP2DecisionContract:
         """Update AP2 contract with decision results from legacy response."""
 
@@ -289,7 +289,7 @@ def _generate_human_explanation(ap2_contract: AP2DecisionContract) -> str:
         return f"Your {currency} {amount} transaction could not be processed at this time."
 
 
-def _generate_routing_hint(ap2_contract: AP2DecisionContract) -> Optional[str]:
+def _generate_routing_hint(ap2_contract: AP2DecisionContract) -> str | None:
     """Generate routing hint from AP2 contract."""
     actions = [action.type for action in ap2_contract.decision.actions]
 

@@ -119,12 +119,12 @@ class TestXGBoostTrainer:
 
             assert isinstance(importances, dict)
             assert len(importances) > 0  # Should have multiple features
-            assert all(isinstance(imp, (int, float)) for imp in importances.values())
+            assert all(isinstance(imp, int | float) for imp in importances.values())
             # Check that we have the expected features
             expected_features = ["amount", "velocity_24h", "cross_border"]
             for feature in expected_features:
                 if feature in importances:
-                    assert isinstance(importances[feature], (int, float))
+                    assert isinstance(importances[feature], int | float)
 
     def test_training_metrics(self):
         """Test training metrics from train_model."""

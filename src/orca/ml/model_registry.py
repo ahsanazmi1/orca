@@ -8,7 +8,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 import joblib
 import numpy as np
@@ -25,11 +25,11 @@ class ModelRegistry:
             model_dir: Directory containing model artifacts
         """
         self.model_dir = Path(model_dir)
-        self.model: Optional[xgb.Booster] = None
-        self.calibrator: Optional[Any] = None
-        self.scaler: Optional[Any] = None
-        self.feature_spec: Optional[dict[str, Any]] = None
-        self.metadata: Optional[dict[str, Any]] = None
+        self.model: xgb.Booster | None = None
+        self.calibrator: Any | None = None
+        self.scaler: Any | None = None
+        self.feature_spec: dict[str, Any] | None = None
+        self.metadata: dict[str, Any] | None = None
         self.is_loaded = False
 
         # Set deterministic random states
@@ -46,7 +46,7 @@ class ModelRegistry:
         # Set Python hash seed for deterministic behavior
         os.environ["PYTHONHASHSEED"] = "0"
 
-    def load_model(self, version: Optional[str] = None) -> bool:
+    def load_model(self, version: str | None = None) -> bool:
         """Load XGBoost model and artifacts from disk.
 
         Args:
@@ -114,7 +114,7 @@ class ModelRegistry:
             self.is_loaded = False
             return False
 
-    def _get_latest_version(self) -> Optional[str]:
+    def _get_latest_version(self) -> str | None:
         """Get the latest model version."""
         if not self.model_dir.exists():
             return None
@@ -323,7 +323,7 @@ class ModelRegistry:
         contributions.sort(key=lambda x: x["contribution"], reverse=True)
         return contributions[:5]
 
-    def _compute_shap_values(self, feature_vector: np.ndarray) -> Optional[dict[str, Any]]:
+    def _compute_shap_values(self, feature_vector: np.ndarray) -> dict[str, Any] | None:
         """Compute SHAP values for feature explanation.
 
         Args:
@@ -352,7 +352,7 @@ class ModelRegistry:
                 ap2_mappings = {}
 
             shap_explanations = []
-            for i, (feature_name, shap_value) in enumerate(zip(feature_names, shap_values[0])):
+            for feature_name, shap_value in zip(feature_names, shap_values[0], strict=False):
                 ap2_path = ap2_mappings.get(feature_name, f"feature.{feature_name}")
                 shap_explanations.append(
                     {
@@ -427,7 +427,7 @@ class ModelRegistry:
 
 
 # Global model registry instance
-_model_registry: Optional[ModelRegistry] = None
+_model_registry: ModelRegistry | None = None
 
 
 def get_model_registry() -> ModelRegistry:
@@ -438,7 +438,7 @@ def get_model_registry() -> ModelRegistry:
     return _model_registry
 
 
-def load_model(version: Optional[str] = None) -> bool:
+def load_model(version: str | None = None) -> bool:
     """Load model using global registry.
 
     Args:

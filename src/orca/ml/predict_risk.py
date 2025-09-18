@@ -5,7 +5,7 @@ SHAP support, and AP2 feature mapping, replacing the stub implementation.
 """
 
 import os
-from typing import Any, Optional
+from typing import Any
 
 from .model_registry import get_model_registry, load_model
 
@@ -196,7 +196,7 @@ def is_model_loaded() -> bool:
     return registry.is_loaded
 
 
-def get_feature_spec() -> Optional[dict[str, Any]]:
+def get_feature_spec() -> dict[str, Any] | None:
     """Get the feature specification for the loaded model.
 
     Returns:

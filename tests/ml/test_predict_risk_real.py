@@ -22,9 +22,9 @@ class TestRealMLPrediction:
     def setup_method(self):
         """Set up test environment."""
         # Clear any existing model registry
-        from src.orca.ml.model_registry import _model_registry
-
-        _model_registry = None
+        # Clear any existing model registry
+        import src.orca.ml.model_registry as mr
+        mr._model_registry = None
 
     def test_model_loading(self):
         """Test model loading from artifacts."""
@@ -180,7 +180,7 @@ class TestRealMLPrediction:
             (1000.0, "DECLINE"),  # High amount
         ]
 
-        for amount, expected_boundary in test_cases:
+        for amount, _expected_boundary in test_cases:
             features = {
                 "amount": amount,
                 "velocity_24h": 1.0,

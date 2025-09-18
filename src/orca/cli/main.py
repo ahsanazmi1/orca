@@ -4,7 +4,7 @@ import json
 import sys
 from datetime import UTC
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 import typer
 from rich.console import Console
@@ -37,7 +37,7 @@ console = Console()
 
 def write_output_with_headers(
     output_data: dict[str, Any],
-    output_file: Optional[Path],
+    output_file: Path | None,
     use_legacy: bool = False,
     verbose: bool = False,
 ) -> None:
@@ -62,7 +62,7 @@ def write_output_with_headers(
 @app.command()
 def decide_file(
     input_file: Path = typer.Argument(..., help="Path to AP2 JSON input file"),
-    output_file: Optional[Path] = typer.Option(
+    output_file: Path | None = typer.Option(
         None, "--output", "-o", help="Path to output file (default: stdout)"
     ),
     legacy_json: bool = typer.Option(False, "--legacy-json", help="Output in legacy JSON format"),

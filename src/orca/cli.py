@@ -4,7 +4,6 @@ import json
 import sys
 from datetime import UTC
 from pathlib import Path
-from typing import Optional
 
 import typer
 from rich.console import Console
@@ -37,7 +36,7 @@ console = Console()
 @app.command()
 def decide_file(
     input_file: Path = typer.Argument(..., help="Path to AP2 JSON input file"),
-    output_file: Optional[Path] = typer.Option(
+    output_file: Path | None = typer.Option(
         None, "--output", "-o", help="Path to output file (default: stdout)"
     ),
     legacy_json: bool = typer.Option(False, "--legacy-json", help="Output in legacy JSON format"),

@@ -7,7 +7,7 @@ immutable audit trails without storing sensitive data.
 import hashlib
 import json
 from datetime import UTC, datetime
-from typing import Any, Optional
+from typing import Any
 
 
 class ReceiptHasher:
@@ -184,7 +184,7 @@ class ReceiptHasher:
 
 
 # Global receipt hasher instance
-_receipt_hasher: Optional[ReceiptHasher] = None
+_receipt_hasher: ReceiptHasher | None = None
 
 
 def get_receipt_hasher() -> ReceiptHasher:

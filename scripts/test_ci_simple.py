@@ -101,7 +101,7 @@ def test_explain_nlg():
             for key, value in obj.items():
                 current_path = f"{prefix}.{key}" if prefix else key
                 valid_fields.add(current_path)
-                if isinstance(value, (dict, list)):
+                if isinstance(value, dict | list):
                     extract_fields(value, current_path)
 
     extract_fields(ap2_data)
@@ -110,7 +110,7 @@ def test_explain_nlg():
 
     Path("tests/snapshots").mkdir(exist_ok=True)
     with open("tests/snapshots/valid_ap2_fields.json", "w") as f:
-        json.dump(sorted(list(valid_fields)), f, indent=2)
+        json.dump(sorted(valid_fields), f, indent=2)
 
     return True
 

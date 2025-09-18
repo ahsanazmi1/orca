@@ -5,7 +5,7 @@ and ML models, ensuring consistent feature mapping across the system.
 """
 
 from datetime import UTC, datetime
-from typing import Any, Optional
+from typing import Any
 
 from ..mandates.ap2_types import (
     CartMandate,
@@ -37,7 +37,7 @@ class AP2FeatureExtractor:
     def extract_features_from_ap2(
         self,
         ap2_contract: AP2DecisionContract,
-        additional_features: Optional[dict[str, float]] = None,
+        additional_features: dict[str, float] | None = None,
     ) -> dict[str, float]:
         """
         Extract features from AP2 decision contract.
@@ -509,7 +509,7 @@ class AP2FeatureExtractor:
 
 
 # Global feature extractor instance
-_feature_extractor: Optional[AP2FeatureExtractor] = None
+_feature_extractor: AP2FeatureExtractor | None = None
 
 
 def get_ap2_feature_extractor() -> AP2FeatureExtractor:
@@ -521,7 +521,7 @@ def get_ap2_feature_extractor() -> AP2FeatureExtractor:
 
 
 def extract_features_from_ap2(
-    ap2_contract: AP2DecisionContract, additional_features: Optional[dict[str, float]] = None
+    ap2_contract: AP2DecisionContract, additional_features: dict[str, float] | None = None
 ) -> dict[str, float]:
     """Extract features from AP2 contract using global extractor."""
     extractor = get_ap2_feature_extractor()

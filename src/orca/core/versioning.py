@@ -4,7 +4,7 @@ This module provides versioning utilities for AP2 contracts and ML models,
 ensuring backward compatibility and smooth migration paths.
 """
 
-from typing import Any, Optional
+from typing import Any
 
 from packaging import version
 
@@ -98,7 +98,7 @@ class VersionManager:
         return str(model_meta.get("model_version", self.ml_model_version))
 
     def create_version_info(
-        self, contract_type: str = "ap2", model_meta: Optional[dict[str, Any]] = None
+        self, contract_type: str = "ap2", model_meta: dict[str, Any] | None = None
     ) -> dict[str, Any]:
         """Create version information dictionary.
 
@@ -151,7 +151,7 @@ class VersionManager:
         except version.InvalidVersion as e:
             return False, f"Invalid version format: {e}"
 
-    def get_migration_path(self, from_version: str, to_version: str) -> Optional[str]:
+    def get_migration_path(self, from_version: str, to_version: str) -> str | None:
         """Get migration path between versions.
 
         Args:
@@ -213,7 +213,7 @@ class VersionManager:
 
 
 # Global version manager instance
-_version_manager: Optional[VersionManager] = None
+_version_manager: VersionManager | None = None
 
 
 def get_version_manager() -> VersionManager:
@@ -250,13 +250,13 @@ def is_legacy_version(version_str: str) -> bool:
 
 
 def create_version_info(
-    contract_type: str = "ap2", model_meta: Optional[dict[str, Any]] = None
+    contract_type: str = "ap2", model_meta: dict[str, Any] | None = None
 ) -> dict[str, Any]:
     """Create version information dictionary."""
     return get_version_manager().create_version_info(contract_type, model_meta)
 
 
-def get_migration_path(from_version: str, to_version: str) -> Optional[str]:
+def get_migration_path(from_version: str, to_version: str) -> str | None:
     """Get migration path between versions."""
     return get_version_manager().get_migration_path(from_version, to_version)
 
@@ -267,7 +267,7 @@ def get_supported_versions() -> dict[str, Any]:
 
 
 def attach_model_version_to_decision_meta(
-    decision_meta: dict[str, Any], model_meta: Optional[dict[str, Any]] = None
+    decision_meta: dict[str, Any], model_meta: dict[str, Any] | None = None
 ) -> dict[str, Any]:
     """Attach model version information to decision metadata.
 

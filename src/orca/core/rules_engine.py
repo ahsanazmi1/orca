@@ -4,7 +4,6 @@ This module provides the rules engine that consumes AP2 mandates and produces
 structured decision outcomes with reasons and actions.
 """
 
-from typing import Optional
 
 from .decision_contract import (
     AP2DecisionContract,
@@ -23,9 +22,9 @@ class AP2RuleResult:
 
     def __init__(
         self,
-        decision_hint: Optional[str] = None,
-        reasons: Optional[list[DecisionReason]] = None,
-        actions: Optional[list[DecisionAction]] = None,
+        decision_hint: str | None = None,
+        reasons: list[DecisionReason] | None = None,
+        actions: list[DecisionAction] | None = None,
     ):
         """
         Initialize AP2 rule result.
@@ -43,7 +42,7 @@ class AP2RuleResult:
 class AP2Rule:
     """Abstract base class for AP2-compatible decision rules."""
 
-    def apply(self, ap2_contract: AP2DecisionContract) -> Optional[AP2RuleResult]:
+    def apply(self, ap2_contract: AP2DecisionContract) -> AP2RuleResult | None:
         """
         Apply the rule to an AP2 decision contract.
 
@@ -275,7 +274,7 @@ class AP2RulesEngine:
 
 
 # Global rules engine instance
-_rules_engine: Optional[AP2RulesEngine] = None
+_rules_engine: AP2RulesEngine | None = None
 
 
 def get_ap2_rules_engine() -> AP2RulesEngine:

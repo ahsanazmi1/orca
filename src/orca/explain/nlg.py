@@ -4,7 +4,7 @@ This module generates human-readable explanations that explicitly cite AP2 field
 providing transparency and traceability for decision reasoning.
 """
 
-from typing import Any, Optional
+from typing import Any
 
 from ..core.decision_contract import AP2DecisionContract, DecisionAction, DecisionReason
 
@@ -378,7 +378,7 @@ class AP2NLGExplainer:
 
 
 # Global AP2 NLG explainer instance
-_ap2_nlg_explainer: Optional[AP2NLGExplainer] = None
+_ap2_nlg_explainer: AP2NLGExplainer | None = None
 
 
 def get_ap2_nlg_explainer() -> AP2NLGExplainer:

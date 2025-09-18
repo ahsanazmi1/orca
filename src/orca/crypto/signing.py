@@ -6,7 +6,7 @@ This module provides verifiable credential (VC) signing for AP2 decision contrac
 import base64
 import json
 from datetime import UTC, datetime
-from typing import Any, Optional
+from typing import Any
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
@@ -21,7 +21,7 @@ class VCSigner:
         """Initialize the VC signer."""
         self.key_manager = get_key_manager()
 
-    def sign_decision(self, decision_json: dict[str, Any]) -> Optional[dict[str, Any]]:
+    def sign_decision(self, decision_json: dict[str, Any]) -> dict[str, Any] | None:
         """
         Sign a decision contract with a verifiable credential proof.
 
@@ -189,7 +189,7 @@ class VCSigner:
 
 
 # Global VC signer instance
-_vc_signer: Optional[VCSigner] = None
+_vc_signer: VCSigner | None = None
 
 
 def get_vc_signer() -> VCSigner:
@@ -200,7 +200,7 @@ def get_vc_signer() -> VCSigner:
     return _vc_signer
 
 
-def sign_decision(decision_json: dict[str, Any]) -> Optional[dict[str, Any]]:
+def sign_decision(decision_json: dict[str, Any]) -> dict[str, Any] | None:
     """
     Sign a decision contract with VC proof.
 

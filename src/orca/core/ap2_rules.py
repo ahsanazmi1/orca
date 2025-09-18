@@ -4,7 +4,6 @@ This module contains rules that operate on AP2 mandates and produce
 structured decision outcomes with canonical reason and action codes.
 """
 
-from typing import Optional
 
 from ..mandates.ap2_types import PaymentModality
 from .decision_contract import (
@@ -18,7 +17,7 @@ from .rules_engine import AP2Rule, AP2RuleResult
 class AP2HighTicketRule(AP2Rule):
     """Rule that flags high-value transactions for review."""
 
-    def __init__(self, threshold: float = 500.0, rail_specific: Optional[str] = None):
+    def __init__(self, threshold: float = 500.0, rail_specific: str | None = None):
         """
         Initialize the AP2 high ticket rule.
 
@@ -29,7 +28,7 @@ class AP2HighTicketRule(AP2Rule):
         self.threshold = threshold
         self.rail_specific = rail_specific
 
-    def apply(self, ap2_contract: AP2DecisionContract) -> Optional[AP2RuleResult]:
+    def apply(self, ap2_contract: AP2DecisionContract) -> AP2RuleResult | None:
         """
         Apply the high ticket rule to AP2 contract.
 
@@ -92,7 +91,7 @@ class AP2HighTicketRule(AP2Rule):
 class AP2VelocityRule(AP2Rule):
     """Rule that flags high-velocity transactions for review."""
 
-    def __init__(self, threshold: float = 3.0, rail_specific: Optional[str] = None):
+    def __init__(self, threshold: float = 3.0, rail_specific: str | None = None):
         """
         Initialize the AP2 velocity rule.
 
@@ -103,7 +102,7 @@ class AP2VelocityRule(AP2Rule):
         self.threshold = threshold
         self.rail_specific = rail_specific
 
-    def apply(self, ap2_contract: AP2DecisionContract) -> Optional[AP2RuleResult]:
+    def apply(self, ap2_contract: AP2DecisionContract) -> AP2RuleResult | None:
         """
         Apply the velocity rule to AP2 contract.
 
@@ -182,7 +181,7 @@ class AP2VelocityRule(AP2Rule):
 class AP2LocationMismatchRule(AP2Rule):
     """Rule that flags transactions with location mismatches for review."""
 
-    def apply(self, ap2_contract: AP2DecisionContract) -> Optional[AP2RuleResult]:
+    def apply(self, ap2_contract: AP2DecisionContract) -> AP2RuleResult | None:
         """
         Apply the location mismatch rule to AP2 contract.
 
@@ -233,7 +232,7 @@ class AP2LocationMismatchRule(AP2Rule):
 class AP2PaymentModalityRule(AP2Rule):
     """Rule that applies different processing based on payment modality."""
 
-    def apply(self, ap2_contract: AP2DecisionContract) -> Optional[AP2RuleResult]:
+    def apply(self, ap2_contract: AP2DecisionContract) -> AP2RuleResult | None:
         """
         Apply the payment modality rule to AP2 contract.
 
@@ -298,7 +297,7 @@ class AP2PaymentModalityRule(AP2Rule):
 class AP2ChannelRiskRule(AP2Rule):
     """Rule that applies different risk levels based on channel."""
 
-    def apply(self, ap2_contract: AP2DecisionContract) -> Optional[AP2RuleResult]:
+    def apply(self, ap2_contract: AP2DecisionContract) -> AP2RuleResult | None:
         """
         Apply the channel risk rule to AP2 contract.
 
@@ -351,7 +350,7 @@ class AP2GeoRiskRule(AP2Rule):
         """
         self.threshold = threshold
 
-    def apply(self, ap2_contract: AP2DecisionContract) -> Optional[AP2RuleResult]:
+    def apply(self, ap2_contract: AP2DecisionContract) -> AP2RuleResult | None:
         """
         Apply the geo risk rule to AP2 contract.
 
@@ -415,7 +414,7 @@ class AP2GeoRiskRule(AP2Rule):
 class AP2AuthRequirementRule(AP2Rule):
     """Rule that applies different processing based on authentication requirements."""
 
-    def apply(self, ap2_contract: AP2DecisionContract) -> Optional[AP2RuleResult]:
+    def apply(self, ap2_contract: AP2DecisionContract) -> AP2RuleResult | None:
         """
         Apply the auth requirement rule to AP2 contract.
 

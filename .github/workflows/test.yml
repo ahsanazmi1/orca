@@ -34,8 +34,8 @@ jobs:
     - name: Run linting
       run: |
         echo "🔍 Running code linting..."
-        PYTHONPATH=src python -m ruff check src/ tests/
-        PYTHONPATH=src python -m black --check src/ tests/
+        uv run ruff check .
+        uv run black --check .
 
     - name: Run type checking
       run: |

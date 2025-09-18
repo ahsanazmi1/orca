@@ -6,7 +6,6 @@ decisions and generating receipt hashes.
 
 import base64
 import os
-from typing import Optional
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, serialization
@@ -18,9 +17,9 @@ class KeyManager:
 
     def __init__(self) -> None:
         """Initialize the key manager."""
-        self._private_key: Optional[bytes] = None
-        self._public_key: Optional[bytes] = None
-        self._key_id: Optional[str] = None
+        self._private_key: bytes | None = None
+        self._public_key: bytes | None = None
+        self._key_id: str | None = None
 
     def load_keys_from_env(self) -> bool:
         """
@@ -89,7 +88,7 @@ class KeyManager:
             print(f"Failed to generate test keys: {e}")
             return False
 
-    def get_private_key(self) -> Optional[bytes]:
+    def get_private_key(self) -> bytes | None:
         """
         Get the private key.
 
@@ -98,7 +97,7 @@ class KeyManager:
         """
         return self._private_key
 
-    def get_public_key(self) -> Optional[bytes]:
+    def get_public_key(self) -> bytes | None:
         """
         Get the public key.
 
@@ -107,7 +106,7 @@ class KeyManager:
         """
         return self._public_key
 
-    def get_key_id(self) -> Optional[str]:
+    def get_key_id(self) -> str | None:
         """
         Get the key ID.
 
@@ -125,7 +124,7 @@ class KeyManager:
         """
         return self._private_key is not None and self._public_key is not None
 
-    def get_public_key_fingerprint(self) -> Optional[str]:
+    def get_public_key_fingerprint(self) -> str | None:
         """
         Get the public key fingerprint.
 
@@ -161,7 +160,7 @@ class KeyManager:
 
 
 # Global key manager instance
-_key_manager: Optional[KeyManager] = None
+_key_manager: KeyManager | None = None
 
 
 def get_key_manager() -> KeyManager:

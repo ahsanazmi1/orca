@@ -62,7 +62,7 @@ def generate_shap_sample():
         feature_names = shap_values.get("feature_names", [])
         shap_vals = shap_values.get("shap_values", [])
 
-        for i, (feature_name, value) in enumerate(zip(feature_names, shap_vals)):
+        for feature_name, value in zip(feature_names, shap_vals, strict=True):
             shap_contributions.append(
                 {
                     "feature_name": feature_name,
