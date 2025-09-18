@@ -7,8 +7,9 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
-from orca_core.cli import app
 from typer.testing import CliRunner
+
+from orca_core.cli import app
 
 
 class TestCLI:

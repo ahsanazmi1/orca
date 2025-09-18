@@ -156,7 +156,7 @@ class TestAP2StreamlitUISmoke:
             mock_session.decision_result = None
             mock_session.explanation = None
 
-            with patch.object(st, "spinner") as mock_spinner:
+            with patch.object(st, "spinner"):
                 with patch.object(st, "success") as mock_success:
                     with patch("src.orca.ui.app.evaluate_ap2_rules") as mock_evaluate:
                         with patch("src.orca.ui.app.sign_and_hash_decision") as mock_sign:
@@ -230,7 +230,7 @@ class TestAP2StreamlitUISmoke:
             mock_session.signing_enabled = True
             mock_session.receipt_hash_only = False
 
-            with patch.object(st, "sidebar") as mock_sidebar:
+            with patch.object(st, "sidebar"):
                 with patch.object(st, "checkbox") as mock_checkbox:
                     mock_checkbox.return_value = True
 
@@ -293,9 +293,9 @@ class TestAP2StreamlitUISmoke:
         """Test sample contract creation logic."""
         with patch.object(st, "session_state", MagicMock()):
             with patch.object(st, "success") as mock_success:
-                with patch("src.orca.ui.app.IntentMandate") as mock_intent:
-                    with patch("src.orca.ui.app.CartMandate") as mock_cart:
-                        with patch("src.orca.ui.app.PaymentMandate") as mock_payment:
+                with patch("src.orca.ui.app.IntentMandate"):
+                    with patch("src.orca.ui.app.CartMandate"):
+                        with patch("src.orca.ui.app.PaymentMandate"):
                             with patch(
                                 "src.orca.ui.app.create_ap2_decision_contract"
                             ) as mock_create:

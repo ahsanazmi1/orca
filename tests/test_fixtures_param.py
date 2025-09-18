@@ -5,6 +5,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
+
 from orca_core.engine import evaluate_rules
 from orca_core.models import DecisionRequest
 

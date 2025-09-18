@@ -5,8 +5,9 @@ from datetime import datetime
 from pathlib import Path
 
 import pytest
-from orca_core.models import DecisionRequest, DecisionResponse
 from pydantic import ValidationError
+
+from orca_core.models import DecisionRequest, DecisionResponse
 
 
 class TestDecisionRequestValidation:

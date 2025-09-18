@@ -266,7 +266,7 @@ class TestRealMLPrediction:
     def test_fallback_to_stub(self):
         """Test fallback to stub when model fails."""
         # Create a registry with non-existent model
-        registry = ModelRegistry("non_existent_dir")
+        ModelRegistry("non_existent_dir")
 
         # Should fallback to stub
         features = {

@@ -9,6 +9,7 @@ from datetime import datetime
 from unittest.mock import patch
 
 import numpy as np
+
 from orca_core.ml.features import FeatureExtractor, extract_features, get_feature_extractor
 
 

@@ -8,8 +8,9 @@ from unittest.mock import MagicMock, patch
 
 import pandas as pd
 import pytest
-from orca_core.cli import app
 from typer.testing import CliRunner
+
+from orca_core.cli import app
 
 
 class TestCLIBatchMode:
@@ -38,7 +39,7 @@ class TestCLIBatchMode:
     def test_decide_batch_basic(self):
         """Test basic batch decision processing."""
         # Create test fixtures
-        fixture1 = self.create_test_fixture(
+        self.create_test_fixture(
             "test1.json",
             {
                 "cart_total": 100.0,
@@ -49,7 +50,7 @@ class TestCLIBatchMode:
             },
         )
 
-        fixture2 = self.create_test_fixture(
+        self.create_test_fixture(
             "test2.json",
             {
                 "cart_total": 500.0,

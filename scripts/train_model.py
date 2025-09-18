@@ -9,9 +9,10 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
-from orca_core.core.ml_hooks import train_model  # noqa: E402
 from sklearn.metrics import classification_report, roc_auc_score  # noqa: E402
 from sklearn.model_selection import train_test_split  # noqa: E402
+
+from orca_core.core.ml_hooks import train_model  # noqa: E402
 
 
 def generate_sample_data(n_samples: int = 1000) -> tuple[pd.DataFrame, pd.Series]:

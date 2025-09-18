@@ -8,6 +8,7 @@ from unittest.mock import patch
 import numpy as np
 import pandas as pd
 import pytest
+
 from orca_core.config import ORCA_DECISION_MODE, decision_mode, get_settings, is_ai_enabled
 from orca_core.engine import evaluate_rules
 from orca_core.llm.explain import get_llm_explainer
@@ -469,7 +470,7 @@ class TestEndToEndWorkflows:
 
         # Set up logging
         logging.basicConfig(level=logging.INFO)
-        logger = logging.getLogger("orca_core")
+        logging.getLogger("orca_core")
 
         # Process request (should generate logs)
         request = DecisionRequest(

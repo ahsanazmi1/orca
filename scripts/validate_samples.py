@@ -30,7 +30,7 @@ def validate_ap2_sample(file_path: Path) -> tuple[bool, str]:
         data["decision"] = decision_outcome.model_dump()
 
         # Validate AP2 contract
-        ap2_contract = AP2DecisionContract(**data)
+        AP2DecisionContract(**data)
         return True, "Valid AP2 contract"
 
     except Exception as e:
@@ -44,7 +44,7 @@ def validate_legacy_sample(file_path: Path) -> tuple[bool, str]:
             data = json.load(f)
 
         # Validate legacy request
-        legacy_request = LegacyDecisionRequest(**data)
+        LegacyDecisionRequest(**data)
         return True, "Valid legacy request"
 
     except Exception as e:

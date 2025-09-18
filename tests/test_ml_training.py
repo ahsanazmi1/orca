@@ -7,6 +7,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import pytest
+
 from orca_core.ml.features import FeatureExtractor
 from orca_core.ml.train_xgb import XGBoostTrainer
 
@@ -207,7 +208,7 @@ class TestXGBoostTrainer:
             X, y = trainer.generate_synthetic_data(n_samples=100)
 
             # Train model (the actual implementation doesn't support custom parameters)
-            metrics = trainer.train_model(X, y)
+            trainer.train_model(X, y)
 
             assert trainer.model is not None
             assert trainer.model.n_estimators == 100  # Default value

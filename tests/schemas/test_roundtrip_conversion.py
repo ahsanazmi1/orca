@@ -77,7 +77,7 @@ class TestRoundTripConversion:
         assert ap2_contract.cart.mcc == legacy_contract["mcc"]
 
         # Convert back to legacy
-        converted_legacy = json.loads(self.adapter.to_legacy_json(ap2_contract))
+        json.loads(self.adapter.to_legacy_json(ap2_contract))
 
         # Verify cart info is preserved in AP2 structure
         assert ap2_contract.cart.amount == legacy_contract["cart_total"]
@@ -353,7 +353,7 @@ class TestRoundTripConversion:
     def test_round_trip_with_golden_files(self):
         """Test round-trip conversion using golden files if available."""
         golden_legacy_file = Path("tests/golden/decision.legacy.json")
-        golden_ap2_file = Path("tests/golden/decision.ap2.json")
+        Path("tests/golden/decision.ap2.json")
 
         if golden_legacy_file.exists():
             with open(golden_legacy_file) as f:

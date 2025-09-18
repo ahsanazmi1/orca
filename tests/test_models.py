@@ -1,8 +1,9 @@
 """Tests for Pydantic models."""
 
 import pytest
-from orca_core.models import DecisionRequest, DecisionResponse
 from pydantic import ValidationError
+
+from orca_core.models import DecisionRequest, DecisionResponse
 
 
 class TestDecisionRequest:
