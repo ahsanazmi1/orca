@@ -3,8 +3,13 @@
     "amount": 1500.0,
     "velocity_24h": 4.0,
     "velocity_7d": 12.0,
+    "cross_border": 1.0,
+    "location_mismatch": 1.0,
+    "payment_method_risk": 0.7,
+    "chargebacks_12m": 3.0,
     "customer_age_days": 30.0,
-    "chargebacks_12m": 3.0
+    "loyalty_score": 0.1,
+    "time_since_last_purchase": 0.1
   },
   "risk_score": 0.7939312855402628,
   "key_signals": [
@@ -51,8 +56,13 @@
       "amount",
       "velocity_24h",
       "velocity_7d",
+      "cross_border",
+      "location_mismatch",
+      "payment_method_risk",
+      "chargebacks_12m",
       "customer_age_days",
-      "chargebacks_12m"
+      "loyalty_score",
+      "time_since_last_purchase"
     ],
     "shap_enabled": true
   }

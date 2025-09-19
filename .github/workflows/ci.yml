@@ -244,7 +244,7 @@ jobs:
 
           from src.orca.ml.predict_risk import predict_risk
 
-          # Test features
+          # Test features (10 features required by actual model)
           test_features = {
               'amount': 100.0,
               'velocity_24h': 1.0,
@@ -432,7 +432,7 @@ jobs:
 
           from src.orca.ml.predict_risk import predict_with_shap
 
-          # Test features for SHAP analysis
+          # Test features for SHAP analysis (10 features required by actual model)
           test_features = {
               'amount': 1500.0,
               'velocity_24h': 4.0,
