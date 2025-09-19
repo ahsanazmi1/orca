@@ -11,32 +11,34 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v4
-      - run: uv python install 3.12
-      - run: uv sync --all-extras --dev
-      - run: uv run ruff check . --config pyproject.toml
-      - run: uv run black --check .
-      - run: uv run mypy src
-      - run: uv run pytest -q --maxfail=1 --disable-warnings
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+      - run: pip install -e .
+      - run: ruff check . --config pyproject.toml
+      - run: black --check .
+      - run: mypy src
+      - run: pytest -q --maxfail=1 --disable-warnings
 
   # Schema validation for AP2 and legacy contracts
   schema-validation:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v4
-      - run: uv python install 3.12
-      - run: uv sync --all-extras --dev
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+      - run: pip install -e .
 
       - name: Validate AP2 samples
         run: |
           echo "🔍 Validating AP2 sample schemas..."
-          uv run python scripts/validate_samples.py
+          PYTHONPATH=src python scripts/validate_samples.py
 
       - name: Validate legacy samples
         run: |
           echo "🔍 Validating legacy sample schemas..."
-          uv run python -c "
+          PYTHONPATH=src python -c "
           from pathlib import Path
           from src.orca.core.decision_legacy_adapter import LegacyDecisionRequest
           import json
@@ -52,7 +54,7 @@ jobs:
       - name: Validate golden decisions
         run: |
           echo "🔍 Validating golden decision schemas..."
-          uv run python -c "
+          PYTHONPATH=src python -c "
           from pathlib import Path
           import json
 
@@ -79,19 +81,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v4
-      - run: uv python install 3.12
-      - run: uv sync --all-extras --dev
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+      - run: pip install -e .
 
       - name: Generate test keys
         run: |
           echo "🔐 Generating test keys for determinism testing..."
-          uv run python scripts/generate_test_keys.py
+          PYTHONPATH=src python scripts/generate_test_keys.py
 
       - name: Test key generation determinism
         run: |
           echo "🔍 Testing key generation determinism..."
-          uv run python -c "
+          PYTHONPATH=src python -c "
           import os
           import tempfile
           from pathlib import Path
@@ -113,7 +116,7 @@ jobs:
       - name: Test decision signing determinism
         run: |
           echo "🔍 Testing decision signing determinism..."
-          uv run python -c "
+          PYTHONPATH=src python -c "
           import os
           import json
           from pathlib import Path
@@ -136,21 +139,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v4
-      - run: uv python install 3.12
-      - run: uv sync --all-extras --dev
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+      - run: pip install -e .
 
       - name: Generate golden decisions
         run: |
           echo "📸 Generating golden decision snapshots..."
           # Reset golden files to ensure clean state
           git checkout HEAD -- samples/golden/
-          uv run python scripts/generate_golden_decisions.py
+          PYTHONPATH=src python scripts/generate_golden_decisions.py
 
       - name: Validate golden snapshots
         run: |
           echo "🔍 Validating golden snapshots..."
-          uv run python -c "
+          PYTHONPATH=src python -c "
           from pathlib import Path
           import json
 
@@ -206,9 +210,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v4
-      - run: uv python install 3.12
-      - run: uv sync --all-extras --dev
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+      - run: pip install -e .
 
       - name: Verify model artifacts exist
         run: |
@@ -231,7 +236,7 @@ jobs:
       - name: Test inference determinism
         run: |
           echo "🔍 Testing ML inference determinism..."
-          uv run python -c "
+          PYTHONPATH=src python -c "
           import os
           import numpy as np
           from pathlib import Path
@@ -279,7 +284,7 @@ jobs:
       - name: Test golden sample inference
         run: |
           echo "🔍 Testing inference on golden samples..."
-          uv run python -c "
+          PYTHONPATH=src python -c "
           import os
           import json
           from pathlib import Path
@@ -338,14 +343,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v4
-      - run: uv python install 3.12
-      - run: uv sync --all-extras --dev
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+      - run: pip install -e .
 
       - name: Validate feature specification
         run: |
           echo "🔍 Validating feature specification..."
-          uv run python -c "
+          PYTHONPATH=src python -c "
           from pathlib import Path
           import json
 
@@ -409,12 +415,12 @@ jobs:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v4
       - run: uv python install 3.11
-      - run: uv sync --all-extras --dev
+      - run: pip install -e .
 
       - name: Generate SHAP snapshots
         run: |
           echo "📸 Generating SHAP snapshots..."
-          uv run python -c "
+          PYTHONPATH=src python -c "
           import os
           import json
           from pathlib import Path
@@ -473,7 +479,7 @@ jobs:
       - name: Validate SHAP snapshots
         run: |
           echo "🔍 Validating SHAP snapshots..."
-          uv run python -c "
+          PYTHONPATH=src python -c "
           from pathlib import Path
           import json
 
@@ -535,14 +541,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v4
-      - run: uv python install 3.12
-      - run: uv sync --all-extras --dev
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+      - run: pip install -e .
 
       - name: Test NLG with mocked Azure OpenAI
         run: |
           echo "🔍 Testing NLG explanations with mocked Azure OpenAI..."
-          uv run python -c "
+          PYTHONPATH=src python -c "
           import os
           import json
           from pathlib import Path
@@ -645,7 +652,7 @@ jobs:
       - name: Test AP2 field validation
         run: |
           echo "🔍 Testing AP2 field validation in explanations..."
-          uv run python -c "
+          PYTHONPATH=src python -c "
           from pathlib import Path
           import json
 

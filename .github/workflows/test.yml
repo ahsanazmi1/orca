@@ -59,7 +59,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        uv sync --all-extras --dev
+        pip install -e .
 
     - name: Run unit tests
       if: matrix.test-group == 'unit'
