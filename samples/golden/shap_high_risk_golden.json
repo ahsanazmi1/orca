@@ -149,6 +149,61 @@
         "chargebacks_12m": 1.0
       },
       "feature_count": 10
+    },
+    "shap_values": {
+      "explanations": [
+        {
+          "feature_name": "chargebacks_12m",
+          "ap2_path": "customer.chargebacks_12m",
+          "shap_value": -2.027299165725708
+        },
+        {
+          "feature_name": "amount",
+          "ap2_path": "cart.amount",
+          "shap_value": 1.2412179708480835
+        },
+        {
+          "feature_name": "location_mismatch",
+          "ap2_path": "cart.geo.location_mismatch",
+          "shap_value": -0.45518195629119873
+        },
+        {
+          "feature_name": "loyalty_score",
+          "ap2_path": "customer.loyalty_score",
+          "shap_value": 0.444916307926178
+        },
+        {
+          "feature_name": "cross_border",
+          "ap2_path": "cart.geo.cross_border",
+          "shap_value": -0.4242066740989685
+        },
+        {
+          "feature_name": "velocity_24h",
+          "ap2_path": "velocity.24h",
+          "shap_value": -0.34248748421669006
+        },
+        {
+          "feature_name": "velocity_7d",
+          "ap2_path": "velocity.7d",
+          "shap_value": -0.2784551978111267
+        },
+        {
+          "feature_name": "customer_age_days",
+          "ap2_path": "customer.age_days",
+          "shap_value": 0.2649304270744324
+        },
+        {
+          "feature_name": "payment_method_risk",
+          "ap2_path": "payment.method_risk",
+          "shap_value": -0.22654728591442108
+        },
+        {
+          "feature_name": "time_since_last_purchase",
+          "ap2_path": "customer.time_since_last_purchase",
+          "shap_value": 0.16051463782787323
+        }
+      ],
+      "base_value": -3.3935773372650146
     }
   }
 }

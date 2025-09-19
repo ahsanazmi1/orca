@@ -1,40 +1,40 @@
 {
-  "risk_score": 0.976239800453186,
+  "risk_score": 0.7939312855402628,
   "key_signals": [
     {
       "feature_name": "amount",
       "ap2_path": "cart.amount",
       "value": 1500.0,
       "importance": 0.03689694404602051,
-      "contribution": 54.03039793922915
+      "contribution": 43.940457328446314
     },
     {
       "feature_name": "chargebacks_12m",
       "ap2_path": "customer.chargebacks_12m",
       "value": 3.0,
       "importance": 0.45550593733787537,
-      "contribution": 1.3340490761159067
+      "contribution": 1.0849212432056454
     },
     {
       "feature_name": "customer_age_days",
       "ap2_path": "customer.age_days",
       "value": 30.0,
       "importance": 0.03622858598828316,
-      "contribution": 1.0610336266770792
+      "contribution": 0.862890235409508
     },
     {
       "feature_name": "velocity_7d",
       "ap2_path": "velocity.7d",
       "value": 12.0,
       "importance": 0.04688887670636177,
-      "contribution": 0.5492974516715119
+      "contribution": 0.44671855393224824
     },
     {
       "feature_name": "velocity_24h",
       "ap2_path": "velocity.24h",
       "value": 4.0,
       "importance": 0.09366224706172943,
-      "contribution": 0.365747253526159
+      "contribution": 0.2974455528652342
     }
   ]
 }
