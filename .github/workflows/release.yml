@@ -102,14 +102,13 @@ jobs:
 
     - name: Install uv and dependencies
       run: |
-        curl -LsSf https://astral.sh/uv/install.sh | sh
-        export PATH="$HOME/.cargo/bin:$PATH"
+        # Install uv using pip as fallback
+        pip install uv
         uv sync --all-extras --dev
 
     - name: Train production XGBoost model
       run: |
         echo "🤖 Training production XGBoost model..."
-        export PATH="$HOME/.cargo/bin:$PATH"
         uv run python -m orca_core.cli train-xgb --samples 50000
 
     - name: Set up Docker Buildx
