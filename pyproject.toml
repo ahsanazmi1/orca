@@ -23,6 +23,7 @@ dependencies = [
     "httpx>=0.25.0",
     "cryptography>=41.0.0",
     "packaging>=23.0.0",
+    "shap>=0.48.0",
 ]
 
 [project.optional-dependencies]
