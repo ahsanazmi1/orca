@@ -24,13 +24,10 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: Install uv
+    - name: Install uv and dependencies
       run: |
         curl -LsSf https://astral.sh/uv/install.sh | sh
-        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-
-    - name: Install dependencies
-      run: |
+        export PATH="$HOME/.cargo/bin:$PATH"
         uv sync --all-extras --dev
 
     - name: Run linting
@@ -42,7 +39,7 @@ jobs:
     - name: Run type checking
       run: |
         echo "🔍 Running type checking..."
-        uv run python -m mypy src/orca_core
+        export PATH="$HOME/.cargo/bin:$PATH" && uv run python -m mypy src/orca_core
 
   # Unit Tests
   test:
@@ -70,13 +67,13 @@ jobs:
       if: matrix.test-group == 'unit'
       run: |
         echo "🧪 Running unit tests..."
-        uv run python -m pytest tests/ -v --cov=src/orca_core --cov-report=xml -m "not integration"
+        export PATH="$HOME/.cargo/bin:$PATH" && uv run python -m pytest tests/ -v --cov=src/orca_core --cov-report=xml -m "not integration"
 
     - name: Run integration tests
       if: matrix.test-group == 'integration'
       run: |
         echo "🧪 Running integration tests..."
-        uv run python -m pytest tests/ -v --cov=src/orca_core --cov-report=xml -m "integration"
+        export PATH="$HOME/.cargo/bin:$PATH" && uv run python -m pytest tests/ -v --cov=src/orca_core --cov-report=xml -m "integration"
 
     - name: Upload coverage reports
       uses: codecov/codecov-action@v3
@@ -97,30 +94,27 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: Install uv
+    - name: Install uv and dependencies
       run: |
         curl -LsSf https://astral.sh/uv/install.sh | sh
-        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-
-    - name: Install dependencies
-      run: |
+        export PATH="$HOME/.cargo/bin:$PATH"
         uv sync --all-extras --dev
 
     - name: Test ML stub model
       run: |
         echo "🤖 Testing ML stub model..."
-        uv run python -m pytest tests/test_model_stub.py -v
+        export PATH="$HOME/.cargo/bin:$PATH" && uv run python -m pytest tests/test_model_stub.py -v
 
     - name: Test XGBoost training
       run: |
         echo "🤖 Testing XGBoost training..."
-        uv run python -m orca_core.cli train-xgb --samples 1000
-        uv run python -m orca_core.cli model-info
+        export PATH="$HOME/.cargo/bin:$PATH" && uv run python -m orca_core.cli train-xgb --samples 1000
+        export PATH="$HOME/.cargo/bin:$PATH" && uv run python -m orca_core.cli model-info
 
     - name: Test model validation
       run: |
         echo "🧪 Testing model validation..."
-        uv run python -m pytest tests/test_ml_hooks.py -v
+        export PATH="$HOME/.cargo/bin:$PATH" && uv run python -m pytest tests/test_ml_hooks.py -v
 
   # CLI Tests
   test-cli:
@@ -134,27 +128,24 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: Install uv
+    - name: Install uv and dependencies
       run: |
         curl -LsSf https://astral.sh/uv/install.sh | sh
-        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-
-    - name: Install dependencies
-      run: |
+        export PATH="$HOME/.cargo/bin:$PATH"
         uv sync --all-extras --dev
 
     - name: Test CLI commands
       run: |
         echo "🖥️ Testing CLI commands..."
-        uv run python -m orca_core.cli --help
-        uv run python -m orca_core.cli config
-        uv run python -m orca_core.cli model-info
+        export PATH="$HOME/.cargo/bin:$PATH" && uv run python -m orca_core.cli --help
+        export PATH="$HOME/.cargo/bin:$PATH" && uv run python -m orca_core.cli config
+        export PATH="$HOME/.cargo/bin:$PATH" && uv run python -m orca_core.cli model-info
 
     - name: Test decision commands
       run: |
         echo "🖥️ Testing decision commands..."
-        uv run python -m orca_core.cli decide '{"cart_total": 100.0, "currency": "USD", "rail": "Card", "channel": "online", "features": {"amount": 100.0, "velocity_24h": 1.0, "cross_border": 0}}'
-        uv run python -m orca_core.cli decide-file fixtures/requests/low_ticket_ok.json
+        export PATH="$HOME/.cargo/bin:$PATH" && uv run python -m orca_core.cli decide '{"cart_total": 100.0, "currency": "USD", "rail": "Card", "channel": "online", "features": {"amount": 100.0, "velocity_24h": 1.0, "cross_border": 0}}'
+        export PATH="$HOME/.cargo/bin:$PATH" && uv run python -m orca_core.cli decide-file fixtures/requests/low_ticket_ok.json
 
   # Validation Tests
   test-validation:
@@ -168,24 +159,21 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: Install uv
+    - name: Install uv and dependencies
       run: |
         curl -LsSf https://astral.sh/uv/install.sh | sh
-        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-
-    - name: Install dependencies
-      run: |
+        export PATH="$HOME/.cargo/bin:$PATH"
         uv sync --all-extras --dev
 
     - name: Test validation fixtures
       run: |
         echo "🧪 Testing validation fixtures..."
-        uv run python -m orca_core.cli decide-batch --glob "validation/phase2/fixtures/*.json" --format csv --output validation_results.csv
+        export PATH="$HOME/.cargo/bin:$PATH" && uv run python -m orca_core.cli decide-batch --glob "validation/phase2/fixtures/*.json" --format csv --output validation_results.csv
 
     - name: Test LLM guardrails
       run: |
         echo "🛡️ Testing LLM guardrails..."
-        uv run python -m pytest tests/test_llm_guardrails.py -v
+        export PATH="$HOME/.cargo/bin:$PATH" && uv run python -m pytest tests/test_llm_guardrails.py -v
 
   # Security Tests
   security:
@@ -199,19 +187,16 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: Install uv
+    - name: Install uv and dependencies
       run: |
         curl -LsSf https://astral.sh/uv/install.sh | sh
-        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-
-    - name: Install dependencies
-      run: |
+        export PATH="$HOME/.cargo/bin:$PATH"
         uv sync --all-extras --dev
 
     - name: Run security scan
       run: |
         echo "🔒 Running security scan..."
-        uv run python -m bandit -r src/ -f json -o bandit-report.json || true
+        export PATH="$HOME/.cargo/bin:$PATH" && uv run python -m bandit -r src/ -f json -o bandit-report.json || true
 
     - name: Upload security report
       uses: actions/upload-artifact@v4

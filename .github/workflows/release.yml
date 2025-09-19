@@ -100,18 +100,16 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: Install uv
+    - name: Install uv and dependencies
       run: |
         curl -LsSf https://astral.sh/uv/install.sh | sh
-        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-
-    - name: Install dependencies
-      run: |
+        export PATH="$HOME/.cargo/bin:$PATH"
         uv sync --all-extras --dev
 
     - name: Train production XGBoost model
       run: |
         echo "🤖 Training production XGBoost model..."
+        export PATH="$HOME/.cargo/bin:$PATH"
         uv run python -m orca_core.cli train-xgb --samples 50000
 
     - name: Set up Docker Buildx

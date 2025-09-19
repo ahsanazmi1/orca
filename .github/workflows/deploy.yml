@@ -63,18 +63,16 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: Install uv
+    - name: Install uv and dependencies
       run: |
         curl -LsSf https://astral.sh/uv/install.sh | sh
-        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-
-    - name: Install dependencies
-      run: |
+        export PATH="$HOME/.cargo/bin:$PATH"
         uv sync --all-extras --dev
 
     - name: Run tests
       if: ${{ !inputs.skip_tests }}
       run: |
+        export PATH="$HOME/.cargo/bin:$PATH"
         uv run python -m pytest tests/ -v --cov=src/orca_core --cov-report=xml
       env:
         ORCA_MODE: RULES_ONLY
@@ -84,6 +82,7 @@ jobs:
       id: train
       run: |
         echo "🤖 Training XGBoost model..."
+        export PATH="$HOME/.cargo/bin:$PATH"
         uv run python -m orca_core.cli train-xgb --samples 10000
 
         # Get model version from metadata
