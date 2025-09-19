@@ -31,8 +31,8 @@ jobs:
     - name: Run linting
       run: |
         echo "🔍 Running code linting..."
-        uv run ruff check .
-        uv run black --check .
+        ruff check .
+        black --check .
 
     - name: Run type checking
       run: |
