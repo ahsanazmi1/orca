@@ -294,9 +294,7 @@ class OrcaDebugUI:
             decision_color = (
                 "green"
                 if result.decision == "APPROVE"
-                else "red"
-                if result.decision == "DECLINE"
-                else "orange"
+                else "red" if result.decision == "DECLINE" else "orange"
             )
             st.markdown(f"### Decision: :{decision_color}[{result.decision}]")
 
