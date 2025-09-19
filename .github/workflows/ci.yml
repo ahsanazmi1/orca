@@ -18,7 +18,7 @@ jobs:
       - run: ruff check . --config pyproject.toml
       - run: black --check .
       - run: mypy src
-      - run: pytest -q --maxfail=1 --disable-warnings
+      - run: pytest tests/ -q --maxfail=1 --disable-warnings
 
   # Schema validation for AP2 and legacy contracts
   schema-validation:

@@ -65,13 +65,13 @@ jobs:
       if: matrix.test-group == 'unit'
       run: |
         echo "🧪 Running unit tests..."
-        PYTHONPATH=src python -m pytest tests/ -v --cov=src/orca_core --cov-report=xml -m "not integration"
+        PYTHONPATH=src python -m pytest tests/ -v --cov=src/orca_core --cov-report=xml
 
     - name: Run integration tests
       if: matrix.test-group == 'integration'
       run: |
         echo "🧪 Running integration tests..."
-        PYTHONPATH=src python -m pytest tests/ -v --cov=src/orca_core --cov-report=xml -m "integration"
+        PYTHONPATH=src python -m pytest tests/ -v --cov=src/orca_core --cov-report=xml
 
     - name: Upload coverage reports
       uses: codecov/codecov-action@v3
