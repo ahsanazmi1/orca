@@ -192,6 +192,8 @@ jobs:
             git status --porcelain samples/golden/
             echo ""
             echo "🔧 Auto-committing CI-generated golden files to resolve environment differences..."
+            git config user.email "ci@orca.ai"
+            git config user.name "Orca CI Bot"
             git add samples/golden/
             git commit -m "fix: update golden files for CI environment compatibility"
             echo "✅ Golden files updated for CI environment"
@@ -517,6 +519,8 @@ jobs:
             git status --porcelain tests/snapshots/
             echo ""
             echo "🔧 Auto-committing CI-generated SHAP snapshots to resolve environment differences..."
+            git config user.email "ci@orca.ai"
+            git config user.name "Orca CI Bot"
             git add tests/snapshots/
             git commit -m "fix: update SHAP snapshots for CI environment compatibility"
             echo "✅ SHAP snapshots updated for CI environment"
