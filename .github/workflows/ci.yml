@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v3
+      - uses: astral-sh/setup-uv@v4
       - run: uv python install 3.12
       - run: uv sync --all-extras --dev
       - run: uv run ruff check . --config pyproject.toml
@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v3
+      - uses: astral-sh/setup-uv@v4
       - run: uv python install 3.12
       - run: uv sync --all-extras --dev
 
@@ -79,7 +79,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v3
+      - uses: astral-sh/setup-uv@v4
       - run: uv python install 3.12
       - run: uv sync --all-extras --dev
 
@@ -136,7 +136,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v3
+      - uses: astral-sh/setup-uv@v4
       - run: uv python install 3.12
       - run: uv sync --all-extras --dev
 
@@ -206,7 +206,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v3
+      - uses: astral-sh/setup-uv@v4
       - run: uv python install 3.12
       - run: uv sync --all-extras --dev
 
@@ -338,7 +338,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v3
+      - uses: astral-sh/setup-uv@v4
       - run: uv python install 3.12
       - run: uv sync --all-extras --dev
 
@@ -407,7 +407,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v3
+      - uses: astral-sh/setup-uv@v4
       - run: uv python install 3.11
       - run: uv sync --all-extras --dev
 
@@ -535,7 +535,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v3
+      - uses: astral-sh/setup-uv@v4
       - run: uv python install 3.12
       - run: uv sync --all-extras --dev
 
