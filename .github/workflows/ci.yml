@@ -143,6 +143,8 @@ jobs:
       - name: Generate golden decisions
         run: |
           echo "📸 Generating golden decision snapshots..."
+          # Reset golden files to ensure clean state
+          git checkout HEAD -- samples/golden/
           uv run python scripts/generate_golden_decisions.py
 
       - name: Validate golden snapshots
