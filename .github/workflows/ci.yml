@@ -449,10 +449,17 @@ jobs:
           # Generate SHAP prediction
           result = predict_with_shap(test_features)
 
-          # Create SHAP snapshot (match original format)
+          # Create SHAP snapshot (comprehensive format)
           shap_snapshot = {
+              'test_features': test_features,
               'risk_score': result['risk_score'],
-              'key_signals': result['key_signals'][:5]  # Top 5
+              'key_signals': result['key_signals'][:5],  # Top 5
+              'model_meta': {
+                  'model_version': 'xgb_v1.0.0',
+                  'model_type': 'XGBoost',
+                  'features_used': list(test_features.keys()),
+                  'shap_enabled': True
+              }
           }
 
           # Save snapshot
