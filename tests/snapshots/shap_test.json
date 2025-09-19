@@ -47,7 +47,13 @@
   "model_meta": {
     "model_version": "xgb_v1.0.0",
     "model_type": "XGBoost",
-    "features_used": ["amount", "velocity_24h", "velocity_7d", "customer_age_days", "chargebacks_12m"],
+    "features_used": [
+      "amount",
+      "velocity_24h",
+      "velocity_7d",
+      "customer_age_days",
+      "chargebacks_12m"
+    ],
     "shap_enabled": true
   }
 }
