@@ -411,11 +411,6 @@ jobs:
       - run: uv python install 3.11
       - run: uv sync --all-extras --dev
 
-      - name: Install SHAP
-        run: |
-          echo "📦 Installing SHAP for snapshot testing..."
-          uv add shap
-
       - name: Generate SHAP snapshots
         run: |
           echo "📸 Generating SHAP snapshots..."
