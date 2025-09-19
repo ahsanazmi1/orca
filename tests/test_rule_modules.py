@@ -1,8 +1,8 @@
 """Tests for individual rule modules."""
 
-from orca_core.models import DecisionRequest
-from orca_core.rules.high_ticket import HighTicketRule
-from orca_core.rules.velocity import VelocityRule
+from src.orca_core.models import DecisionRequest
+from src.orca_core.rules.high_ticket import HighTicketRule
+from src.orca_core.rules.velocity import VelocityRule
 
 
 class TestHighTicketRule:

@@ -1,0 +1,38 @@
+{
+    "ap2_version": "0.1.0",
+    "intent": {
+        "actor": "human",
+        "intent_type": "purchase",
+        "channel": "web",
+        "agent_presence": "none",
+        "timestamps": {
+            "created": "2024-01-15T09:15:00Z",
+            "expires": "2024-01-15T10:15:00Z"
+        }
+    },
+    "cart": {
+        "items": [
+            {
+                "id": "item_004",
+                "name": "Monthly Software Subscription",
+                "quantity": 1,
+                "unit_price": "29.99",
+                "total_price": "29.99"
+            }
+        ],
+        "amount": "29.99",
+        "currency": "USD",
+        "mcc": "7372",
+        "geo": {
+            "country": "US",
+            "ip_country": "US"
+        }
+    },
+    "payment": {
+        "instrument_ref": "ach_checking_****3456",
+        "modality": "deferred",
+        "auth_requirements": [
+            "pin"
+        ]
+    }
+}

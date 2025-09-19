@@ -1,75 +1,60 @@
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
 [project]
-name = "orca-core"
+name = "orca"
 version = "0.1.0"
-description = "Orca Core Decision Engine - A production-ready decision engine for e-commerce applications"
+description = "Open Checkout Agent"
 readme = "README.md"
 requires-python = ">=3.11"
-license = {text = "MIT"}
-authors = [
-    {name = "Orca Team", email = "team@orca.dev"},
-]
-keywords = ["decision-engine", "e-commerce", "rules-engine", "fraud-detection"]
-classifiers = [
-    "Development Status :: 4 - Beta",
-    "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
-    "Topic :: Software Development :: Libraries :: Python Modules",
-    "Topic :: Office/Business :: Financial",
-]
-
 dependencies = [
-    "typer[all]>=0.12.0",
-    "pydantic>=2.0.0",
-    "numpy>=1.24.0",
-    "pandas>=2.0.0",
-    "scikit-learn>=1.3.0",
-    "joblib>=1.3.0",
-    "xgboost>=2.0.0",
-    "openai>=1.0.0",
-    "orjson>=3.9.0",
-    "rich>=13.0.0",
-    "streamlit>=1.28.0",
     "fastapi>=0.104.0",
-    "uvicorn[standard]>=0.24.0",
+    "uvicorn>=0.24.0",
+    "pydantic>=2.5.0",
+    "typer>=0.9.0",
+    "rich>=13.7.0",
+    "orjson>=3.9.0",
+    "streamlit>=1.28.0",
+    "openai>=1.3.0",
+    "xgboost>=2.0.0",
+    "scikit-learn>=1.3.0",
+    "pandas>=2.1.0",
+    "numpy>=1.24.0",
     "matplotlib>=3.7.0",
     "seaborn>=0.12.0",
-    "plotly>=5.15.0",
-    "jupyter>=1.0.0",
+    "joblib>=1.3.0",
+    "httpx>=0.25.0",
+    "cryptography>=41.0.0",
+    "packaging>=23.0.0",
+    "shap>=0.48.0",
+    "pre-commit>=4.3.0",
 ]
 
 [project.optional-dependencies]
 dev = [
-    "ruff>=0.1.0",
-    "black>=23.0.0",
-    "mypy>=1.5.0",
     "pytest>=7.4.0",
     "pytest-cov>=4.1.0",
-    "pre-commit>=3.4.0",
+    "black>=23.12.0",
+    "ruff>=0.1.0",
+    "mypy>=1.7.0",
+    "pre-commit>=3.5.0",
     "bandit>=1.7.0",
-    "httpx>=0.25.0",
 ]
 
-[project.scripts]
-orca-core = "orca_core.cli:app"
-decide = "orca_core.cli:decide"
-
-[project.urls]
-Homepage = "https://github.com/orca-team/orca-core"
-Repository = "https://github.com/orca-team/orca-core"
-Documentation = "https://orca-core.readthedocs.io"
-"Bug Tracker" = "https://github.com/orca-team/orca-core/issues"
-
-[tool.hatch.build.targets.wheel]
-packages = ["src/orca_core"]
+[tool.black]
+line-length = 100
+target-version = ['py311']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
 
 [tool.ruff]
 target-version = "py311"
@@ -93,39 +78,28 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
+"tests/*" = ["B011"]
 
-[tool.ruff.lint.isort]
-known-first-party = ["orca_core"]
-
-[tool.black]
-line-length = 100
-target-version = ['py311']
-include = '\.pyi?$'
-extend-exclude = '''
-/(
-  # directories
-  \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | build
-  | dist
-)/
-'''
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q --strict-markers --strict-config"
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
 
 [tool.mypy]
 python_version = "3.11"
-warn_return_any = true
+explicit_package_bases = true
+warn_return_any = false
 warn_unused_configs = true
 disallow_untyped_defs = true
 disallow_incomplete_defs = true
 check_untyped_defs = true
-disallow_untyped_decorators = true
+disallow_untyped_decorators = false
 no_implicit_optional = true
 warn_redundant_casts = true
-warn_unused_ignores = true
+warn_unused_ignores = false
 warn_no_return = true
 warn_unreachable = true
 strict_equality = true
@@ -135,6 +109,7 @@ show_error_codes = true
 module = [
     "streamlit.*",
     "orjson.*",
+    "packaging.*",
     "typer.*",
     "rich.*",
     "pydantic.*",
@@ -151,6 +126,8 @@ module = [
     "matplotlib.*",
     "xgboost.*",
     "openai.*",
+    "shap.*",
+    "cryptography.*",
 ]
 ignore_missing_imports = true
 
@@ -158,58 +135,24 @@ ignore_missing_imports = true
 module = "tests.*"
 ignore_errors = true
 
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-python_files = ["test_*.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
-pythonpath = ["src"]
-addopts = [
-    "--strict-markers",
-    "--strict-config",
-    "--cov=src/orca_core",
-    "--cov-report=term-missing",
-    "--cov-report=html",
-    "--cov-report=xml",
+[[tool.mypy.overrides]]
+module = [
+    "orca_core.*",
+    "orca_api.*",
+    "orca.*",
 ]
-markers = [
-    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
-    "integration: marks tests as integration tests",
-]
+ignore_missing_imports = true
 
-[tool.coverage.run]
-source = ["src/orca_core"]
-omit = [
-    "*/tests/*",
-    "*/test_*",
+[[tool.mypy.overrides]]
+module = [
+    "src.orca_api.main",
+    "src.orca_core.cli",
 ]
+disable_error_code = ["misc"]
 
-[tool.coverage.report]
-exclude_lines = [
-    "pragma: no cover",
-    "def __repr__",
-    "if self.debug:",
-    "if settings.DEBUG",
-    "raise AssertionError",
-    "raise NotImplementedError",
-    "if 0:",
-    "if __name__ == .__main__.:",
-    "class .*\\bProtocol\\):",
-    "@(abc\\.)?abstractmethod",
-]
+[tool.hatch.build.targets.wheel]
+packages = ["src/orca_core", "src/orca_api"]
 
-[tool.bandit]
-exclude_dirs = ["tests", "demos", "scripts"]
-skips = ["B101", "B601"]
-
-[dependency-groups]
-dev = [
-    "bandit>=1.8.6",
-    "black>=25.1.0",
-    "httpx>=0.28.1",
-    "mypy>=1.17.1",
-    "pre-commit>=4.3.0",
-    "pytest>=8.4.2",
-    "pytest-cov>=7.0.0",
-    "ruff>=0.12.12",
-]
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

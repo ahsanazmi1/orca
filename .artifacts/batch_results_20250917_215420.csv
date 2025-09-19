@@ -1,0 +1,4 @@
+file,timestamp,decision,status,reasons,actions,risk_score,model_type,model_version,reason_codes,llm_explanation,llm_confidence,cart_total,currency,rail,channel
+/var/folders/nc/hyym1ntd5t50x4f0wv_6s5vh0000gn/T/tmpfva9vjz1/test_0.json,2025-09-17T21:54:20.061058,APPROVE,APPROVE,Cart total $100.00 within approved threshold,Process payment | Send confirmation,0.35,stub,stub-0.1.0,BASELINE,N/A,N/A,100.0,USD,N/A,N/A
+/var/folders/nc/hyym1ntd5t50x4f0wv_6s5vh0000gn/T/tmpfva9vjz1/test_1.json,2025-09-17T21:54:20.061213,APPROVE,APPROVE,Cart total $150.00 within approved threshold,Process payment | Send confirmation,0.35,stub,stub-0.1.0,BASELINE,N/A,N/A,150.0,USD,N/A,N/A
+/var/folders/nc/hyym1ntd5t50x4f0wv_6s5vh0000gn/T/tmpfva9vjz1/test_2.json,2025-09-17T21:54:20.061339,APPROVE,APPROVE,Cart total $200.00 within approved threshold,Process payment | Send confirmation,0.35,stub,stub-0.1.0,BASELINE,N/A,N/A,200.0,USD,N/A,N/A

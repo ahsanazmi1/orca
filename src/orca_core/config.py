@@ -96,7 +96,8 @@ class OrcaSettings:
         if self.is_ai_enabled:
             if not self.has_azure_openai_config:
                 issues.append(
-                    "Azure OpenAI configuration missing (AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_API_KEY)"
+                    "Azure OpenAI configuration missing "
+                    "(AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_API_KEY)"
                 )
 
             if not self.has_azure_ml_config:

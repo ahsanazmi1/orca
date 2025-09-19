@@ -1,7 +1,7 @@
 """Tests for decision explainer module."""
 
-from orca_core.core.explainer import explain_decision
-from orca_core.models import DecisionResponse
+from src.orca_core.core.explainer import explain_decision
+from src.orca_core.models import DecisionResponse
 
 
 class TestDecisionExplainer:

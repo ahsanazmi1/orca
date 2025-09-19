@@ -1,0 +1,39 @@
+{
+    "ap2_version": "0.1.0",
+    "intent": {
+        "actor": "human",
+        "intent_type": "purchase",
+        "channel": "web",
+        "agent_presence": "none",
+        "timestamps": {
+            "created": "2024-01-15T20:45:00Z",
+            "expires": "2024-01-15T21:45:00Z"
+        }
+    },
+    "cart": {
+        "items": [
+            {
+                "id": "item_shap",
+                "name": "High-Risk Electronics Bundle",
+                "quantity": 1,
+                "unit_price": "1500.00",
+                "total_price": "1500.00"
+            }
+        ],
+        "amount": "1500.00",
+        "currency": "USD",
+        "mcc": "5732",
+        "geo": {
+            "country": "US",
+            "ip_country": "CA"
+        }
+    },
+    "payment": {
+        "instrument_ref": "card_visa_****9999",
+        "modality": "immediate",
+        "auth_requirements": [
+            "pin",
+            "biometric"
+        ]
+    }
+}

@@ -1,0 +1,39 @@
+{
+    "ap2_version": "0.1.0",
+    "intent": {
+        "actor": "human",
+        "intent_type": "purchase",
+        "channel": "pos",
+        "agent_presence": "assisted",
+        "timestamps": {
+            "created": "2024-01-15T12:00:00Z",
+            "expires": "2024-01-15T13:00:00Z"
+        }
+    },
+    "cart": {
+        "items": [
+            {
+                "id": "item_006",
+                "name": "Electronics Bundle",
+                "quantity": 1,
+                "unit_price": "750.00",
+                "total_price": "750.00"
+            }
+        ],
+        "amount": "750.00",
+        "currency": "USD",
+        "mcc": "5732",
+        "geo": {
+            "country": "US",
+            "ip_country": "US"
+        }
+    },
+    "payment": {
+        "instrument_ref": "card_discover_****2468",
+        "modality": "immediate",
+        "auth_requirements": [
+            "pin",
+            "biometric"
+        ]
+    }
+}

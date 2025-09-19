@@ -1,0 +1,45 @@
+{
+    "instrument_ref": "card_1234567890123456",
+    "modality": "immediate",
+    "constraints": {
+        "max_amount": 1000.00,
+        "allowed_currencies": [
+            "USD",
+            "EUR"
+        ],
+        "merchant_whitelist": [
+            "merchant_001",
+            "merchant_002"
+        ]
+    },
+    "routing_hints": [
+        {
+            "processor": "stripe",
+            "priority": 1,
+            "constraints": {
+                "region": "US",
+                "card_types": [
+                    "visa",
+                    "mastercard"
+                ]
+            }
+        },
+        {
+            "processor": "paypal",
+            "priority": 2,
+            "constraints": {
+                "fallback": true
+            }
+        }
+    ],
+    "auth_requirements": [
+        "pin",
+        "biometric"
+    ],
+    "metadata": {
+        "payment_id": "pay_abc123",
+        "merchant_id": "merchant_001",
+        "transaction_type": "ecommerce",
+        "recurring": false
+    }
+}

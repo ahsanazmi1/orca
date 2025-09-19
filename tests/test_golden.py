@@ -3,8 +3,8 @@
 import json
 from unittest.mock import patch
 
-from orca_core.engine import evaluate_rules
-from orca_core.models import DecisionRequest
+from src.orca_core.engine import evaluate_rules
+from src.orca_core.models import DecisionRequest
 
 
 class TestGolden:
@@ -13,7 +13,7 @@ class TestGolden:
     def test_golden_high_risk_scenario(self) -> None:
         """Test golden scenario with high cart total and velocity."""
         with patch(
-            "orca_core.engine.predict_risk",
+            "src.orca_core.engine.predict_risk",
             return_value={
                 "risk_score": 0.15,
                 "reason_codes": ["LOW_RISK"],
@@ -73,7 +73,7 @@ class TestGolden:
     def test_golden_approve_scenario(self) -> None:
         """Test golden scenario with low cart total and velocity."""
         with patch(
-            "orca_core.engine.predict_risk",
+            "src.orca_core.engine.predict_risk",
             return_value={
                 "risk_score": 0.15,
                 "reason_codes": ["LOW_RISK"],
@@ -143,7 +143,7 @@ class TestGolden:
         # Mock high risk score
         with (
             patch(
-                "orca_core.engine.predict_risk",
+                "src.orca_core.engine.predict_risk",
                 return_value={
                     "risk_score": 0.95,
                     "reason_codes": ["HIGH_RISK"],
@@ -151,7 +151,7 @@ class TestGolden:
                 },
             ),
             patch(
-                "orca_core.rules.high_risk.predict_risk",
+                "src.orca_core.rules.high_risk.predict_risk",
                 return_value={
                     "risk_score": 0.95,
                     "reason_codes": ["HIGH_RISK"],

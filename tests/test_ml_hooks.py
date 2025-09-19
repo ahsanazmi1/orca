@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from orca_core.core.ml_hooks import RiskPredictionModel, get_model, predict_risk, train_model
+from src.orca_core.core.ml_hooks import RiskPredictionModel, get_model, predict_risk, train_model
 
 
 class TestMLHooks:
@@ -127,7 +127,7 @@ class TestMLHooks:
 
             # Should have feature importance after training
             assert len(importance) > 0
-            assert all(isinstance(v, (int, float)) for v in importance.values())
+            assert all(isinstance(v, int | float) for v in importance.values())
 
     def test_model_fallback_on_prediction_error(self) -> None:
         """Test that model falls back gracefully on prediction errors."""

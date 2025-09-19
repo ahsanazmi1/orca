@@ -1,0 +1,177 @@
+"""Script to generate golden decision JSONs with ML model information."""
+
+import json
+import os
+import sys
+from pathlib import Path
+from typing import Any
+
+import numpy as np
+
+# Set deterministic environment variables early
+os.environ["XGBOOST_RANDOM_STATE"] = "42"
+os.environ["PYTHONHASHSEED"] = "0"
+
+sys.path.append(".")
+
+# Set numpy seed for deterministic behavior
+np.random.seed(42)
+
+from src.orca.core.decision_contract import AP2DecisionContract  # noqa: E402
+from src.orca.core.rules_engine import evaluate_ap2_rules  # noqa: E402
+from src.orca.ml.predict_risk import load_model_version, predict_risk  # noqa: E402
+
+
+def generate_golden_decision(ap2_file: Path, output_file: Path, enable_shap: bool = False) -> None:
+    """Generate golden decision JSON for an AP2 sample file."""
+    print(f"Processing {ap2_file.name}...")
+
+    # Load AP2 contract
+    with open(ap2_file) as f:
+        ap2_data = json.load(f)
+
+    # Set deterministic nonce for golden files
+    if "intent" in ap2_data:
+        # Generate a deterministic UUID based on the filename
+        import hashlib
+
+        filename_hash = hashlib.md5(ap2_file.stem.encode()).hexdigest()
+        deterministic_uuid = f"{filename_hash[:8]}-{filename_hash[8:12]}-{filename_hash[12:16]}-{filename_hash[16:20]}-{filename_hash[20:32]}"
+        ap2_data["intent"]["nonce"] = deterministic_uuid
+
+    # Create a minimal decision outcome for the contract
+    from src.orca.core.decision_contract import DecisionMeta, DecisionOutcome
+
+    # Use deterministic values for golden files
+    deterministic_trace_id = f"golden-trace-{ap2_file.stem}"
+
+    decision_meta = DecisionMeta(
+        model="rules_only",
+        trace_id=deterministic_trace_id,
+        version="0.1.0",
+        processing_time_ms=0.0,
+        model_version="0.1.0",
+        model_sha256="",
+        model_trained_on="",
+    )
+
+    decision_outcome = DecisionOutcome(
+        result="APPROVE", risk_score=0.0, reasons=[], actions=[], meta=decision_meta
+    )
+
+    # Add decision to AP2 data
+    ap2_data["decision"] = decision_outcome.model_dump()
+
+    ap2_contract = AP2DecisionContract(**ap2_data)
+
+    # Evaluate with rules engine
+    decision_outcome = evaluate_ap2_rules(ap2_contract)
+
+    # Get ML prediction if model is available
+    ml_result = None
+    try:
+        # Load model if available
+        if load_model_version("1.0.0"):
+            # Extract features for ML prediction
+            features = {
+                "amount": float(ap2_contract.cart.amount),
+                "velocity_24h": 1.0,  # Default values for missing features
+                "velocity_7d": 3.0,
+                "cross_border": 0.0,
+                "location_mismatch": 0.0,
+                "payment_method_risk": 0.3,
+                "chargebacks_12m": 0.0,
+                "customer_age_days": 365.0,
+                "loyalty_score": 0.5,
+                "time_since_last_purchase": 7.0,
+            }
+
+            # Predict with ML
+            if enable_shap:
+                from src.orca.ml.predict_risk import predict_with_shap
+
+                ml_result = predict_with_shap(features)
+            else:
+                ml_result = predict_risk(features)
+    except Exception as e:
+        print(f"ML prediction failed for {ap2_file.name}: {e}")
+        ml_result = None
+
+    # Create golden decision structure
+    golden_decision: dict[str, Any] = {
+        "ap2_version": ap2_contract.ap2_version,
+        "intent": ap2_contract.intent.model_dump(),
+        "cart": ap2_contract.cart.model_dump(),
+        "payment": ap2_contract.payment.model_dump(),
+        "decision": {
+            "result": decision_outcome.result,
+            "risk_score": decision_outcome.risk_score,
+            "reasons": [reason.model_dump() for reason in decision_outcome.reasons],
+            "actions": [action.model_dump() for action in decision_outcome.actions],
+            "meta": {
+                "model": "xgboost" if ml_result else "rules_only",
+                "model_version": (
+                    ml_result.get("model_meta", {}).get("model_version", "1.0.0")
+                    if ml_result
+                    else "1.0.0"
+                ),
+                "model_sha256": (
+                    ml_result.get("model_meta", {}).get("model_sha256", "abc123def456")
+                    if ml_result
+                    else "rules-only"
+                ),
+                "model_trained_on": (
+                    ml_result.get("model_meta", {}).get("trained_on", "2024-01-01")
+                    if ml_result
+                    else "deterministic"
+                ),
+                "trace_id": decision_outcome.meta.trace_id,
+                "processing_time_ms": decision_outcome.meta.processing_time_ms,
+                "version": decision_outcome.meta.version,
+                "rules_evaluated": [],
+                "feature_snapshot": {},
+            },
+        },
+        "signing": {"vc_proof": None, "receipt_hash": None},
+    }
+
+    # Add ML-specific information if available
+    if ml_result:
+        golden_decision["ml_prediction"] = {
+            "risk_score": ml_result["risk_score"],
+            "key_signals": ml_result["key_signals"],
+            "model_meta": ml_result["model_meta"],
+        }
+
+        # Add SHAP values if enabled
+        if enable_shap and ml_result.get("shap_values"):
+            golden_decision["ml_prediction"]["shap_values"] = ml_result["shap_values"]
+
+    # Write golden decision
+    with open(output_file, "w") as f:
+        json.dump(golden_decision, f, indent=2, default=str)
+        f.write("\n")  # Ensure newline at end of file
+
+    print(f"✅ Generated {output_file.name}")
+
+
+def main() -> None:
+    """Generate golden decisions for all AP2 samples."""
+    samples_dir = Path("samples/ap2")
+    golden_dir = Path("samples/golden")
+    golden_dir.mkdir(exist_ok=True)
+
+    # Process each AP2 sample
+    for ap2_file in samples_dir.glob("*.json"):
+        golden_file = golden_dir / f"{ap2_file.stem}_golden.json"
+
+        # Enable SHAP for the high amount and shap samples
+        enable_shap = "high_amount" in ap2_file.name or "shap" in ap2_file.name
+
+        generate_golden_decision(ap2_file, golden_file, enable_shap)
+
+    print(f"\n🎉 Generated {len(list(samples_dir.glob('*.json')))} golden decision files!")
+
+
+if __name__ == "__main__":
+    main()

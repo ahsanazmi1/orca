@@ -1,6 +1,6 @@
 """Unit tests for explanation templates and generation."""
 
-from orca_core.explanations import (
+from src.orca_core.explanations import (
     EXPLANATION_TEMPLATES,
     FALLBACK_TEMPLATE,
     generate_human_explanation,
@@ -166,7 +166,7 @@ class TestHumanExplanationGeneration:
     def test_template_formatting_error(self):
         """Test that template formatting errors are handled gracefully."""
         # Test with a template that actually has a formatting error
-        from orca_core.explanations import EXPLANATION_TEMPLATES
+        from src.orca_core.explanations import EXPLANATION_TEMPLATES
 
         reasons = ["high_ticket"]
         context = {"threshold": "test"}

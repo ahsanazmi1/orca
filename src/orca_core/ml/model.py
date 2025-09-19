@@ -1,21 +1,30 @@
 """
 ML Model Dispatcher for Orca Core Phase 2
 
-This module provides a dispatcher that chooses between XGBoost model
+This module provides a dispatcher that chooses between real XGBoost model
 and deterministic ML stub based on configuration.
 """
 
 import os
 from typing import Any
 
-from .xgb_infer import get_xgb_model_info, predict_risk_xgb
+# Import the new real ML system
+try:
+    from src.orca.ml.model_registry import get_model_registry
+    from src.orca.ml.predict_risk import predict_risk as predict_risk_real
+
+    REAL_ML_AVAILABLE = True
+except ImportError:
+    REAL_ML_AVAILABLE = False
+
+from .xgb_infer import get_xgb_model_info
 
 
 def predict_risk(features: dict[str, float]) -> dict[str, Any]:
     """
     Predict risk score using model dispatcher.
 
-    This function dispatches to either XGBoost model or deterministic stub
+    This function dispatches to either real XGBoost model or deterministic stub
     based on the ORCA_USE_XGB environment variable.
 
     Args:
@@ -28,12 +37,36 @@ def predict_risk(features: dict[str, float]) -> dict[str, Any]:
             - version: Model version identifier
             - model_type: Type of model used ("xgboost" or "stub")
     """
-    # Check if XGBoost should be used
-    use_xgb = os.getenv("ORCA_USE_XGB", "false").lower() == "true"
+    # Check if real ML system should be used
+    use_real_ml = os.getenv("ORCA_USE_XGB", "false").lower() == "true"
 
-    if use_xgb:
-        # Use XGBoost model (will fallback to stub if not available)
-        return predict_risk_xgb({"features": features})
+    if use_real_ml and REAL_ML_AVAILABLE:
+        try:
+            # Ensure model is loaded
+            registry = get_model_registry()
+            if not registry.is_loaded:
+                registry.load_model()
+
+            # Use real XGBoost model with calibration
+            result = predict_risk_real(features)
+
+            # Convert to legacy format for compatibility
+            return {
+                "risk_score": result["risk_score"],
+                "reason_codes": [
+                    signal["feature_name"].upper() for signal in result["key_signals"][:3]
+                ],
+                "version": result["version"],
+                "model_type": result["model_type"],
+                "key_signals": result["key_signals"],
+                "model_meta": result["model_meta"],
+            }
+        except Exception as e:
+            import traceback
+
+            print(f"⚠️ Real ML model failed, falling back to stub: {e}")
+            print(f"Traceback: {traceback.format_exc()}")
+            return predict_risk_stub(features)
     else:
         # Use deterministic stub
         return predict_risk_stub(features)

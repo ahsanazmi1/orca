@@ -1,0 +1,23 @@
+[
+  "ap2_version",
+  "cart",
+  "cart.amount",
+  "cart.currency",
+  "cart.geo",
+  "cart.geo.country",
+  "cart.geo.ip_country",
+  "cart.items",
+  "cart.mcc",
+  "intent",
+  "intent.actor",
+  "intent.agent_presence",
+  "intent.channel",
+  "intent.intent_type",
+  "intent.timestamps",
+  "intent.timestamps.created",
+  "intent.timestamps.expires",
+  "payment",
+  "payment.auth_requirements",
+  "payment.instrument_ref",
+  "payment.modality"
+]

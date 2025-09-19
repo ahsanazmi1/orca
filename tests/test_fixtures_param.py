@@ -6,8 +6,8 @@ from unittest.mock import patch
 
 import pytest
 
-from orca_core.engine import evaluate_rules
-from orca_core.models import DecisionRequest
+from src.orca_core.engine import evaluate_rules
+from src.orca_core.models import DecisionRequest
 
 
 class TestFixturesParametrized:
@@ -83,7 +83,7 @@ class TestFixturesParametrized:
         # For high_risk_decline, monkeypatch predict_risk to return 0.95
         if fixture_name == "high_risk_decline.json":
             with patch(
-                "orca_core.engine.predict_risk",
+                "src.orca_core.engine.predict_risk",
                 return_value={
                     "risk_score": 0.95,
                     "reason_codes": ["HIGH_RISK"],
@@ -97,7 +97,7 @@ class TestFixturesParametrized:
                 response = evaluate_rules(request)
             else:
                 # Rules only mode
-                with patch("orca_core.engine.predict_risk", return_value=0.0):
+                with patch("src.orca_core.engine.predict_risk", return_value=0.0):
                     response = evaluate_rules(request)
 
         # Assert decision
@@ -278,7 +278,7 @@ class TestFixturesParametrized:
         # Use monkeypatch for high_risk_decline to ensure DECLINE
         if fixture_name == "high_risk_decline.json":
             with patch(
-                "orca_core.engine.predict_risk",
+                "src.orca_core.engine.predict_risk",
                 return_value={
                     "risk_score": 0.95,
                     "reason_codes": ["HIGH_RISK"],

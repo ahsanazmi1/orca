@@ -1,0 +1,31 @@
+{
+    "cart_total": 750.00,
+    "currency": "USD",
+    "rail": "Card",
+    "channel": "pos",
+    "features": {
+        "amount": 750.00,
+        "velocity_24h": 2.0,
+        "velocity_7d": 8.0,
+        "cross_border": 0.0,
+        "location_mismatch": 0.0,
+        "payment_method_risk": 0.3,
+        "chargebacks_12m": 0.0,
+        "customer_age_days": 450.0,
+        "loyalty_score": 0.7,
+        "time_since_last_purchase": 5.0
+    },
+    "context": {
+        "customer_id": "cust_44444",
+        "location_country": "US",
+        "ip_country": "US",
+        "mcc": "5732",
+        "auth_requirements": [
+            "pin",
+            "biometric"
+        ],
+        "trace_id": "trace_006",
+        "processing_time_ms": 43.6,
+        "model": "rules_only"
+    }
+}

@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from orca_core.models import DecisionRequest, DecisionResponse
+from src.orca_core.models import DecisionRequest, DecisionResponse
 
 
 class TestDecisionRequestValidation:

@@ -1,0 +1,192 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://orca.ai/schemas/decision.schema.json",
+    "title": "AP2 Decision Contract Schema",
+    "description": "Schema for AP2-wrapped decision contract with intent, cart, payment mandates and decision outcome",
+    "type": "object",
+    "properties": {
+        "ap2_version": {
+            "type": "string",
+            "description": "AP2 protocol version",
+            "default": "0.1.0"
+        },
+        "intent": {
+            "$ref": "ap2_intent.schema.json",
+            "description": "AP2 intent mandate"
+        },
+        "cart": {
+            "$ref": "ap2_cart.schema.json",
+            "description": "AP2 cart mandate"
+        },
+        "payment": {
+            "$ref": "ap2_payment.schema.json",
+            "description": "AP2 payment mandate"
+        },
+        "decision": {
+            "type": "object",
+            "description": "Decision outcome and metadata",
+            "properties": {
+                "result": {
+                    "type": "string",
+                    "enum": [
+                        "APPROVE",
+                        "REVIEW",
+                        "DECLINE"
+                    ],
+                    "description": "Decision result"
+                },
+                "risk_score": {
+                    "type": "number",
+                    "minimum": 0.0,
+                    "maximum": 1.0,
+                    "description": "Risk score (0.0-1.0)"
+                },
+                "reasons": {
+                    "type": "array",
+                    "description": "Decision reasons",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "code": {
+                                "type": "string",
+                                "enum": [
+                                    "high_ticket",
+                                    "velocity_flag",
+                                    "ach_limit_exceeded",
+                                    "location_mismatch",
+                                    "online_verification",
+                                    "ach_online_verification",
+                                    "chargeback_history",
+                                    "high_risk"
+                                ],
+                                "description": "Canonical reason code"
+                            },
+                            "detail": {
+                                "type": "string",
+                                "description": "Human-readable detail"
+                            }
+                        },
+                        "required": [
+                            "code",
+                            "detail"
+                        ],
+                        "additionalProperties": false
+                    }
+                },
+                "actions": {
+                    "type": "array",
+                    "description": "Recommended actions",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "enum": [
+                                    "manual_review",
+                                    "step_up_auth",
+                                    "fallback_card",
+                                    "block_transaction",
+                                    "micro_deposit_verification",
+                                    "process_payment",
+                                    "send_confirmation"
+                                ],
+                                "description": "Canonical action code"
+                            },
+                            "to": {
+                                "type": "string",
+                                "description": "Target for routing actions"
+                            },
+                            "detail": {
+                                "type": "string",
+                                "description": "Additional action detail"
+                            }
+                        },
+                        "required": [
+                            "type"
+                        ],
+                        "additionalProperties": false
+                    }
+                },
+                "meta": {
+                    "type": "object",
+                    "description": "Decision metadata and trace information",
+                    "properties": {
+                        "model": {
+                            "type": "string",
+                            "enum": [
+                                "xgb_stub",
+                                "rules_only",
+                                "ml_ensemble"
+                            ],
+                            "description": "Model used for decision"
+                        },
+                        "trace_id": {
+                            "type": "string",
+                            "format": "uuid",
+                            "description": "Unique trace identifier"
+                        },
+                        "processing_time_ms": {
+                            "type": "number",
+                            "minimum": 0,
+                            "description": "Processing time in milliseconds"
+                        },
+                        "version": {
+                            "type": "string",
+                            "description": "Decision engine version",
+                            "default": "0.1.0"
+                        }
+                    },
+                    "required": [
+                        "model",
+                        "trace_id",
+                        "version"
+                    ],
+                    "additionalProperties": false
+                }
+            },
+            "required": [
+                "result",
+                "risk_score",
+                "reasons",
+                "actions",
+                "meta"
+            ],
+            "additionalProperties": false
+        },
+        "signing": {
+            "type": "object",
+            "description": "Signing and receipt information for AP2 compliance",
+            "properties": {
+                "vc_proof": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "Verifiable credential proof"
+                },
+                "receipt_hash": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "Receipt hash for audit trail"
+                }
+            },
+            "additionalProperties": false
+        },
+        "metadata": {
+            "type": "object",
+            "description": "Additional contract metadata",
+            "additionalProperties": true
+        }
+    },
+    "required": [
+        "ap2_version",
+        "intent",
+        "cart",
+        "payment",
+        "decision",
+        "signing"
+    ],
+    "additionalProperties": false
+}

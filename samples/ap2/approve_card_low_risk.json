@@ -1,0 +1,38 @@
+{
+    "ap2_version": "0.1.0",
+    "intent": {
+        "actor": "human",
+        "intent_type": "purchase",
+        "channel": "web",
+        "agent_presence": "none",
+        "timestamps": {
+            "created": "2024-01-15T10:30:00Z",
+            "expires": "2024-01-15T11:30:00Z"
+        }
+    },
+    "cart": {
+        "items": [
+            {
+                "id": "item_001",
+                "name": "Wireless Headphones",
+                "quantity": 1,
+                "unit_price": "89.99",
+                "total_price": "89.99"
+            }
+        ],
+        "amount": "89.99",
+        "currency": "USD",
+        "mcc": "5733",
+        "geo": {
+            "country": "US",
+            "ip_country": "US"
+        }
+    },
+    "payment": {
+        "instrument_ref": "card_visa_****1234",
+        "modality": "immediate",
+        "auth_requirements": [
+            "pin"
+        ]
+    }
+}

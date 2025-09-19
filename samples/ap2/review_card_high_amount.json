@@ -1,0 +1,39 @@
+{
+    "ap2_version": "0.1.0",
+    "intent": {
+        "actor": "human",
+        "intent_type": "purchase",
+        "channel": "web",
+        "agent_presence": "none",
+        "timestamps": {
+            "created": "2024-01-15T14:45:00Z",
+            "expires": "2024-01-15T15:45:00Z"
+        }
+    },
+    "cart": {
+        "items": [
+            {
+                "id": "item_002",
+                "name": "MacBook Pro 16-inch",
+                "quantity": 1,
+                "unit_price": "2499.00",
+                "total_price": "2499.00"
+            }
+        ],
+        "amount": "2499.00",
+        "currency": "USD",
+        "mcc": "5732",
+        "geo": {
+            "country": "US",
+            "ip_country": "US"
+        }
+    },
+    "payment": {
+        "instrument_ref": "card_mastercard_****5678",
+        "modality": "immediate",
+        "auth_requirements": [
+            "pin",
+            "biometric"
+        ]
+    }
+}

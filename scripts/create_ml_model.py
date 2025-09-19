@@ -10,9 +10,9 @@ from pathlib import Path
 # Add src to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from typing import Any
+from typing import Any  # noqa: E402
 
-from orca_core.ml.model import get_model_info, predict_risk
+from src.orca_core.ml.model import get_model_info, predict_risk  # noqa: E402
 
 
 def create_sample_data() -> list[dict[str, Any]]:
@@ -92,7 +92,9 @@ def main() -> None:
         risk_score = sample["risk_score"]
         reason_codes = sample["reason_codes"]
         print(
-            f"   {i+1}. Amount: ${features['amount']}, Velocity: {features['velocity_24h']}, Cross-border: {features['cross_border']}"
+            f"   {i+1}. Amount: ${features['amount']}, "
+            f"Velocity: {features['velocity_24h']}, "
+            f"Cross-border: {features['cross_border']}"
         )
         print(f"      → Risk Score: {risk_score:.2f}, Reasons: {reason_codes}")
 

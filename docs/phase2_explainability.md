@@ -1,16 +1,16 @@
 # Phase 2: Explainability Architecture
 
-This document describes the explainability architecture for Orca Core, including the decision flow, Azure setup, and configuration options.
+This document describes the explainability architecture for Orca Core, including the AP2 decision flow, Azure setup, and configuration options.
 
 ## Architecture Overview
 
-The Orca Core explainability system follows a multi-stage pipeline that transforms raw transaction data into human-readable explanations through a combination of rule-based logic, machine learning, and large language models.
+The Orca Core explainability system follows a multi-stage pipeline that transforms AP2 decision contracts into human-readable explanations through a combination of rule-based logic, machine learning, and large language models.
 
-### Decision Flow Architecture
+### AP2 Decision Flow Architecture
 
 ```mermaid
 graph TD
-    A[Transaction Request] --> B[Rules Engine]
+    A[AP2 Decision Contract] --> B[Rules Engine]
     B --> C[Feature Extraction]
     C --> D{ML Mode}
     D -->|Stub| E[Deterministic ML Stub]
@@ -26,20 +26,50 @@ graph TD
     L --> N[Guardrails]
     N --> O[Sanitized Explanation]
     O --> M
-    M --> P[Final Response]
+    M --> P[AP2 Response with Explanation]
+```
+
+### AP2 → Feature Map → XGBoost → Calibration → Decision → NLG Flow
+
+```mermaid
+graph LR
+    A[AP2 Contract] --> B[Feature Extraction]
+    B --> C[Feature Map]
+    C --> D[XGBoost Model]
+    D --> E[Raw Risk Score]
+    E --> F[Calibration]
+    F --> G[Calibrated Score]
+    G --> H[Threshold Policy]
+    H --> I[Decision Result]
+    I --> J[NLG Engine]
+    J --> K[Human Explanation]
+
+    subgraph "Feature Mapping"
+        C1[intent.metadata.velocity_24h → velocity_24h]
+        C2[cart.amount → amount]
+        C3[payment.method → payment_method_risk]
+        C4[intent.actor.metadata.loyalty_score → loyalty_score]
+    end
+
+    subgraph "Calibration & Thresholds"
+        H1[approve >= 0.85]
+        H2[review 0.65–0.85]
+        H3[decline < 0.65]
+    end
 ```
 
 ### Detailed Component Flow
 
-1. **Input Processing**: Transaction data is received and validated
+1. **AP2 Input Processing**: AP2 decision contract is received and validated
 2. **Rules Evaluation**: Business rules are applied to determine initial decision
-3. **Feature Engineering**: Raw data is transformed into ML features
+3. **Feature Engineering**: AP2 fields are mapped to ML features using feature specification
 4. **ML Prediction**: Either stub or XGBoost model generates risk score
-5. **Calibration**: XGBoost scores are calibrated for better probability estimates
-6. **Decision Synthesis**: Rules and ML results are combined
-7. **Explanation Generation**: Human-readable explanations are created
-8. **Guardrail Validation**: LLM explanations are validated and sanitized
-9. **Response Assembly**: Final decision and explanation are packaged
+5. **Calibration**: XGBoost scores are calibrated using Platt scaling for better probability estimates
+6. **Threshold Policy**: Calibrated scores are compared against configurable thresholds
+7. **Decision Synthesis**: Rules and ML results are combined into AP2 decision response
+8. **Explanation Generation**: Human-readable explanations are created with AP2 field references
+9. **Guardrail Validation**: LLM explanations are validated for AP2 field accuracy
+10. **Response Assembly**: Final AP2 decision contract with explanation is packaged
 
 ### Component Details
 
@@ -49,22 +79,35 @@ graph TD
 - **Output**: Rule-based decisions and metadata
 
 #### 2. Feature Extraction
-- **Purpose**: Transforms raw transaction data into ML-ready features
-- **Key Features**:
-  - `cart_total`: Transaction amount
-  - `velocity_24h`: Transaction frequency
-  - `cross_border`: International transaction flag
-  - `currency`: Transaction currency
-  - `payment_method`: Payment type
+- **Purpose**: Transforms AP2 decision contract fields into ML-ready features
+- **AP2 Field Mapping**:
+  - `cart.amount` → `amount`: Transaction amount (Decimal)
+  - `intent.metadata.velocity_24h` → `velocity_24h`: 24-hour transaction frequency
+  - `intent.metadata.velocity_7d` → `velocity_7d`: 7-day transaction frequency
+  - `cart.geo.country != intent.geo.country` → `cross_border`: International transaction flag
+  - `cart.currency` → `currency`: Transaction currency
+  - `payment.method` → `payment_method_risk`: Payment method risk score
+  - `intent.actor.metadata.loyalty_score` → `loyalty_score`: Customer loyalty metric
+  - `intent.actor.metadata.chargebacks_12m` → `chargebacks_12m`: 12-month chargeback count
+  - `intent.actor.metadata.age_days` → `customer_age_days`: Account age in days
+  - `intent.actor.metadata.time_since_last_purchase` → `time_since_last_purchase`: Days since last purchase
 
 #### 3. Machine Learning Pipeline
 - **Stub Mode**: Deterministic scoring based on business rules
 - **XGBoost Mode**: Gradient boosting model with calibration
 - **Calibration**: Platt scaling for probability calibration
+- **Threshold Policy**: Configurable decision thresholds
+  - **Approve**: `risk_score >= 0.85` (configurable)
+  - **Review**: `0.65 <= risk_score < 0.85` (configurable)
+  - **Decline**: `risk_score < 0.65` (configurable)
 
 #### 4. Explanation Generation
-- **Template Mode**: Pre-defined human-readable templates
-- **LLM Mode**: Azure OpenAI-generated explanations with guardrails
+- **Template Mode**: Pre-defined human-readable templates with AP2 field references
+- **LLM Mode**: Azure OpenAI-generated explanations with AP2 field validation guardrails
+- **Key Signals Mapping**: Each key signal must point to a valid AP2 JSONPath
+  - Example: `"ap2_path": "intent.metadata.velocity_24h"`
+  - Validation: Ensures all referenced fields exist in AP2 contract
+  - Guardrails: Prevents hallucination of non-existent AP2 fields
 
 ## Azure Setup
 
@@ -291,6 +334,70 @@ python -m orca_core.cli model-info
 ```bash
 python -m orca_core.cli config
 ```
+
+## Key Signals Mapping Rules
+
+The explainability system enforces strict mapping rules to ensure all explanations reference valid AP2 fields.
+
+### AP2 Field Reference Validation
+
+Each key signal in explanations must include a valid `ap2_path` that points to an actual field in the AP2 decision contract:
+
+```json
+{
+  "key_signals": [
+    {
+      "feature_name": "velocity_24h",
+      "ap2_path": "intent.metadata.velocity_24h",
+      "value": 8.0,
+      "importance": 0.85,
+      "contribution": 0.15
+    },
+    {
+      "feature_name": "amount",
+      "ap2_path": "cart.amount",
+      "value": 2500.0,
+      "importance": 0.75,
+      "contribution": 0.12
+    }
+  ]
+}
+```
+
+### Valid AP2 Paths
+
+| AP2 Path | Description | Example Value |
+|----------|-------------|---------------|
+| `intent.metadata.velocity_24h` | 24-hour transaction velocity | 8.0 |
+| `intent.metadata.velocity_7d` | 7-day transaction velocity | 25.0 |
+| `cart.amount` | Transaction amount | "2500.00" |
+| `cart.currency` | Transaction currency | "USD" |
+| `payment.method` | Payment method | "card" |
+| `payment.modality` | Payment timing | "immediate" |
+| `intent.actor.metadata.loyalty_score` | Customer loyalty | 0.2 |
+| `intent.actor.metadata.age_days` | Account age | 30.0 |
+| `intent.actor.metadata.chargebacks_12m` | 12-month chargebacks | 2.0 |
+| `intent.channel` | Transaction channel | "web" |
+| `intent.geo.country` | Customer country | "US" |
+| `cart.geo.country` | Merchant country | "US" |
+
+### Invalid AP2 Paths (Will Cause Validation Errors)
+
+| Invalid Path | Reason |
+|--------------|--------|
+| `user.profile` | Non-existent field |
+| `transaction.metadata` | Non-existent field |
+| `system.config` | Non-existent field |
+| `payment.card_number` | Sensitive data not in AP2 |
+| `customer.email` | PII not in AP2 |
+
+### Guardrail Validation Process
+
+1. **Path Extraction**: Extract all `ap2_path` values from key signals
+2. **Schema Validation**: Check if paths exist in AP2 contract schema
+3. **Field Existence**: Verify fields exist in actual AP2 contract instance
+4. **Type Validation**: Ensure referenced values match expected types
+5. **Hallucination Detection**: Flag explanations with invalid field references
 
 ## Guardrails
 

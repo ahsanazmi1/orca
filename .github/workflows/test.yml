@@ -23,19 +23,16 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
-        cache: 'pip'
 
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install uv
-        uv pip install -e .
+        pip install -e .[dev]
 
     - name: Run linting
       run: |
         echo "🔍 Running code linting..."
-        PYTHONPATH=src python -m ruff check src/ tests/
-        PYTHONPATH=src python -m black --check src/ tests/
+        ruff check .
+        black --check .
 
     - name: Run type checking
       run: |
@@ -62,21 +59,19 @@ jobs:
 
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install uv
-        uv pip install -e .
+        pip install -e .[dev]
 
     - name: Run unit tests
       if: matrix.test-group == 'unit'
       run: |
         echo "🧪 Running unit tests..."
-        PYTHONPATH=src python -m pytest tests/ -v --cov=src/orca_core --cov-report=xml -m "not integration"
+        PYTHONPATH=src python -m pytest tests/ -v --cov=src/orca_core --cov-report=xml
 
     - name: Run integration tests
       if: matrix.test-group == 'integration'
       run: |
         echo "🧪 Running integration tests..."
-        PYTHONPATH=src python -m pytest tests/ -v --cov=src/orca_core --cov-report=xml -m "integration"
+        PYTHONPATH=src python -m pytest tests/ -v --cov=src/orca_core --cov-report=xml
 
     - name: Upload coverage reports
       uses: codecov/codecov-action@v3
@@ -96,13 +91,10 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
-        cache: 'pip'
 
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install uv
-        uv pip install -e .
+        pip install -e .[dev]
 
     - name: Test ML stub model
       run: |
@@ -131,13 +123,10 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
-        cache: 'pip'
 
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install uv
-        uv pip install -e .
+        pip install -e .[dev]
 
     - name: Test CLI commands
       run: |
@@ -163,13 +152,10 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
-        cache: 'pip'
 
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install uv
-        uv pip install -e .
+        pip install -e .[dev]
 
     - name: Test validation fixtures
       run: |
@@ -192,13 +178,10 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
-        cache: 'pip'
 
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install uv
-        uv pip install -e .
+        pip install -e .[dev]
 
     - name: Run security scan
       run: |
@@ -206,7 +189,7 @@ jobs:
         PYTHONPATH=src python -m bandit -r src/ -f json -o bandit-report.json || true
 
     - name: Upload security report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: security-report
         path: bandit-report.json

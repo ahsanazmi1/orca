@@ -1,0 +1,150 @@
+{
+  "ap2_version": "0.1.0",
+  "intent": {
+    "actor": "human",
+    "intent_type": "purchase",
+    "channel": "pos",
+    "agent_presence": "assisted",
+    "timestamps": {
+      "created": "2024-01-15 12:00:00+00:00",
+      "expires": "2024-01-15 13:00:00+00:00"
+    },
+    "nonce": "66bb6e27-fe97-fab1-7a1d-c8da901e999d",
+    "metadata": null
+  },
+  "cart": {
+    "items": [
+      {
+        "id": "item_006",
+        "name": "Electronics Bundle",
+        "description": null,
+        "quantity": 1,
+        "unit_price": "750.00",
+        "total_price": "750.00",
+        "category": null,
+        "sku": null
+      }
+    ],
+    "amount": "750.00",
+    "currency": "USD",
+    "mcc": "5732",
+    "geo": {
+      "country": "US",
+      "region": null,
+      "city": null,
+      "latitude": null,
+      "longitude": null,
+      "timezone": null
+    },
+    "risk_flags": [],
+    "metadata": null
+  },
+  "payment": {
+    "instrument_ref": "card_discover_****2468",
+    "instrument_token": null,
+    "modality": "immediate",
+    "constraints": null,
+    "routing_hints": [],
+    "auth_requirements": [
+      "pin",
+      "biometric"
+    ],
+    "metadata": null
+  },
+  "decision": {
+    "result": "REVIEW",
+    "risk_score": 0.36,
+    "reasons": [
+      {
+        "code": "high_ticket",
+        "detail": "Transaction amount $750.00 exceeds $500.0 threshold"
+      }
+    ],
+    "actions": [
+      {
+        "type": "manual_review",
+        "to": null,
+        "detail": "Transaction requires review"
+      },
+      {
+        "type": "process_payment",
+        "to": null,
+        "detail": "Biometric authentication verified"
+      },
+      {
+        "type": "process_payment",
+        "to": null,
+        "detail": "POS transaction processing"
+      }
+    ],
+    "meta": {
+      "model": "xgboost",
+      "model_version": "1.0.0",
+      "model_sha256": "4c8b4f96c5dce7b9",
+      "model_trained_on": "2024-01-01",
+      "trace_id": "golden-trace-review_agent_present_kiosk",
+      "processing_time_ms": 0.0,
+      "version": "0.1.0",
+      "rules_evaluated": [],
+      "feature_snapshot": {}
+    }
+  },
+  "signing": {
+    "vc_proof": null,
+    "receipt_hash": null
+  },
+  "ml_prediction": {
+    "risk_score": 0.012244152215619883,
+    "key_signals": [
+      {
+        "feature_name": "amount",
+        "ap2_path": "cart.amount",
+        "value": 750.0,
+        "importance": 0.03689694404602051,
+        "contribution": 0.3388288493930136
+      },
+      {
+        "feature_name": "customer_age_days",
+        "ap2_path": "customer.age_days",
+        "value": 365.0,
+        "importance": 0.03622858598828316,
+        "contribution": 0.16190973730998262
+      },
+      {
+        "feature_name": "time_since_last_purchase",
+        "ap2_path": "customer.time_since_last_purchase",
+        "value": 7.0,
+        "importance": 0.030877450481057167,
+        "contribution": 0.002646477426042305
+      },
+      {
+        "feature_name": "velocity_7d",
+        "ap2_path": "velocity.7d",
+        "value": 3.0,
+        "importance": 0.04688887670636177,
+        "contribution": 0.0017223436308363808
+      },
+      {
+        "feature_name": "velocity_24h",
+        "ap2_path": "velocity.24h",
+        "value": 1.0,
+        "importance": 0.09366224706172943,
+        "contribution": 0.0011468148098808112
+      }
+    ],
+    "model_meta": {
+      "model_version": "1.0.0",
+      "model_sha256": "4c8b4f96c5dce7b9",
+      "trained_on": "2024-01-01",
+      "thresholds": {
+        "amount": 500.0,
+        "velocity_24h": 3.0,
+        "cross_border": 0.5,
+        "location_mismatch": 0.5,
+        "payment_method_risk": 0.7,
+        "chargebacks_12m": 1.0
+      },
+      "feature_count": 10
+    }
+  }
+}

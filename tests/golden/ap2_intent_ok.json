@@ -1,0 +1,18 @@
+{
+    "actor": "human",
+    "intent_type": "purchase",
+    "channel": "web",
+    "agent_presence": "assisted",
+    "timestamps": {
+        "created": "2024-01-15T10:30:00Z",
+        "expires": "2024-01-15T11:30:00Z",
+        "last_updated": "2024-01-15T10:30:00Z"
+    },
+    "nonce": "123e4567-e89b-12d3-a456-426614174000",
+    "metadata": {
+        "session_id": "sess_abc123",
+        "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)",
+        "ip_address": "192.168.1.100",
+        "referrer": "https://example.com/products"
+    }
+}
