@@ -1,11 +1,21 @@
 """Script to generate golden decision JSONs with ML model information."""
 
 import json
+import os
 import sys
 from pathlib import Path
 from typing import Any
 
+import numpy as np
+
+# Set deterministic environment variables early
+os.environ["XGBOOST_RANDOM_STATE"] = "42"
+os.environ["PYTHONHASHSEED"] = "0"
+
 sys.path.append(".")
+
+# Set numpy seed for deterministic behavior
+np.random.seed(42)
 
 from src.orca.core.decision_contract import AP2DecisionContract  # noqa: E402
 from src.orca.core.rules_engine import evaluate_ap2_rules  # noqa: E402
@@ -140,6 +150,7 @@ def generate_golden_decision(ap2_file: Path, output_file: Path, enable_shap: boo
     # Write golden decision
     with open(output_file, "w") as f:
         json.dump(golden_decision, f, indent=2, default=str)
+        f.write("\n")  # Ensure newline at end of file
 
     print(f"✅ Generated {output_file.name}")
 
@@ -154,8 +165,8 @@ def main() -> None:
     for ap2_file in samples_dir.glob("*.json"):
         golden_file = golden_dir / f"{ap2_file.stem}_golden.json"
 
-        # Enable SHAP for the high amount sample
-        enable_shap = "high_amount" in ap2_file.name
+        # Enable SHAP for the high amount and shap samples
+        enable_shap = "high_amount" in ap2_file.name or "shap" in ap2_file.name
 
         generate_golden_decision(ap2_file, golden_file, enable_shap)
 

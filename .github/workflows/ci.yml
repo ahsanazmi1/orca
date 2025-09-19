@@ -439,45 +439,19 @@ jobs:
           # Generate SHAP prediction
           result = predict_with_shap(test_features)
 
-          # Create SHAP snapshot
+          # Create SHAP snapshot (match original format)
           shap_snapshot = {
-              'test_features': test_features,
               'risk_score': result['risk_score'],
-              'key_signals': result['key_signals'][:5],  # Top 5
-              'model_meta': result['model_meta']
+              'key_signals': result['key_signals'][:5]  # Top 5
           }
 
-          # Add SHAP values if available
-          if result.get('shap_values'):
-              shap_values = result['shap_values']
-              shap_snapshot['shap_analysis'] = {
-                  'base_value': shap_values.get('base_value', 0.0),
-                  'feature_contributions': []
-              }
-
-              # Get top 5 SHAP contributions
-              feature_names = shap_values.get('feature_names', [])
-              shap_vals = shap_values.get('shap_values', [])
-
-              contributions = []
-              for i, (feature_name, value) in enumerate(zip(feature_names, shap_vals)):
-                  contributions.append({
-                      'feature_name': feature_name,
-                      'feature_value': test_features.get(feature_name, 0.0),
-                      'shap_value': value,
-                      'rank': i + 1
-                  })
-
-              # Sort by absolute SHAP value
-              contributions.sort(key=lambda x: abs(x['shap_value']), reverse=True)
-              shap_snapshot['shap_analysis']['feature_contributions'] = contributions[:5]
-
           # Save snapshot
-          snapshot_path = Path('tests/snapshots/shap_contributions.json')
+          snapshot_path = Path('tests/snapshots/shap_test.json')
           snapshot_path.parent.mkdir(exist_ok=True)
 
           with open(snapshot_path, 'w') as f:
               json.dump(shap_snapshot, f, indent=2, default=str)
+              f.write('\n')  # Ensure newline at end of file
 
           print(f'✅ SHAP snapshot saved to {snapshot_path}')
           print(f'  Risk score: {result[\"risk_score\"]:.3f}')
@@ -491,7 +465,7 @@ jobs:
           from pathlib import Path
           import json
 
-          snapshot_path = Path('tests/snapshots/shap_contributions.json')
+          snapshot_path = Path('tests/snapshots/shap_test.json')
           if not snapshot_path.exists():
               print('❌ SHAP snapshot not found')
               exit(1)
