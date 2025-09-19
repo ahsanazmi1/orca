@@ -65,12 +65,12 @@ jobs:
 
     - name: Install dependencies
       run: |
-        uv pip install -e .
+        uv sync --all-extras --dev
 
     - name: Run tests
       if: ${{ !inputs.skip_tests }}
       run: |
-        PYTHONPATH=src python -m pytest tests/ -v --cov=src/orca_core --cov-report=xml
+        uv run python -m pytest tests/ -v --cov=src/orca_core --cov-report=xml
       env:
         ORCA_MODE: RULES_ONLY
         ORCA_USE_XGB: false
@@ -79,7 +79,7 @@ jobs:
       id: train
       run: |
         echo "🤖 Training XGBoost model..."
-        PYTHONPATH=src python -m orca_core.cli train-xgb --samples 10000
+        uv run python -m orca_core.cli train-xgb --samples 10000
 
         # Get model version from metadata
         if [ -f "models/metadata.json" ]; then
