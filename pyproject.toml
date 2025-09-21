@@ -25,6 +25,7 @@ dependencies = [
     "packaging>=23.0.0",
     "shap>=0.48.0",
     "pre-commit>=4.3.0",
+    "ocn-common>=0.1.0",
 ]
 
 [project.optional-dependencies]

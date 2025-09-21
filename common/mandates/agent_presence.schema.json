@@ -1,0 +1,113 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://schemas.ocn.ai/mandates/agent_presence.schema.json",
+    "title": "Agent Presence",
+    "description": "Schema for agent presence in AP2 format",
+    "type": "object",
+    "required": [
+        "present",
+        "agent_id",
+        "capabilities"
+    ],
+    "properties": {
+        "present": {
+            "type": "boolean",
+            "description": "Whether an agent is present"
+        },
+        "agent_id": {
+            "type": "string",
+            "description": "Unique identifier for the agent"
+        },
+        "agent_type": {
+            "type": "string",
+            "enum": [
+                "orca",
+                "weave",
+                "okra",
+                "opal",
+                "custom"
+            ],
+            "description": "Type of agent"
+        },
+        "capabilities": {
+            "type": "array",
+            "description": "List of agent capabilities",
+            "items": {
+                "type": "string",
+                "enum": [
+                    "decision_making",
+                    "risk_assessment",
+                    "credit_analysis",
+                    "wallet_management",
+                    "receipt_storage",
+                    "explanation_generation",
+                    "fraud_detection",
+                    "compliance_checking"
+                ]
+            }
+        },
+        "status": {
+            "type": "string",
+            "enum": [
+                "active",
+                "standby",
+                "maintenance",
+                "offline"
+            ],
+            "description": "Agent operational status"
+        },
+        "version": {
+            "type": "string",
+            "description": "Agent version identifier"
+        },
+        "metadata": {
+            "type": "object",
+            "description": "Additional agent metadata",
+            "properties": {
+                "deployment_id": {
+                    "type": "string",
+                    "description": "Deployment identifier"
+                },
+                "region": {
+                    "type": "string",
+                    "description": "Deployment region"
+                },
+                "last_heartbeat": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Last heartbeat timestamp"
+                }
+            },
+            "additionalProperties": true
+        }
+    },
+    "examples": [
+        {
+            "present": true,
+            "agent_id": "orca_001",
+            "agent_type": "orca",
+            "capabilities": [
+                "decision_making",
+                "risk_assessment",
+                "explanation_generation",
+                "fraud_detection"
+            ],
+            "status": "active",
+            "version": "0.1.0",
+            "metadata": {
+                "deployment_id": "deploy_123",
+                "region": "us-west-2",
+                "last_heartbeat": "2024-01-21T12:00:00Z"
+            }
+        },
+        {
+            "present": false,
+            "agent_id": "",
+            "agent_type": "custom",
+            "capabilities": [],
+            "status": "offline",
+            "version": "",
+            "metadata": {}
+        }
+    ]
+}

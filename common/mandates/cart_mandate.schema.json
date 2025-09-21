@@ -1,0 +1,122 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://schemas.ocn.ai/mandates/cart_mandate.schema.json",
+    "title": "Cart Mandate",
+    "description": "Schema for shopping cart mandate in AP2 format",
+    "type": "object",
+    "required": [
+        "amount",
+        "currency",
+        "items",
+        "geo"
+    ],
+    "properties": {
+        "amount": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d{2}$",
+            "description": "Total cart amount in decimal format"
+        },
+        "currency": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$",
+            "description": "ISO 4217 currency code"
+        },
+        "items": {
+            "type": "array",
+            "description": "List of cart items",
+            "items": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "name",
+                    "amount"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Unique item identifier"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Item name"
+                    },
+                    "amount": {
+                        "type": "string",
+                        "pattern": "^\\d+\\.\\d{2}$",
+                        "description": "Item amount"
+                    },
+                    "quantity": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Item quantity"
+                    },
+                    "category": {
+                        "type": "string",
+                        "description": "Item category"
+                    },
+                    "mcc": {
+                        "type": "string",
+                        "pattern": "^\\d{4}$",
+                        "description": "Merchant Category Code"
+                    }
+                }
+            }
+        },
+        "geo": {
+            "type": "object",
+            "description": "Cart geographic context",
+            "properties": {
+                "country": {
+                    "type": "string",
+                    "pattern": "^[A-Z]{2}$",
+                    "description": "ISO 3166-1 alpha-2 country code"
+                },
+                "region": {
+                    "type": "string",
+                    "description": "State or province"
+                },
+                "city": {
+                    "type": "string",
+                    "description": "City name"
+                }
+            }
+        },
+        "metadata": {
+            "type": "object",
+            "description": "Additional cart metadata",
+            "additionalProperties": true
+        }
+    },
+    "examples": [
+        {
+            "amount": "99.99",
+            "currency": "USD",
+            "items": [
+                {
+                    "id": "item_001",
+                    "name": "Wireless Headphones",
+                    "amount": "79.99",
+                    "quantity": 1,
+                    "category": "Electronics",
+                    "mcc": "5733"
+                },
+                {
+                    "id": "item_002",
+                    "name": "Shipping",
+                    "amount": "20.00",
+                    "quantity": 1,
+                    "category": "Shipping"
+                }
+            ],
+            "geo": {
+                "country": "US",
+                "region": "CA",
+                "city": "San Francisco"
+            },
+            "metadata": {
+                "merchant_id": "merchant_123",
+                "order_id": "order_456"
+            }
+        }
+    ]
+}

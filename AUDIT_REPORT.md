@@ -1,9 +1,9 @@
 # OCN Orca Audit — Foundations / Phase 1 / Phase 2
 
-**Audit Date:** 2025-09-21 11:37:32
+**Audit Date:** 2025-09-21 17:07:48
 
 ## Summary
-- Foundations: 6/11 ✅
+- Foundations: 8/11 ✅
 - Phase 1: 6/12 ✅
 - Phase 2: 4/9 ✅
 
@@ -14,15 +14,13 @@
 - [✅] EditorConfig present — Found .editorconfig
 - [⚠️] CODEOWNERS present — No CODEOWNERS found
   - **Remedy:** Add CODEOWNERS file for code review assignment
-- [⚠️] ocn-common available — ocn-common not found (not installed, not a submodule, not in PYTHONPATH)
-  - **Remedy:** Install ocn-common or add as git submodule
+- [✅] ocn-common available — ocn_common installed as package (version: unknown)
 - [❌] AP2 content type constant — AP2 content type not found in codebase
   - **Remedy:** Add CONTENT_TYPE constant with value 'application/vnd.ocn.ap2+json; version=1'
 - [✅] AP2 input fixtures — Found 21 AP2 samples with approve/decline/review examples
 - [❌] Trace ID propagation — No trace_id usage found
   - **Remedy:** Implement trace_id propagation utilities
-- [❌] Required GitHub workflows — Missing workflows: contracts.yml, security.yml
-  - **Remedy:** Add missing workflow files: contracts.yml, security.yml
+- [✅] Required GitHub workflows — Found workflows: release.yml, security.yml, contracts.yml, test.yml, deploy.yml, ci.yml
 - [✅] CI workflow linting — CI workflow includes Black and Ruff
 
 ## Phase 1
@@ -43,7 +41,7 @@
   - **Remedy:** Add configurable HTTP subscriber URL for decision CE
 - [❌] pytest runs without error — pytest failed: Unknown error
   - **Remedy:** Fix failing tests
-- [✅] Git tags available — Found 1 git tags: v0.2.0
+- [✅] Git tags available — Found 2 git tags: v0.1.0+ap2.v1+ce.v1, v0.2.0
 
 ## Phase 2
 - [✅] ML prediction module — Found ML files: ['src/orca/ml/predict_risk.py']
@@ -60,4 +58,3 @@
 - [⚠️] Explanation CloudEvent — No explanation CloudEvent found
   - **Remedy:** Emit CloudEvent ocn.orca.explanation.v1
 - [✅] Log redaction — No PII patterns found in logs
-

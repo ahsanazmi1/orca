@@ -1,0 +1,111 @@
+{
+    "ap2_version": "0.1.0",
+    "intent": {
+        "actor": {
+            "id": "user_55555",
+            "type": "user",
+            "profile": {
+                "identity": {
+                    "verified": true,
+                    "verification_level": "basic",
+                    "kyc_status": "approved"
+                },
+                "risk_profile": {
+                    "risk_score": 0.45,
+                    "risk_category": "medium",
+                    "velocity_flags": [
+                        "moderate_velocity"
+                    ]
+                },
+                "preferences": {
+                    "language": "en-US",
+                    "currency": "USD",
+                    "timezone": "America/Chicago"
+                },
+                "metadata": {
+                    "member_since": "2023-06-15",
+                    "total_transactions": 25
+                }
+            }
+        },
+        "channel": "pos",
+        "geo": {
+            "country": "US",
+            "region": "TX",
+            "city": "Austin",
+            "timezone": "America/Chicago"
+        },
+        "metadata": {
+            "terminal_id": "term_123",
+            "merchant_location": "store_456"
+        }
+    },
+    "cart": {
+        "amount": "750.00",
+        "currency": "USD",
+        "items": [
+            {
+                "id": "item_004",
+                "name": "Home Appliance",
+                "amount": "750.00",
+                "quantity": 1,
+                "category": "Appliances",
+                "mcc": "5722"
+            }
+        ],
+        "geo": {
+            "country": "US",
+            "region": "TX",
+            "city": "Austin"
+        },
+        "metadata": {
+            "merchant_id": "merchant_555",
+            "order_id": "order_777"
+        }
+    },
+    "payment": {
+        "method": "card",
+        "modality": {
+            "type": "immediate",
+            "description": "Immediate payment processing"
+        },
+        "auth_requirements": [
+            "pin",
+            "signature"
+        ],
+        "metadata": {
+            "card_brand": "amex",
+            "last_four": "9012"
+        }
+    },
+    "decision": {
+        "result": "REVIEW",
+        "risk_score": 0.45,
+        "reasons": [
+            "Medium risk score requires manual review",
+            "Moderate velocity pattern detected",
+            "Amount exceeds automated approval threshold",
+            "POS transaction from new location"
+        ],
+        "actions": [
+            "Hold transaction for manual review",
+            "Request additional verification",
+            "Notify risk team",
+            "Send notification to user"
+        ],
+        "meta": {
+            "model_version": "0.1.0",
+            "processing_time_ms": 67,
+            "rules_triggered": [
+                "medium_risk_threshold",
+                "pos_location_check",
+                "amount_threshold"
+            ],
+            "review_deadline": "2024-01-22T12:00:00Z"
+        }
+    },
+    "signing": {
+        "vc_proof": null,
+        "receipt_hash": "sha256:def456ghi789jkl"
+    }
+}

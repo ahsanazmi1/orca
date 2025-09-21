@@ -7,6 +7,7 @@ from typing import Any
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import ORJSONResponse
+from ocn_common.trace import trace_middleware
 from pydantic import BaseModel, Field, ValidationError
 
 from src.orca_core.config import get_settings
@@ -26,6 +27,9 @@ app = FastAPI(
     version="0.1.0",
     default_response_class=ORJSONResponse,
 )
+
+# Add trace middleware for automatic trace ID propagation
+app = trace_middleware(app)
 
 
 # Pydantic models for API requests/responses

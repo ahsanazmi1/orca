@@ -1,8 +1,8 @@
 {
-  "audit_date": "2025-09-21T11:37:32.157494",
+  "audit_date": "2025-09-21T17:07:48.880208",
   "summary": {
     "foundations": {
-      "passed": 6,
+      "passed": 8,
       "total": 11
     },
     "phase1": {
@@ -63,11 +63,11 @@
     {
       "name": "ocn-common available",
       "phase": "Foundations",
-      "status": "warning",
+      "status": "pass",
       "evidence": [
-        "ocn-common not found (not installed, not a submodule, not in PYTHONPATH)"
+        "ocn_common installed as package (version: unknown)"
       ],
-      "remedy": "Install ocn-common or add as git submodule"
+      "remedy": ""
     },
     {
       "name": "AP2 content type constant",
@@ -288,11 +288,11 @@
     {
       "name": "Required GitHub workflows",
       "phase": "Foundations",
-      "status": "fail",
+      "status": "pass",
       "evidence": [
-        "Missing workflows: contracts.yml, security.yml"
+        "Found workflows: release.yml, security.yml, contracts.yml, test.yml, deploy.yml, ci.yml"
       ],
-      "remedy": "Add missing workflow files: contracts.yml, security.yml"
+      "remedy": ""
     },
     {
       "name": "CI workflow linting",
@@ -308,7 +308,7 @@
       "phase": "Phase 1",
       "status": "pass",
       "evidence": [
-        "Found 1 git tags: v0.2.0"
+        "Found 2 git tags: v0.1.0+ap2.v1+ce.v1, v0.2.0"
       ],
       "remedy": ""
     }

@@ -266,5 +266,3 @@ kubectl cluster-info
 - [Azure AD App Registration](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app)
 - [Azure RBAC](https://docs.microsoft.com/en-us/azure/role-based-access-control/)
 - [GitHub Environments](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment)
-
-

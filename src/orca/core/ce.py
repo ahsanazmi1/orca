@@ -12,6 +12,7 @@ from typing import Any
 from uuid import uuid4
 
 import httpx
+from ocn_common.trace import inject_trace_id_ce
 from pydantic import BaseModel, Field
 
 from .contract_validation import get_contract_validator
@@ -79,15 +80,21 @@ class CloudEventEmitter:
                 return None
 
             # Create CloudEvent
-            ce = CloudEvent(
-                id=str(uuid4()),
-                source=self.source_uri,
-                type="ocn.orca.decision.v1",
-                subject=trace_id,
-                time=datetime.now(UTC).isoformat(),
-                dataschema="https://schemas.ocn.ai/ap2/v1/decision.schema.json",
-                data=decision_data,
-            )
+            ce_data = {
+                "specversion": "1.0",
+                "id": str(uuid4()),
+                "source": self.source_uri,
+                "type": "ocn.orca.decision.v1",
+                "time": datetime.now(UTC).isoformat(),
+                "datacontenttype": "application/json",
+                "dataschema": "https://schemas.ocn.ai/ap2/v1/decision.schema.json",
+                "data": decision_data,
+            }
+
+            # Inject trace ID into CloudEvent subject using centralized utility
+            ce_data = inject_trace_id_ce(ce_data, trace_id)
+
+            ce = CloudEvent(**ce_data)
 
             # Validate CloudEvent contract using ocn-common
             if not validator.validate_cloud_event(ce.model_dump(), "orca.decision.v1"):
@@ -132,15 +139,21 @@ class CloudEventEmitter:
                 return None
 
             # Create CloudEvent
-            ce = CloudEvent(
-                id=str(uuid4()),
-                source=self.source_uri,
-                type="ocn.orca.explanation.v1",
-                subject=trace_id,
-                time=datetime.now(UTC).isoformat(),
-                dataschema="https://schemas.ocn.ai/ap2/v1/explanation.schema.json",
-                data=explanation_data,
-            )
+            ce_data = {
+                "specversion": "1.0",
+                "id": str(uuid4()),
+                "source": self.source_uri,
+                "type": "ocn.orca.explanation.v1",
+                "time": datetime.now(UTC).isoformat(),
+                "datacontenttype": "application/json",
+                "dataschema": "https://schemas.ocn.ai/ap2/v1/explanation.schema.json",
+                "data": explanation_data,
+            }
+
+            # Inject trace ID into CloudEvent subject using centralized utility
+            ce_data = inject_trace_id_ce(ce_data, trace_id)
+
+            ce = CloudEvent(**ce_data)
 
             # Validate CloudEvent contract using ocn-common
             if not validator.validate_cloud_event(ce.model_dump(), "orca.explanation.v1"):

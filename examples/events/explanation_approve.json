@@ -1,0 +1,53 @@
+{
+    "specversion": "1.0",
+    "id": "evt_explanation_001",
+    "source": "https://orca.ocn.ai/v1",
+    "type": "ocn.orca.explanation.v1",
+    "subject": "txn_approve_123",
+    "time": "2024-01-21T12:00:01Z",
+    "datacontenttype": "application/vnd.ocn.ap2+json; version=1",
+    "dataschema": "https://schemas.ocn.ai/events/v1/orca.explanation.v1.schema.json",
+    "data": {
+        "explanation_version": "0.1.0",
+        "trace_id": "txn_approve_123",
+        "decision_id": "evt_decision_001",
+        "explanation": {
+            "reason": "Transaction approved based on low risk profile and verified user identity",
+            "key_signals": [
+                {
+                    "signal": "user_verification_status",
+                    "value": "verified",
+                    "impact": "positive",
+                    "weight": 0.3
+                },
+                {
+                    "signal": "transaction_amount",
+                    "value": 99.99,
+                    "impact": "positive",
+                    "weight": 0.2
+                },
+                {
+                    "signal": "velocity_check",
+                    "value": "normal",
+                    "impact": "positive",
+                    "weight": 0.25
+                },
+                {
+                    "signal": "merchant_risk_score",
+                    "value": 0.05,
+                    "impact": "positive",
+                    "weight": 0.25
+                }
+            ],
+            "mitigation": [
+                "Enhanced monitoring for high-value transactions",
+                "Regular velocity checks"
+            ],
+            "confidence": 0.92
+        },
+        "metadata": {
+            "model_version": "0.1.0",
+            "explanation_method": "rule_based"
+        }
+    }
+}

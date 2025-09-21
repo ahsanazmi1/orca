@@ -10,7 +10,6 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
-from unittest.mock import patch
 
 import pytest
 
@@ -44,8 +43,9 @@ class TestAuditSmoke:
 
         try:
             import audit_orca_phase_status
-            assert hasattr(audit_orca_phase_status, 'OrcaAuditor')
-            assert hasattr(audit_orca_phase_status, 'AuditResult')
+
+            assert hasattr(audit_orca_phase_status, "OrcaAuditor")
+            assert hasattr(audit_orca_phase_status, "AuditResult")
         except ImportError as e:
             pytest.fail(f"Failed to import audit script: {e}")
         finally:
@@ -57,9 +57,10 @@ class TestAuditSmoke:
 
         try:
             import _audit_utils
-            assert hasattr(_audit_utils, 'find_files_by_pattern')
-            assert hasattr(_audit_utils, 'load_json_file')
-            assert hasattr(_audit_utils, 'check_python_version')
+
+            assert hasattr(_audit_utils, "find_files_by_pattern")
+            assert hasattr(_audit_utils, "load_json_file")
+            assert hasattr(_audit_utils, "check_python_version")
         except ImportError as e:
             pytest.fail(f"Failed to import audit utilities: {e}")
         finally:
@@ -77,7 +78,7 @@ class TestAuditSmoke:
                 phase="Foundations",
                 status="pass",
                 evidence=["Test evidence"],
-                remedy="Test remedy"
+                remedy="Test remedy",
             )
 
             # Test to_dict method
@@ -103,7 +104,7 @@ class TestAuditSmoke:
                 [sys.executable, str(audit_script), "--help"],
                 capture_output=True,
                 text=True,
-                timeout=30
+                timeout=30,
             )
             # Script should either exit with 0 or have some output
             assert result.returncode in [0, 1] or result.stdout or result.stderr
@@ -130,7 +131,7 @@ class TestAuditSmoke:
             assert isinstance(version, str)
 
             # Test JSON loading
-            with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
                 test_data = {"test": "data"}
                 json.dump(test_data, f)
                 f.flush()
@@ -167,32 +168,33 @@ class TestAuditSmoke:
                         audit_script.read_text()
                     )
                 if utils_script.exists():
-                    (temp_path / "scripts" / "_audit_utils.py").write_text(
-                        utils_script.read_text()
-                    )
+                    (temp_path / "scripts" / "_audit_utils.py").write_text(utils_script.read_text())
 
                 # Create minimal test files
                 (temp_path / "README.md").write_text("# Test README")
                 (temp_path / "LICENSE").write_text("Test License")
-                (temp_path / "pyproject.toml").write_text("""
+                (temp_path / "pyproject.toml").write_text(
+                    """
 [project]
 name = "test"
 version = "0.1.0"
 requires-python = ">=3.12"
-""")
+"""
+                )
 
                 # Change to temp directory
                 import os
+
                 os.chdir(temp_path)
 
                 # Run audit script
                 if (temp_path / "scripts" / "audit_orca_phase_status.py").exists():
-                    result = subprocess.run(
+                    subprocess.run(
                         [sys.executable, "scripts/audit_orca_phase_status.py"],
                         capture_output=True,
                         text=True,
                         timeout=60,
-                        cwd=temp_path
+                        cwd=temp_path,
                     )
 
                     # Check that output files were created
@@ -200,8 +202,9 @@ requires-python = ">=3.12"
                     json_report = temp_path / "audit_report.json"
 
                     # At least one should exist (depending on how far the script gets)
-                    assert markdown_report.exists() or json_report.exists(), \
-                        "Audit should generate at least one report file"
+                    assert (
+                        markdown_report.exists() or json_report.exists()
+                    ), "Audit should generate at least one report file"
 
                     if markdown_report.exists():
                         content = markdown_report.read_text()
@@ -250,7 +253,7 @@ requires-python = ">=3.12"
             import _audit_utils
 
             # Test with invalid JSON
-            with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
                 f.write("{ invalid json }")
                 f.flush()
 

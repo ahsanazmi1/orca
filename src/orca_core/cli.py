@@ -14,8 +14,9 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-from .config import decision_mode, get_settings, is_ai_enabled, validate_configuration
 from src.orca.core.ce import get_cloud_event_emitter
+
+from .config import decision_mode, get_settings, is_ai_enabled, validate_configuration
 from .core.explainer import explain_decision
 from .core.ml_hooks import get_model, train_model
 from .engine import evaluate_rules

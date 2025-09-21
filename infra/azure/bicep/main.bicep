@@ -299,5 +299,3 @@ output appInsightsConnectionString string = appInsights.properties.ConnectionStr
 
 output storageAccountName string = storageAccount.name
 output storageAccountKey string = storageAccount.listKeys().keys[0].value
-
-

@@ -1,0 +1,129 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://schemas.ocn.ai/mandates/modality.schema.json",
+    "title": "Payment Modality",
+    "description": "Schema for payment modality in AP2 format",
+    "type": "object",
+    "required": [
+        "type",
+        "description"
+    ],
+    "properties": {
+        "type": {
+            "type": "string",
+            "enum": [
+                "immediate",
+                "scheduled",
+                "recurring",
+                "installment"
+            ],
+            "description": "Payment timing type"
+        },
+        "description": {
+            "type": "string",
+            "description": "Human-readable description of the modality"
+        },
+        "scheduled_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Scheduled payment date (ISO 8601)"
+        },
+        "recurring": {
+            "type": "object",
+            "description": "Recurring payment configuration",
+            "properties": {
+                "frequency": {
+                    "type": "string",
+                    "enum": [
+                        "daily",
+                        "weekly",
+                        "monthly",
+                        "quarterly",
+                        "annually"
+                    ],
+                    "description": "Recurring frequency"
+                },
+                "interval": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "Interval between payments"
+                },
+                "end_date": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "End date for recurring payments"
+                }
+            }
+        },
+        "installment": {
+            "type": "object",
+            "description": "Installment payment configuration",
+            "properties": {
+                "total_installments": {
+                    "type": "integer",
+                    "minimum": 2,
+                    "description": "Total number of installments"
+                },
+                "installment_amount": {
+                    "type": "string",
+                    "pattern": "^\\d+\\.\\d{2}$",
+                    "description": "Amount per installment"
+                },
+                "frequency": {
+                    "type": "string",
+                    "enum": [
+                        "weekly",
+                        "monthly"
+                    ],
+                    "description": "Installment frequency"
+                }
+            }
+        },
+        "metadata": {
+            "type": "object",
+            "description": "Additional modality metadata",
+            "additionalProperties": true
+        }
+    },
+    "examples": [
+        {
+            "type": "immediate",
+            "description": "Immediate payment processing",
+            "metadata": {
+                "processing_time": "instant"
+            }
+        },
+        {
+            "type": "scheduled",
+            "description": "Payment scheduled for future processing",
+            "scheduled_date": "2024-02-01",
+            "metadata": {
+                "scheduled_by": "user_123"
+            }
+        },
+        {
+            "type": "recurring",
+            "description": "Monthly subscription payment",
+            "recurring": {
+                "frequency": "monthly",
+                "interval": 1,
+                "end_date": "2024-12-31"
+            },
+            "metadata": {
+                "subscription_id": "sub_456"
+            }
+        },
+        {
+            "type": "installment",
+            "description": "3-month installment plan",
+            "installment": {
+                "total_installments": 3,
+                "installment_amount": "33.33",
+                "frequency": "monthly"
+            },
+            "metadata": {
+                "plan_id": "plan_789"
+            }
+        }
+    ]
+}

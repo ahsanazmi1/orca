@@ -425,5 +425,3 @@ docker exec -it <container-id> /bin/bash
 - [Health Checks](https://docs.docker.com/engine/reference/builder/#healthcheck)
 - [Docker Compose](https://docs.docker.com/compose/)
 - [Kubernetes Health Checks](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/)
-
-

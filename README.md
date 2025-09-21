@@ -1,5 +1,6 @@
 # Orca — The Open Checkout Agent
 
+[![Latest Release](https://img.shields.io/github/v/release/ocn-ai/orca?label=latest%20release)](https://github.com/ocn-ai/orca/releases/latest)
 [![Contracts Validation](https://github.com/ocn-ai/orca/actions/workflows/contracts.yml/badge.svg)](https://github.com/ocn-ai/orca/actions/workflows/contracts.yml)
 [![Security Validation](https://github.com/ocn-ai/orca/actions/workflows/security.yml/badge.svg)](https://github.com/ocn-ai/orca/actions/workflows/security.yml)
 [![CI](https://github.com/ocn-ai/orca/actions/workflows/ci.yml/badge.svg)](https://github.com/ocn-ai/orca/actions/workflows/ci.yml)
@@ -7,6 +8,12 @@
 
 **Anchor story:** Checkout hasn't changed in 20 years. **B2B payments are even worse.**
 **Orca** is the first **open, transparent, merchant-controlled checkout agent** with explainability built in.
+
+## 🎯 Phase 1 Complete: v0.1.0+ap2.v1+ce.v1
+
+**Latest Release**: [v0.1.0+ap2.v1+ce.v1](https://github.com/ocn-ai/orca/releases/latest)
+
+Orca Phase 1 delivers a complete rules engine with CloudEvents integration, AP2 decision contracts, and Weave blockchain receipt storage. This release establishes the foundation for open, transparent, merchant-controlled checkout with explainability built in.
 
 ## Why Orca
 - Today: black-box fraud/routing decisions from processors.
@@ -18,20 +25,60 @@
 - **Marketplaces** – multi-party routing + seller trust.
 - **Exporters (International B2B)** – cross-border transparency and higher auth rates.
 
-## What's Here in Phase 1 (Weeks 1–4)
-- Repo + roadmap public
-- Rules engine skeleton
-- JSON decision contract draft
-- Local demos: CLI + Streamlit stubs
-- Community docs (contributing, templates)
+## What's Here in Phase 1 ✅
+- **Deterministic Rules Engine**: Complete rules engine with APPROVE/DECLINE/REVIEW outcomes
+- **AP2 Decision Contract v1**: Standardized decision payload format with full traceability
+- **CloudEvents v1 Integration**: Event-driven architecture with ocn.orca.decision.v1 and ocn.orca.explanation.v1
+- **Weave Blockchain Integration**: Receipt storage for immutable audit trails
+- **ocn-common Schema Validation**: Cross-stack contract validation and compliance
+- **CLI + Streamlit Demos**: Complete local demos with CloudEvents emission
+- **Security-First CI/CD**: Comprehensive GitHub workflows for contracts and security validation
+- **Community Docs**: Contributing guides, templates, and comprehensive documentation
 
 ## Quick Start (Local)
+
+### Basic Setup
 ```bash
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
 pre-commit install
 python -m orca.cli --help
 streamlit run examples/streamlit_demo.py
+```
+
+### CloudEvents + Weave Integration
+```bash
+# 1. Start Weave subscriber (in one terminal)
+cd weave
+python subscriber.py
+# Server runs on http://localhost:8080
+
+# 2. Emit CloudEvents from Orca (in another terminal)
+export ORCA_CE_SUBSCRIBER_URL="http://localhost:8080/events"
+
+# Emit decision CloudEvent
+python -m orca_core.cli decide '{"cart_total": 100.0, "currency": "USD"}' --emit-ce
+
+# Emit from fixture file
+python -m orca_core.cli decide-file fixtures/requests/high_ticket_review.json --emit-ce
+
+# 3. Check Weave receipt
+curl http://localhost:8080/receipts/txn_cli_test_123456
+```
+
+### Example Output
+```json
+{
+  "status": "success",
+  "receipt": {
+    "trace_id": "txn_1234567890abcdef",
+    "receipt_hash": "sha256:abc123def456789",
+    "event_type": "decision",
+    "block_height": 1000001,
+    "transaction_hash": "0x1234567890abcdef",
+    "status": "success"
+  }
+}
 ```
 
 ## AP2 Decision Contract (v0.1.0)
