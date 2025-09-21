@@ -323,7 +323,7 @@ jobs:
   # Summary job
   contracts-summary:
     runs-on: ubuntu-latest
-    needs: [cloudevents-validation, cloudevents-integration, ap2-contract-validation, security-validation]
+    needs: [ocn-common-validation, cloudevents-integration, ap2-contract-validation, security-validation]
     if: always()
     steps:
     - name: Contracts Validation Summary
