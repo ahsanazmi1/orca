@@ -1,5 +1,10 @@
 # Orca — The Open Checkout Agent
 
+[![Contracts Validation](https://github.com/ocn-ai/orca/actions/workflows/contracts.yml/badge.svg)](https://github.com/ocn-ai/orca/actions/workflows/contracts.yml)
+[![Security Validation](https://github.com/ocn-ai/orca/actions/workflows/security.yml/badge.svg)](https://github.com/ocn-ai/orca/actions/workflows/security.yml)
+[![CI](https://github.com/ocn-ai/orca/actions/workflows/ci.yml/badge.svg)](https://github.com/ocn-ai/orca/actions/workflows/ci.yml)
+[![Coverage](https://codecov.io/gh/ocn-ai/orca/branch/main/graph/badge.svg)](https://codecov.io/gh/ocn-ai/orca)
+
 **Anchor story:** Checkout hasn't changed in 20 years. **B2B payments are even worse.**
 **Orca** is the first **open, transparent, merchant-controlled checkout agent** with explainability built in.
 

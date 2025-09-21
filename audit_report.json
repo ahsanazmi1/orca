@@ -1,0 +1,316 @@
+{
+  "audit_date": "2025-09-21T11:37:32.157494",
+  "summary": {
+    "foundations": {
+      "passed": 6,
+      "total": 11
+    },
+    "phase1": {
+      "passed": 6,
+      "total": 12
+    },
+    "phase2": {
+      "passed": 4,
+      "total": 9
+    }
+  },
+  "results": [
+    {
+      "name": "Required files present",
+      "phase": "Foundations",
+      "status": "pass",
+      "evidence": [
+        "All required files found: LICENSE, README.md, CHANGELOG.md, CONTRIBUTING.md, pyproject.toml, .pre-commit-config.yaml"
+      ],
+      "remedy": ""
+    },
+    {
+      "name": "Python version \u2265 3.12",
+      "phase": "Foundations",
+      "status": "pass",
+      "evidence": [
+        "Python version: 3.13.0"
+      ],
+      "remedy": ""
+    },
+    {
+      "name": "Pre-commit configured",
+      "phase": "Foundations",
+      "status": "pass",
+      "evidence": [
+        "pre-commit hooks configured"
+      ],
+      "remedy": ""
+    },
+    {
+      "name": "EditorConfig present",
+      "phase": "Foundations",
+      "status": "pass",
+      "evidence": [
+        "Found .editorconfig"
+      ],
+      "remedy": ""
+    },
+    {
+      "name": "CODEOWNERS present",
+      "phase": "Foundations",
+      "status": "warning",
+      "evidence": [
+        "No CODEOWNERS found"
+      ],
+      "remedy": "Add CODEOWNERS file for code review assignment"
+    },
+    {
+      "name": "ocn-common available",
+      "phase": "Foundations",
+      "status": "warning",
+      "evidence": [
+        "ocn-common not found (not installed, not a submodule, not in PYTHONPATH)"
+      ],
+      "remedy": "Install ocn-common or add as git submodule"
+    },
+    {
+      "name": "AP2 content type constant",
+      "phase": "Foundations",
+      "status": "fail",
+      "evidence": [
+        "AP2 content type not found in codebase"
+      ],
+      "remedy": "Add CONTENT_TYPE constant with value 'application/vnd.ocn.ap2+json; version=1'"
+    },
+    {
+      "name": "AP2 input fixtures",
+      "phase": "Foundations",
+      "status": "pass",
+      "evidence": [
+        "Found 21 AP2 samples with approve/decline/review examples"
+      ],
+      "remedy": ""
+    },
+    {
+      "name": "Rules engine present",
+      "phase": "Phase 1",
+      "status": "pass",
+      "evidence": [
+        "Found rules files: ['src/orca/core/rules_engine.py', 'src/orca/core/ap2_rules.py', 'src/orca_core/rules/ach_rules.py', 'src/orca_core/rules/card_rules.py']"
+      ],
+      "remedy": ""
+    },
+    {
+      "name": "Deterministic decision logic",
+      "phase": "Phase 1",
+      "status": "fail",
+      "evidence": [
+        "Missing decision types: APPROVE, DECLINE, REVIEW"
+      ],
+      "remedy": "Implement deterministic logic for all three decision types"
+    },
+    {
+      "name": "Rules unit tests",
+      "phase": "Phase 1",
+      "status": "pass",
+      "evidence": [
+        "Found rules tests: ['tests/test_rules.py', 'tests/test_rail_channel_rules.py', 'tests/schemas/test_ap2_rules_engine.py']"
+      ],
+      "remedy": ""
+    },
+    {
+      "name": "Decision contract present",
+      "phase": "Phase 1",
+      "status": "pass",
+      "evidence": [
+        "Found contract files: ['src/orca/core/decision_contract.py']"
+      ],
+      "remedy": ""
+    },
+    {
+      "name": "Decision contract fields",
+      "phase": "Phase 1",
+      "status": "fail",
+      "evidence": [
+        "Missing fields: intent, cart, payment, modality, agent_presence, trace_id, content_type, version, ml_model_version"
+      ],
+      "remedy": "Add missing fields to decision contract model"
+    },
+    {
+      "name": "CloudEvents emitter present",
+      "phase": "Phase 1",
+      "status": "pass",
+      "evidence": [
+        "Found CE files: ['src/orca/crypto/receipts.py', 'src/orca/core/ce.py']"
+      ],
+      "remedy": ""
+    },
+    {
+      "name": "Decision CloudEvent type",
+      "phase": "Phase 1",
+      "status": "fail",
+      "evidence": [
+        "ocn.orca.decision.v1 event type not found"
+      ],
+      "remedy": "Implement CloudEvents with type 'ocn.orca.decision.v1'"
+    },
+    {
+      "name": "CLI decide command",
+      "phase": "Phase 1",
+      "status": "fail",
+      "evidence": [
+        "CLI files found but no decide command"
+      ],
+      "remedy": "Implement 'orca decide --input <file.json>' command"
+    },
+    {
+      "name": "Streamlit demo app",
+      "phase": "Phase 1",
+      "status": "pass",
+      "evidence": [
+        "Found: examples/streamlit_demo.py",
+        "  Contains Streamlit code: examples/streamlit_demo.py",
+        "Found: .venv/lib/python3.12/site-packages/streamlit/hello/streamlit_app.py",
+        "  Contains Streamlit code: .venv/lib/python3.12/site-packages/streamlit/hello/streamlit_app.py",
+        "Found: .venv/lib/python3.12/site-packages/streamlit/external/langchain/streamlit_callback_handler.py",
+        "  Contains Streamlit code: .venv/lib/python3.12/site-packages/streamlit/external/langchain/streamlit_callback_handler.py",
+        "Found: .venv/lib/python3.12/site-packages/streamlit/elements/lib/streamlit_plotly_theme.py",
+        "  Contains Streamlit code: .venv/lib/python3.12/site-packages/streamlit/elements/lib/streamlit_plotly_theme.py",
+        "Found: tests/ui/test_streamlit_ap2_smoke.py",
+        "  Contains Streamlit code: tests/ui/test_streamlit_ap2_smoke.py"
+      ],
+      "remedy": ""
+    },
+    {
+      "name": "ML prediction module",
+      "phase": "Phase 2",
+      "status": "pass",
+      "evidence": [
+        "Found ML files: ['src/orca/ml/predict_risk.py']"
+      ],
+      "remedy": ""
+    },
+    {
+      "name": "XGBoost integration",
+      "phase": "Phase 2",
+      "status": "warning",
+      "evidence": [
+        "No XGBoost references found"
+      ],
+      "remedy": "Implement XGBoost model integration"
+    },
+    {
+      "name": "predict_risk function",
+      "phase": "Phase 2",
+      "status": "fail",
+      "evidence": [
+        "No predict_risk function found"
+      ],
+      "remedy": "Implement predict_risk(features) function"
+    },
+    {
+      "name": "Deterministic ML",
+      "phase": "Phase 2",
+      "status": "warning",
+      "evidence": [
+        "No random state configuration found"
+      ],
+      "remedy": "Add fixed random_state for deterministic results"
+    },
+    {
+      "name": "Feature mapping",
+      "phase": "Phase 2",
+      "status": "pass",
+      "evidence": [
+        "Found feature files: ['src/orca/core/feature_extractor.py', 'src/orca_core/core/feature_extraction.py', 'src/orca_core/ml/features.py']"
+      ],
+      "remedy": ""
+    },
+    {
+      "name": "LLM explainer present",
+      "phase": "Phase 2",
+      "status": "pass",
+      "evidence": [
+        "Found LLM files: ['src/orca_core/llm/explain.py', 'src/orca_core/core/explainer.py']"
+      ],
+      "remedy": ""
+    },
+    {
+      "name": "Explanation schema",
+      "phase": "Phase 2",
+      "status": "warning",
+      "evidence": [
+        "Found keys: , missing: mitigation, confidence, key_signals, reason"
+      ],
+      "remedy": "Implement explanation with keys: reason, key_signals, mitigation, confidence"
+    },
+    {
+      "name": "Explanation CloudEvent",
+      "phase": "Phase 2",
+      "status": "warning",
+      "evidence": [
+        "No explanation CloudEvent found"
+      ],
+      "remedy": "Emit CloudEvent ocn.orca.explanation.v1"
+    },
+    {
+      "name": "Trace ID propagation",
+      "phase": "Foundations",
+      "status": "fail",
+      "evidence": [
+        "No trace_id usage found"
+      ],
+      "remedy": "Implement trace_id propagation utilities"
+    },
+    {
+      "name": "Log redaction",
+      "phase": "Phase 2",
+      "status": "pass",
+      "evidence": [
+        "No PII patterns found in logs"
+      ],
+      "remedy": ""
+    },
+    {
+      "name": "HTTP subscriber config",
+      "phase": "Phase 1",
+      "status": "warning",
+      "evidence": [
+        "No HTTP subscriber configuration found"
+      ],
+      "remedy": "Add configurable HTTP subscriber URL for decision CE"
+    },
+    {
+      "name": "pytest runs without error",
+      "phase": "Phase 1",
+      "status": "fail",
+      "evidence": [
+        "pytest failed: Unknown error"
+      ],
+      "remedy": "Fix failing tests"
+    },
+    {
+      "name": "Required GitHub workflows",
+      "phase": "Foundations",
+      "status": "fail",
+      "evidence": [
+        "Missing workflows: contracts.yml, security.yml"
+      ],
+      "remedy": "Add missing workflow files: contracts.yml, security.yml"
+    },
+    {
+      "name": "CI workflow linting",
+      "phase": "Foundations",
+      "status": "pass",
+      "evidence": [
+        "CI workflow includes Black and Ruff"
+      ],
+      "remedy": ""
+    },
+    {
+      "name": "Git tags available",
+      "phase": "Phase 1",
+      "status": "pass",
+      "evidence": [
+        "Found 1 git tags: v0.2.0"
+      ],
+      "remedy": ""
+    }
+  ]
+}

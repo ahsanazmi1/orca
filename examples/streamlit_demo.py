@@ -16,3 +16,5 @@ features = {"amount": amount, "trace_id": trace_id}
 if st.button("Decide"):
     d = decide(features)
     st.code(json.dumps(d.__dict__, indent=2, default=lambda o: o.__dict__), language="json")
+
+

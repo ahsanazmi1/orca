@@ -144,3 +144,5 @@ output "log_analytics_workspace_name" {
   description = "The name of the Log Analytics workspace"
   value       = azurerm_log_analytics_workspace.main.name
 }
+
+

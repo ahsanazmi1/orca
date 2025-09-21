@@ -1,0 +1,129 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://schemas.ocn.ai/events/v1/weave.audit.v1.schema.json",
+    "title": "Weave Audit CloudEvent",
+    "description": "CloudEvent schema for Weave audit events",
+    "type": "object",
+    "required": [
+        "specversion",
+        "id",
+        "source",
+        "type",
+        "subject",
+        "time",
+        "data"
+    ],
+    "properties": {
+        "specversion": {
+            "type": "string",
+            "const": "1.0",
+            "description": "CloudEvents specification version"
+        },
+        "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier for the event"
+        },
+        "source": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^https://weave\\.ocn\\.ai/",
+            "description": "URI identifying the Weave service"
+        },
+        "type": {
+            "type": "string",
+            "const": "ocn.weave.audit.v1",
+            "description": "Event type identifier"
+        },
+        "subject": {
+            "type": "string",
+            "pattern": "^txn_[a-f0-9]{16}$",
+            "description": "Transaction ID (trace_id) for correlation"
+        },
+        "time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Event timestamp in RFC3339 format"
+        },
+        "datacontenttype": {
+            "type": "string",
+            "const": "application/json",
+            "description": "Content type of the data payload"
+        },
+        "dataschema": {
+            "type": "string",
+            "format": "uri",
+            "const": "https://schemas.ocn.ai/weave/v1/audit.schema.json",
+            "description": "Schema URI for the data payload"
+        },
+        "data": {
+            "type": "object",
+            "description": "Audit payload containing receipt information",
+            "required": [
+                "trace_id",
+                "receipt_hash",
+                "event_type",
+                "timestamp",
+                "block_height",
+                "transaction_hash"
+            ],
+            "properties": {
+                "trace_id": {
+                    "type": "string",
+                    "pattern": "^txn_[a-f0-9]{16}$",
+                    "description": "Transaction ID for correlation"
+                },
+                "receipt_hash": {
+                    "type": "string",
+                    "pattern": "^sha256:[a-f0-9]{64}$",
+                    "description": "SHA-256 hash of the original decision/explanation"
+                },
+                "event_type": {
+                    "type": "string",
+                    "enum": [
+                        "decision",
+                        "explanation"
+                    ],
+                    "description": "Type of event being audited"
+                },
+                "timestamp": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "When the receipt was created"
+                },
+                "block_height": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "Block height where receipt was stored"
+                },
+                "transaction_hash": {
+                    "type": "string",
+                    "pattern": "^0x[a-f0-9]{64}$",
+                    "description": "Weave transaction hash"
+                },
+                "gas_used": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "Gas used for the transaction"
+                },
+                "gas_price": {
+                    "type": "string",
+                    "description": "Gas price in wei"
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "success",
+                        "failed"
+                    ],
+                    "description": "Transaction status"
+                },
+                "error_message": {
+                    "type": "string",
+                    "description": "Error message if transaction failed"
+                }
+            }
+        }
+    },
+    "additionalProperties": false
+}
