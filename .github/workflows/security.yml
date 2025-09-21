@@ -94,12 +94,21 @@ jobs:
   # Container security scan (if Dockerfile exists)
   container-security-scan:
     runs-on: ubuntu-latest
-    if: hashFiles('**/Dockerfile') != ''
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    - name: Check for Dockerfile
+      id: check-dockerfile
+      run: |
+        if [ -f "Dockerfile" ]; then
+          echo "dockerfile-exists=true" >> $GITHUB_OUTPUT
+        else
+          echo "dockerfile-exists=false" >> $GITHUB_OUTPUT
+        fi
+
     - name: Install Trivy
+      if: steps.check-dockerfile.outputs.dockerfile-exists == 'true'
       run: |
         echo "🔧 Installing Trivy..."
         sudo apt-get update
@@ -110,6 +119,7 @@ jobs:
         sudo apt-get install trivy
 
     - name: Run Trivy filesystem scan
+      if: steps.check-dockerfile.outputs.dockerfile-exists == 'true'
       run: |
         echo "🔍 Running Trivy filesystem scan..."
         trivy fs --format json --output trivy-fs-report.json . || true
@@ -141,11 +151,13 @@ jobs:
         fi
 
     - name: Build Docker image for scanning
+      if: steps.check-dockerfile.outputs.dockerfile-exists == 'true'
       run: |
         echo "🐳 Building Docker image for security scanning..."
         docker build -t orca-security-scan:latest .
 
     - name: Run Trivy image scan
+      if: steps.check-dockerfile.outputs.dockerfile-exists == 'true'
       run: |
         echo "🔍 Running Trivy image scan..."
         trivy image --format json --output trivy-image-report.json orca-security-scan:latest || true
@@ -178,7 +190,7 @@ jobs:
 
     - name: Upload container security reports
       uses: actions/upload-artifact@v4
-      if: always()
+      if: always() && steps.check-dockerfile.outputs.dockerfile-exists == 'true'
       with:
         name: container-security-reports
         path: |
