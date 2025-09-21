@@ -94,7 +94,7 @@ jobs:
   # Container security scan (if Dockerfile exists)
   container-security-scan:
     runs-on: ubuntu-latest
-    if: hashFiles('Dockerfile') != ''
+    if: hashFiles('**/Dockerfile') != ''
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
