@@ -1,0 +1,39 @@
+# CODEOWNERS file for Orca
+# This file defines who should review changes to specific parts of the codebase
+#
+# For more information about CODEOWNERS files, see:
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Global ownership - all files require review from @ahsanazmi1
+*                 @ahsanazmi1
+
+# Source code ownership
+/src/            @ahsanazmi1
+
+# Test code ownership
+/tests/          @ahsanazmi1
+
+# GitHub configuration ownership
+/.github/        @ahsanazmi1
+
+# Documentation ownership
+/docs/           @ahsanazmi1
+
+# Infrastructure and deployment ownership
+/infra/          @ahsanazmi1
+
+# Examples and samples ownership
+/examples/       @ahsanazmi1
+
+# Scripts and utilities ownership
+/scripts/        @ahsanazmi1
+
+# Models and data ownership
+/models/         @ahsanazmi1
+/data/           @ahsanazmi1
+
+# Configuration files ownership
+pyproject.toml   @ahsanazmi1
+Makefile         @ahsanazmi1
+Dockerfile       @ahsanazmi1
+docker-compose.yml @ahsanazmi1
