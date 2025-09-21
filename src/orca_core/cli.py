@@ -15,6 +15,7 @@ from rich.console import Console
 from rich.table import Table
 
 from src.orca.core.ce import get_cloud_event_emitter
+from src.orca.logging_setup import get_traced_logger, setup_logging
 
 from .config import decision_mode, get_settings, is_ai_enabled, validate_configuration
 from .core.explainer import explain_decision
@@ -28,6 +29,10 @@ from .models import DecisionRequest
 
 app = typer.Typer(help="Orca Core Decision Engine CLI")
 console = Console()
+
+# Set up structured logging with redaction
+setup_logging(level="INFO", format_type="json")
+logger = get_traced_logger(__name__)
 
 
 @app.command()

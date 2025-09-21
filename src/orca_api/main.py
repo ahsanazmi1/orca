@@ -1,6 +1,5 @@
 """FastAPI service for Orca Core decision engine."""
 
-import logging
 import os
 from datetime import datetime
 from typing import Any
@@ -10,15 +9,16 @@ from fastapi.responses import ORJSONResponse
 from ocn_common.trace import trace_middleware
 from pydantic import BaseModel, Field, ValidationError
 
+from src.orca.logging_setup import get_traced_logger, setup_logging
 from src.orca_core.config import get_settings
 from src.orca_core.engine import evaluate_rules
 from src.orca_core.explanations import generate_human_explanation
 from src.orca_core.llm.explain import get_llm_explainer, is_llm_configured
 from src.orca_core.models import DecisionRequest, DecisionResponse
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+# Set up structured logging with redaction
+setup_logging(level="INFO", format_type="json")
+logger = get_traced_logger(__name__)
 
 # Create FastAPI app with orjson response class
 app = FastAPI(
