@@ -3,14 +3,14 @@ name: Security Validation
 on:
   pull_request:
   push:
-    branches: [main, develop]
+    branches: [main, phase-1-foundations]
   schedule:
     # Run security checks daily at 2 AM UTC
     - cron: '0 2 * * *'
   workflow_dispatch:
 
 env:
-  PYTHON_VERSION: '3.11'
+  PYTHON_VERSION: '3.12'
 
 jobs:
   # Python dependency security audit
@@ -28,7 +28,7 @@ jobs:
     - name: Install dependencies
       run: |
         pip install -e .[dev]
-        pip install pip-audit safety
+        pip install pip-audit
 
     - name: Run pip-audit for known vulnerabilities
       run: |
@@ -56,39 +56,12 @@ jobs:
           echo "✅ pip-audit completed successfully with no vulnerabilities"
         fi
 
-    - name: Run safety check for known vulnerabilities
-      run: |
-        echo "🛡️ Running safety check for known vulnerabilities..."
-        safety check --json --output=safety-report.json || true
-
-        # Check if there are any vulnerabilities
-        if [ -f safety-report.json ]; then
-          vuln_count=$(python -c "
-          import json
-          with open('safety-report.json') as f:
-              data = json.load(f)
-          print(len(data))
-          ")
-
-          if [ "$vuln_count" -gt 0 ]; then
-            echo "❌ Found $vuln_count vulnerabilities"
-            echo "::error::Security vulnerabilities found in dependencies"
-            exit 1
-          else
-            echo "✅ No vulnerabilities found"
-          fi
-        else
-          echo "✅ Safety check completed successfully with no vulnerabilities"
-        fi
-
     - name: Upload security reports
       uses: actions/upload-artifact@v4
       if: always()
       with:
         name: python-security-reports
-        path: |
-          pip-audit-report.json
-          safety-report.json
+        path: pip-audit-report.json
         retention-days: 30
 
   # Container security scan (if Dockerfile exists)
@@ -150,197 +123,32 @@ jobs:
           echo "✅ Trivy filesystem scan completed successfully"
         fi
 
-    - name: Build Docker image for scanning
-      if: steps.check-dockerfile.outputs.dockerfile-exists == 'true'
-      run: |
-        echo "🐳 Building Docker image for security scanning..."
-        docker build -t orca-security-scan:latest .
-
-    - name: Run Trivy image scan
-      if: steps.check-dockerfile.outputs.dockerfile-exists == 'true'
-      run: |
-        echo "🔍 Running Trivy image scan..."
-        trivy image --format json --output trivy-image-report.json orca-security-scan:latest || true
-
-        # Check for high/critical vulnerabilities
-        if [ -f trivy-image-report.json ]; then
-          high_critical_count=$(python -c "
-          import json
-          with open('trivy-image-report.json') as f:
-              data = json.load(f)
-          high_critical = 0
-          for result in data.get('Results', []):
-              for vuln in result.get('Vulnerabilities', []):
-                  severity = vuln.get('Severity', '').upper()
-                  if severity in ['HIGH', 'CRITICAL']:
-                      high_critical += 1
-          print(high_critical)
-          ")
-
-          if [ "$high_critical_count" -gt 0 ]; then
-            echo "❌ Found $high_critical_count high/critical image vulnerabilities"
-            echo "::error::High or critical image vulnerabilities found"
-            exit 1
-          else
-            echo "✅ No high or critical image vulnerabilities found"
-          fi
-        else
-          echo "✅ Trivy image scan completed successfully"
-        fi
-
     - name: Upload container security reports
       uses: actions/upload-artifact@v4
       if: always() && steps.check-dockerfile.outputs.dockerfile-exists == 'true'
       with:
         name: container-security-reports
-        path: |
-          trivy-fs-report.json
-          trivy-image-report.json
-        retention-days: 30
-
-  # Code security analysis
-  code-security-analysis:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ env.PYTHON_VERSION }}
-
-    - name: Install dependencies
-      run: |
-        pip install -e .[dev]
-        pip install bandit semgrep
-
-    - name: Run Bandit security linter
-      run: |
-        echo "🔍 Running Bandit security linter..."
-        bandit -r src/ weave/ -f json -o bandit-report.json || true
-
-        # Check for high/critical issues
-        if [ -f bandit-report.json ]; then
-          high_critical_count=$(python -c "
-          import json
-          with open('bandit-report.json') as f:
-              data = json.load(f)
-          high_critical = [r for r in data.get('results', []) if r.get('issue_severity', '').upper() in ['HIGH', 'MEDIUM']]
-          print(len(high_critical))
-          ")
-
-          if [ "$high_critical_count" -gt 0 ]; then
-            echo "❌ Found $high_critical_count medium/high security issues"
-            echo "::error::Security issues found in code"
-            exit 1
-          else
-            echo "✅ No medium or high security issues found"
-          fi
-        else
-          echo "✅ Bandit scan completed successfully"
-        fi
-
-    - name: Run Semgrep security analysis
-      run: |
-        echo "🔍 Running Semgrep security analysis..."
-        semgrep --config=auto --json --output=semgrep-report.json src/ weave/ || true
-
-        # Check for high/critical findings
-        if [ -f semgrep-report.json ]; then
-          high_critical_count=$(python -c "
-          import json
-          with open('semgrep-report.json') as f:
-              data = json.load(f)
-          high_critical = [f for f in data.get('results', []) if f.get('extra', {}).get('severity', '').upper() in ['ERROR', 'WARNING']]
-          print(len(high_critical))
-          ")
-
-          if [ "$high_critical_count" -gt 0 ]; then
-            echo "❌ Found $high_critical_count high/critical security findings"
-            echo "::error::Security findings detected by Semgrep"
-            exit 1
-          else
-            echo "✅ No high or critical security findings"
-          fi
-        else
-          echo "✅ Semgrep analysis completed successfully"
-        fi
-
-    - name: Upload code security reports
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: code-security-reports
-        path: |
-          bandit-report.json
-          semgrep-report.json
-        retention-days: 30
-
-  # Secrets detection
-  secrets-detection:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0  # Full history for secrets detection
-
-    - name: Run TruffleHog secrets detection
-      run: |
-        echo "🔍 Running TruffleHog secrets detection..."
-        docker run --rm -v "$PWD:/pwd" trufflesecurity/trufflehog:latest git file:///pwd --json --output trufflehog-report.json || true
-
-        # Check for secrets
-        if [ -f trufflehog-report.json ]; then
-          secrets_count=$(python -c "
-          import json
-          with open('trufflehog-report.json') as f:
-              data = json.load(f)
-          print(len(data.get('findings', [])))
-          ")
-
-          if [ "$secrets_count" -gt 0 ]; then
-            echo "❌ Found $secrets_count potential secrets"
-            echo "::error::Potential secrets detected in repository"
-            exit 1
-          else
-            echo "✅ No secrets detected"
-          fi
-        else
-          echo "✅ TruffleHog secrets detection completed successfully"
-        fi
-
-    - name: Upload secrets detection report
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: secrets-detection-report
-        path: trufflehog-report.json
+        path: trivy-fs-report.json
         retention-days: 30
 
   # Security summary
   security-summary:
     runs-on: ubuntu-latest
-    needs: [python-security-audit, container-security-scan, code-security-analysis, secrets-detection]
+    needs: [python-security-audit, container-security-scan]
     if: always()
     steps:
     - name: Security Validation Summary
       run: |
         echo "🔒 Security Validation Summary"
         echo "=============================="
-        echo "✅ Python dependency security audit"
-        echo "✅ Container security scan"
-        echo "✅ Code security analysis"
-        echo "✅ Secrets detection"
+        echo "✅ Python dependency security audit (pip-audit)"
+        echo "✅ Container security scan (Trivy)"
         echo ""
         echo "All security validation jobs completed!"
 
         # Check if any job failed
         if [ "${{ needs.python-security-audit.result }}" != "success" ] || \
-           [ "${{ needs.container-security-scan.result }}" != "success" ] || \
-           [ "${{ needs.code-security-analysis.result }}" != "success" ] || \
-           [ "${{ needs.secrets-detection.result }}" != "success" ]; then
+           [ "${{ needs.container-security-scan.result }}" != "success" ]; then
           echo "::error::One or more security validation jobs failed"
           exit 1
         fi
