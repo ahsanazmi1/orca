@@ -1,0 +1,16 @@
+{
+  "name": "orca",
+  "version": "0.1.0",
+  "capabilities": [
+    "getStatus",
+    "getDecisionSchema"
+  ],
+  "endpoints": [
+    {
+      "method": "POST",
+      "path": "/mcp/invoke",
+      "description": "MCP protocol endpoint for Orca service operations"
+    }
+  ],
+  "description": "Orca - Open Checkout Agent with decision schema capabilities"
+}

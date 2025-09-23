@@ -3,6 +3,10 @@ Tests for redaction filtering in logging.
 """
 
 import logging
+import sys
+import os
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from src.orca.logging_setup import RedactionFilter, JSONFormatter
 

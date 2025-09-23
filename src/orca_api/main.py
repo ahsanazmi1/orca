@@ -15,6 +15,7 @@ from src.orca_core.engine import evaluate_rules
 from src.orca_core.explanations import generate_human_explanation
 from src.orca_core.llm.explain import get_llm_explainer, is_llm_configured
 from src.orca_core.models import DecisionRequest, DecisionResponse
+from mcp import router as mcp_router
 
 # Set up structured logging with redaction
 setup_logging(level="INFO", format_type="json")
@@ -30,6 +31,9 @@ app = FastAPI(
 
 # Add trace middleware for automatic trace ID propagation
 app = trace_middleware(app)
+
+# Include MCP router
+app.include_router(mcp_router)
 
 
 # Pydantic models for API requests/responses
