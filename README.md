@@ -35,35 +35,74 @@ Orca Phase 1 delivers a complete rules engine with CloudEvents integration, AP2 
 - **Security-First CI/CD**: Comprehensive GitHub workflows for contracts and security validation
 - **Community Docs**: Contributing guides, templates, and comprehensive documentation
 
-## Quick Start (Local)
+## Quickstart (≤ 60s)
 
-### Basic Setup
+Get up and running with Orca in under a minute:
+
 ```bash
-python -m venv .venv && source .venv/bin/activate
-pip install -e ".[dev]"
-pre-commit install
-python -m orca.cli --help
-streamlit run examples/streamlit_demo.py
+# Clone the repository
+git clone https://github.com/ahsanazmi1/orca.git
+cd orca
+
+# Setup everything (venv, deps, pre-commit hooks)
+make setup
+
+# Run tests to verify everything works
+make test
+
+# Start the service
+make run
 ```
 
-### CloudEvents + Weave Integration
+**That's it!** 🎉
+
+The service will be running at `http://localhost:8080`. Test the endpoints:
+
 ```bash
-# 1. Start Weave subscriber (in one terminal)
-cd weave
-python subscriber.py
-# Server runs on http://localhost:8080
+# Health check
+curl http://localhost:8080/health
 
-# 2. Emit CloudEvents from Orca (in another terminal)
-export ORCA_CE_SUBSCRIBER_URL="http://localhost:8080/events"
+# MCP getStatus
+curl -X POST http://localhost:8080/mcp/invoke \
+  -H "Content-Type: application/json" \
+  -d '{"verb": "getStatus", "args": {}}'
 
-# Emit decision CloudEvent
-python -m orca_core.cli decide '{"cart_total": 100.0, "currency": "USD"}' --emit-ce
+# MCP getDecisionSchema
+curl -X POST http://localhost:8080/mcp/invoke \
+  -H "Content-Type: application/json" \
+  -d '{"verb": "getDecisionSchema", "args": {}}'
+```
 
-# Emit from fixture file
-python -m orca_core.cli decide-file fixtures/requests/high_ticket_review.json --emit-ce
+### Additional Makefile Targets
 
-# 3. Check Weave receipt
-curl http://localhost:8080/receipts/txn_cli_test_123456
+```bash
+make lint        # Run code quality checks
+make fmt         # Format code with black/ruff
+make clean       # Remove virtual environment and cache
+make help        # Show all available targets
+```
+
+## Manual Setup (Alternative)
+
+If you prefer manual setup over the Makefile:
+
+```bash
+# Create virtual environment
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+# Install dependencies
+pip install -e ".[dev]"
+
+# Install pre-commit hooks
+pip install pre-commit
+pre-commit install
+
+# Run tests
+pytest -q
+
+# Start the service
+uvicorn orca_api.main:app --reload
 ```
 
 ### Example Output
