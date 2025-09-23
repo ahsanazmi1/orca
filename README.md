@@ -7,7 +7,7 @@
 [![Coverage](https://codecov.io/gh/ocn-ai/orca/branch/main/graph/badge.svg)](https://codecov.io/gh/ocn-ai/orca)
 
 **Anchor story:** Checkout hasn't changed in 20 years. **B2B payments are even worse.**
-**Orca** is the first **open, transparent, merchant-controlled checkout agent** with explainability built in.
+**Orca** is the first **open, transparent, merchant-controlled checkout agent** with explainability built in for the [Open Checkout Network (OCN)](https://github.com/ocn-ai/ocn-common).
 
 ## 🎯 Phase 1 Complete: v0.1.0+ap2.v1+ce.v1
 
