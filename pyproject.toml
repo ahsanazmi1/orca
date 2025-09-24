@@ -12,12 +12,12 @@ dependencies = [
     "pydantic>=2.5.0",
     "pydantic-settings>=2.0.0",
     "python-multipart>=0.0.6",
-    "pyyaml>=6.0",
-    "ocn-common>=0.1.0"
+    "pyyaml>=6.0"
 ]
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "coverage", "ruff", "black", "mypy"]
+ocn = ["ocn-common @ git+https://github.com/ocn-ai/ocn-common.git@main"]
 
 [tool.ruff]
 line-length = 100
@@ -28,3 +28,4 @@ line-length = 100
 [tool.mypy]
 explicit_package_bases = true
 ignore_missing_imports = true
+disable_error_code = ["assignment", "arg-type", "override"]

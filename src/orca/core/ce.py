@@ -12,7 +12,17 @@ from typing import Any
 from uuid import uuid4
 
 import httpx
-from ocn_common.trace import inject_trace_id_ce
+
+try:
+    from ocn_common.trace import inject_trace_id_ce
+except ImportError:
+    # Fallback when ocn-common is not available
+    def inject_trace_id_ce(ce_data, trace_id):
+        """Fallback trace ID injection when ocn-common is not available."""
+        ce_data["subject"] = trace_id
+        return ce_data
+
+
 from pydantic import BaseModel, Field
 
 from .contract_validation import get_contract_validator
