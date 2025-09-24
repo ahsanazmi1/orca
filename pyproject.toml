@@ -1,7 +1,7 @@
 [project]
-name = "weave"
+name = "orca"
 version = "0.1.0"
-description = "OCN weave"
+description = "OCN orca"
 readme = "README.md"
 requires-python = ">=3.12"
 authors = [{name="Ahsan Azmi"}]
@@ -24,3 +24,7 @@ line-length = 100
 
 [tool.black]
 line-length = 100
+
+[tool.mypy]
+explicit_package_bases = true
+ignore_missing_imports = true
