@@ -1,0 +1,18 @@
+[run]
+source = src
+omit =
+    src/orca/cli.py
+    src/orca_core/ui/debug_ui.py
+    src/orca_api/main.py
+    src/orca/core/feature_extractor.py
+    src/orca/core/contract_validation.py
+    src/orca/core/versioning.py
+
+[report]
+precision = 1
+show_missing = True
+skip_covered = False
+fail_under = 80
+
+[html]
+directory = htmlcov
