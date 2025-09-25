@@ -99,18 +99,7 @@ jobs:
 
         # Check for high/critical vulnerabilities
         if [ -f trivy-fs-report.json ]; then
-          high_critical_count=$(python -c "
-            import json
-            with open('trivy-fs-report.json') as f:
-                data = json.load(f)
-            high_critical = 0
-            for result in data.get('Results', []):
-                for vuln in result.get('Vulnerabilities', []):
-                    severity = vuln.get('Severity', '').upper()
-                    if severity in ['HIGH', 'CRITICAL']:
-                        high_critical += 1
-            print(high_critical)
-          ")
+          high_critical_count=$(python3 -c "import json; data=json.load(open('trivy-fs-report.json')); print(sum(1 for result in data.get('Results', []) for vuln in result.get('Vulnerabilities', []) if vuln.get('Severity', '').upper() in ['HIGH', 'CRITICAL']))")
 
           if [ "$high_critical_count" -gt 0 ]; then
             echo "❌ Found $high_critical_count high/critical filesystem vulnerabilities"
