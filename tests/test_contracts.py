@@ -47,18 +47,22 @@ class TestSchemaLoader:
 
         # Check that we have expected mandate schemas
         expected_mandates = [
-            "intent_mandate",
-            "cart_mandate",
-            "payment_mandate",
-            "actor_profile",
-            "agent_presence",
-            "modality",
+            "intent_mandate.schema",
+            "cart_mandate.schema",
+            "payment_mandate.schema",
+            "actor_profile.schema",
+            "agent_presence.schema",
+            "modality.schema",
         ]
         for mandate in expected_mandates:
             assert mandate in schemas["mandates"]
 
         # Check that we have expected event schemas
-        expected_events = ["orca.decision.v1", "orca.explanation.v1", "weave.audit.v1"]
+        expected_events = [
+            "orca.decision.v1.schema",
+            "orca.explanation.v1.schema",
+            "weave.audit.v1.schema",
+        ]
         for event in expected_events:
             assert event in schemas["events"]
 

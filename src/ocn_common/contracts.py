@@ -47,6 +47,13 @@ class SchemaLoader:
             with open(schema_path) as f:
                 schema = json.load(f)
 
+            # Remove $id to avoid remote reference resolution issues
+            if "$id" in schema:
+                del schema["$id"]
+
+            # Resolve $ref references by inlining the referenced schemas
+            schema = self._resolve_references(schema, schema_path)
+
             # Validate that it's a valid JSON Schema
             Draft202012Validator.check_schema(schema)
             return schema
@@ -54,6 +61,57 @@ class SchemaLoader:
             raise ContractValidationError(f"Invalid schema at {schema_path}: {e}") from e
         except FileNotFoundError as e:
             raise ContractValidationError(f"Schema not found at {schema_path}") from e
+
+    def _resolve_references(self, schema: dict[str, Any], schema_path: Path) -> dict[str, Any]:
+        """Resolve $ref references by inlining referenced schemas."""
+        if isinstance(schema, dict):
+            if "$ref" in schema:
+                ref_path = schema["$ref"]
+                # Handle relative references from events to mandates
+                if ref_path.startswith("../mandates/"):
+                    mandate_name = ref_path.split("/")[-1]
+                    mandate_path = self.base_path / "common" / "mandates" / mandate_name
+                    if mandate_path.exists():
+                        with open(mandate_path) as f:
+                            referenced_schema = json.load(f)
+                        # Remove $id and recursively resolve any nested references
+                        if "$id" in referenced_schema:
+                            del referenced_schema["$id"]
+                        return self._resolve_references(referenced_schema, mandate_path)
+                    else:
+                        raise ContractValidationError(
+                            f"Referenced schema not found: {mandate_path}"
+                        )
+                # Handle references within mandates directory (same directory)
+                elif not ref_path.startswith("/") and not ref_path.startswith("http"):
+                    # This is a relative reference within the mandates directory
+                    mandate_path = self.base_path / "common" / "mandates" / ref_path
+                    if mandate_path.exists():
+                        with open(mandate_path) as f:
+                            referenced_schema = json.load(f)
+                        # Remove $id and recursively resolve any nested references
+                        if "$id" in referenced_schema:
+                            del referenced_schema["$id"]
+                        return self._resolve_references(referenced_schema, mandate_path)
+                    else:
+                        raise ContractValidationError(
+                            f"Referenced schema not found: {mandate_path}"
+                        )
+                else:
+                    # For other references, return as-is (they might be valid)
+                    return schema
+            else:
+                # Recursively resolve references in nested objects
+                resolved = {}
+                for key, value in schema.items():
+                    resolved[key] = self._resolve_references(value, schema_path)
+                return resolved
+        elif isinstance(schema, list):
+            # Recursively resolve references in lists
+            return [self._resolve_references(item, schema_path) for item in schema]
+        else:
+            # Return primitive values as-is
+            return schema
 
     def get_schema(self, schema_name: str, schema_type: str = "mandates") -> dict[str, Any]:
         """
