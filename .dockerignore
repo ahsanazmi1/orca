@@ -4,10 +4,8 @@
 .gitattributes
 
 # Documentation
-README.md
 CHANGELOG.md
 docs/
-*.md
 
 # Python
 __pycache__/
