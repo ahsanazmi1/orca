@@ -2,7 +2,7 @@
 # Multi-stage build for production-ready container with model artifacts
 
 # Build stage
-FROM python:3.11-slim as builder
+FROM python:3.11-slim AS builder
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
@@ -23,11 +23,11 @@ RUN pip install uv
 WORKDIR /app
 
 # Copy requirements and install Python dependencies
-COPY pyproject.toml ./
+COPY pyproject.toml README.md ./
 RUN uv pip install --system -e .
 
 # Model training stage (optional - can be skipped if models exist)
-FROM python:3.11-slim as model-trainer
+FROM python:3.11-slim AS model-trainer
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
@@ -47,7 +47,7 @@ RUN pip install uv
 WORKDIR /app
 
 # Copy requirements and install Python dependencies
-COPY pyproject.toml ./
+COPY pyproject.toml README.md ./
 RUN uv pip install --system -e .
 
 # Copy source code for model training
@@ -61,7 +61,7 @@ RUN mkdir -p models
 RUN python -m orca_core.cli train-xgb --samples 10000 || echo "Model training failed, will use stub model"
 
 # Production stage
-FROM python:3.11-slim as production
+FROM python:3.11-slim AS production
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
@@ -90,6 +90,7 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 
 # Copy application code
 COPY src/ ./src/
+COPY mcp/ ./mcp/
 
 # Copy model artifacts from model-trainer stage
 COPY --from=model-trainer /app/models/ ./models/
