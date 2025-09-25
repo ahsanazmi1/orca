@@ -54,33 +54,33 @@ jobs:
 
         # Validate JSON files in examples/schemas/samples
         python -c "
-        import json
-        import os
-        from pathlib import Path
+          import json
+          import os
+          from pathlib import Path
 
-        # Check common directories
-        dirs_to_check = ['examples', 'schemas', 'samples']
-        json_files = []
+          # Check common directories
+          dirs_to_check = ['examples', 'schemas', 'samples']
+          json_files = []
 
-        for dir_name in dirs_to_check:
-            if os.path.exists(dir_name):
-                for json_file in Path(dir_name).rglob('*.json'):
-                    json_files.append(json_file)
+          for dir_name in dirs_to_check:
+              if os.path.exists(dir_name):
+                  for json_file in Path(dir_name).rglob('*.json'):
+                      json_files.append(json_file)
 
-        print(f'Found {len(json_files)} JSON files to validate')
+          print(f'Found {len(json_files)} JSON files to validate')
 
-        for json_file in json_files:
-            try:
-                with open(json_file) as f:
-                    json.load(f)
-                print(f'✅ {json_file} - Valid JSON')
-            except json.JSONDecodeError as e:
-                print(f'❌ {json_file} - Invalid JSON: {e}')
-                exit(1)
-            except Exception as e:
-                print(f'⚠️ {json_file} - Error: {e}')
+          for json_file in json_files:
+              try:
+                  with open(json_file) as f:
+                      json.load(f)
+                  print(f'✅ {json_file} - Valid JSON')
+              except json.JSONDecodeError as e:
+                  print(f'❌ {json_file} - Invalid JSON: {e}')
+                  exit(1)
+              except Exception as e:
+                  print(f'⚠️ {json_file} - Error: {e}')
 
-        print('✅ All JSON files are valid')
+          print('✅ All JSON files are valid')
         "
 
     - name: Run placeholder validation
@@ -95,20 +95,20 @@ jobs:
         echo "🔍 Validating MCP manifest..."
         if [ -f "mcp/manifest.json" ]; then
           python -c "
-          import json
-          with open('mcp/manifest.json') as f:
-              manifest = json.load(f)
+            import json
+            with open('mcp/manifest.json') as f:
+                manifest = json.load(f)
 
-          required_fields = ['name', 'version', 'capabilities', 'endpoints']
-          for field in required_fields:
-              if field not in manifest:
-                  print(f'❌ Missing field in MCP manifest: {field}')
-                  exit(1)
+            required_fields = ['name', 'version', 'capabilities', 'endpoints']
+            for field in required_fields:
+                if field not in manifest:
+                    print(f'❌ Missing field in MCP manifest: {field}')
+                    exit(1)
 
-          print('✅ MCP manifest validation passed')
-          print(f'  Name: {manifest[\"name\"]}')
-          print(f'  Version: {manifest[\"version\"]}')
-          print(f'  Capabilities: {manifest[\"capabilities\"]}')
+            print('✅ MCP manifest validation passed')
+            print(f'  Name: {manifest[\"name\"]}')
+            print(f'  Version: {manifest[\"version\"]}')
+            print(f'  Capabilities: {manifest[\"capabilities\"]}')
           "
         else
           echo "ℹ️ No MCP manifest found - skipping validation"
