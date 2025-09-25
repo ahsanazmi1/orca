@@ -1,6 +1,6 @@
 [project]
 name = "orca"
-version = "0.1.0"
+version = "0.2.0"
 description = "OCN orca"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -32,7 +32,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "pytest-cov>=4.0.0", "coverage", "ruff", "black", "mypy"]
-ocn = ["ocn-common @ git+https://github.com/ocn-ai/ocn-common.git@main"]
+ocn = ["ocn-common @ git+https://github.com/ocn-ai/ocn-common.git@v0.2.0"]
 
 [tool.ruff]
 line-length = 100
