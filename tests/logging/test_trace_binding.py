@@ -124,13 +124,13 @@ class TestLoggingIntegration:
         handler.addFilter(RedactionFilter())
         test_logger.addHandler(handler)
 
-        # Get traced logger
-        logger = get_traced_logger("integration.test")
-
-        # Mock trace ID
+        # Mock trace ID before creating the logger
         with patch(
             "src.orca.logging_setup.get_current_trace_id", return_value="integration-trace-111"
-        ):
+        ) as mock_trace_id:
+            # Get traced logger after mocking
+            logger = get_traced_logger("integration.test")
+
             logger.info("Integration test message")
 
             # Get output
@@ -146,6 +146,9 @@ class TestLoggingIntegration:
             assert "message" in log_entry
             assert "logger" in log_entry
             assert log_entry["trace_id"] == "integration-trace-111"
+
+            # Verify the mock was called
+            assert mock_trace_id.called
 
     def test_redaction_with_trace_binding(self):
         """Test that redaction works with trace ID binding."""

@@ -6,6 +6,15 @@
 [![CI](https://github.com/ocn-ai/orca/actions/workflows/ci.yml/badge.svg)](https://github.com/ocn-ai/orca/actions/workflows/ci.yml)
 [![Coverage](https://codecov.io/gh/ocn-ai/orca/branch/main/graph/badge.svg)](https://codecov.io/gh/ocn-ai/orca)
 
+## Phase 2 — Explainability
+
+🚧 **Currently in development** - Phase 2 focuses on enhanced explainability features and advanced decision transparency.
+
+- **Status**: Active development on `phase-2-explainability` branch
+- **Features**: Enhanced explainability, LLM-powered explanations, comprehensive audit trails
+- **Issue Tracker**: [Phase 2 Issues](https://github.com/ocn-ai/orca/issues?q=is%3Aopen+is%3Aissue+label%3Aphase-2)
+- **Timeline**: Weeks 4-8 of OCN development roadmap
+
 **Anchor story:** Checkout hasn't changed in 20 years. **B2B payments are even worse.**
 **Orca** is the first **open, transparent, merchant-controlled checkout agent** with explainability built in for the [Open Checkout Network (OCN)](https://github.com/ocn-ai/ocn-common).
 

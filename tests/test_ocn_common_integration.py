@@ -169,10 +169,12 @@ class TestOcnCommonIntegration:
         }
 
         # Should emit successfully (without subscriber)
-        ce = emitter.emit_decision_event(decision_data, "txn_test123", emit_to_subscriber=False)
+        ce = emitter.emit_decision_event(
+            decision_data, "txn_1234567890abcdef", emit_to_subscriber=False
+        )
         assert ce is not None
         assert ce.type == "ocn.orca.decision.v1"
-        assert ce.subject == "txn_test123"
+        assert ce.subject == "txn_1234567890abcdef"
 
     def test_cloud_events_emitter_with_invalid_data(self):
         """Test CloudEvents emitter with invalid data."""
@@ -214,13 +216,13 @@ class TestOcnCommonIntegration:
         }
 
         # Should emit successfully
-        ce = emit_decision_event(decision_data, "txn_test123")
+        ce = emit_decision_event(decision_data, "txn_1234567890abcdef")
         assert ce is not None
         assert ce.type == "ocn.orca.decision.v1"
 
         # Valid explanation data
         explanation_data = {
-            "trace_id": "txn_test123",
+            "trace_id": "txn_1234567890abcdef",
             "decision_result": "APPROVE",
             "explanation": "Test explanation",
             "confidence": 0.85,
@@ -235,7 +237,7 @@ class TestOcnCommonIntegration:
         }
 
         # Should emit successfully
-        ce = emit_explanation_event(explanation_data, "txn_test123")
+        ce = emit_explanation_event(explanation_data, "txn_1234567890abcdef")
         assert ce is not None
         assert ce.type == "ocn.orca.explanation.v1"
 

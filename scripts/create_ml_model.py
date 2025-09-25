@@ -92,7 +92,7 @@ def main() -> None:
         risk_score = sample["risk_score"]
         reason_codes = sample["reason_codes"]
         print(
-            f"   {i+1}. Amount: ${features['amount']}, "
+            f"   {i + 1}. Amount: ${features['amount']}, "
             f"Velocity: {features['velocity_24h']}, "
             f"Cross-border: {features['cross_border']}"
         )

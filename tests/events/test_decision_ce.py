@@ -220,7 +220,15 @@ class TestCloudEventEmitter:
 
         decision_data = {
             "ap2_version": "0.1.0",
+            "intent": {
+                "actor": {"id": "user_12345", "type": "individual"},
+                "channel": "web",
+                "geo": {"country": "US", "region": "CA", "city": "San Francisco"},
+            },
+            "cart": {"total": 100.0, "currency": "USD", "items": []},
+            "payment": {"method": "card", "amount": 100.0, "currency": "USD"},
             "decision": {"result": "APPROVE", "risk_score": 0.15},
+            "signing": {"signature": "test_signature"},
         }
 
         emitter = CloudEventEmitter(subscriber_url="http://localhost:8080/events")

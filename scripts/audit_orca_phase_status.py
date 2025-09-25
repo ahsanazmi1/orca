@@ -14,6 +14,7 @@ Outputs:
     - Exit code 0 if all Phase 1 blocking items pass, non-zero otherwise
 """
 
+import argparse
 import json
 import sys
 from datetime import datetime
@@ -1225,9 +1226,25 @@ class OrcaAuditor:
 
 def main():
     """Main audit function."""
+    parser = argparse.ArgumentParser(
+        description="OCN Orca Phase Status Audit Script",
+        epilog="Generates AUDIT_REPORT.md and audit_report.json with audit results.",
+    )
+    parser.add_argument("--version", action="version", version="Orca Audit Script 1.0.0")
+    parser.add_argument("--quiet", action="store_true", help="Suppress output messages")
+
+    args = parser.parse_args()
+
+    if not args.quiet:
+        print("🔍 Starting OCN Orca Phase Status Audit...")
+        print("=" * 50)
+
     auditor = OrcaAuditor()
     auditor.run_all_checks()
     auditor.generate_reports()
+
+    if not args.quiet:
+        print("✅ Audit completed. Check AUDIT_REPORT.md and audit_report.json")
 
 
 if __name__ == "__main__":

@@ -171,7 +171,7 @@ class SchemaValidator:
 
             # Validate CloudEvent using ocn-common contract validator
             ce_data = ce.model_dump()
-            event_type = ce.type.replace("ocn.", "").replace(".v1", "")
+            event_type = ce.type.replace("ocn.", "")
 
             if not self.contract_validator.validate_cloud_event(ce_data, event_type):
                 logger.error(f"CloudEvent contract validation failed for {ce.type}")
@@ -245,7 +245,7 @@ async def receive_cloud_event(request: Request):
 
     except ValidationError as e:
         logger.error(f"Validation error: {e}")
-        raise HTTPException(status_code=400, detail=f"Invalid CloudEvent format: {e}") from e
+        raise HTTPException(status_code=422, detail=f"Invalid CloudEvent format: {e}") from e
     except HTTPException:
         raise
     except Exception as e:

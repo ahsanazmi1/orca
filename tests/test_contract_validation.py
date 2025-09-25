@@ -120,7 +120,32 @@ class TestContractValidator:
             "type": "ocn.orca.decision.v1",
             "subject": "txn_1234567890abcdef",
             "time": "2024-01-01T12:00:00Z",
-            "data": {"ap2_version": "0.1.0", "decision": {"result": "APPROVE"}},
+            "datacontenttype": "application/json",
+            "dataschema": "https://schemas.ocn.ai/ap2/v1/decision.schema.json",
+            "data": {
+                "ap2_version": "0.1.0",
+                "intent": {
+                    "actor": {"id": "customer_123", "type": "individual"},
+                    "channel": "web",
+                    "geo": {},
+                    "metadata": {},
+                },
+                "cart": {"amount": "100.00", "currency": "USD", "items": [], "geo": {}},
+                "payment": {
+                    "method": "card",
+                    "modality": "immediate",
+                    "auth_requirements": [],
+                    "metadata": {},
+                },
+                "decision": {
+                    "result": "APPROVE",
+                    "risk_score": 0.15,
+                    "reasons": [],
+                    "actions": [],
+                    "meta": {},
+                },
+                "signing": {"vc_proof": None, "receipt_hash": "sha256:abc123"},
+            },
         }
 
         # Should pass basic validation
@@ -270,8 +295,14 @@ class TestOcnCommonIntegration:
         """Test ocn-common path resolution."""
         # Test default path resolution
         validator = ContractValidator()
-        expected_path = Path(__file__).parent.parent.parent / "external" / "ocn-common"
-        assert validator.ocn_common_path == expected_path
+        # The ContractValidator calculates path from its own location
+        # We need to resolve to absolute paths to avoid path comparison issues
+        expected_path = (
+            Path("src/orca/core/contract_validation.py").parent.parent.parent.parent
+            / "external"
+            / "ocn-common"
+        )
+        assert validator.ocn_common_path.resolve() == expected_path.resolve()
 
         # Test custom path
         custom_path = Path("/custom/ocn-common")

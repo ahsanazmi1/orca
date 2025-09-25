@@ -37,13 +37,13 @@ jobs:
 
         # Check if there are any high/critical vulnerabilities
         if [ -f pip-audit-report.json ]; then
-          high_critical_count=$(python -c "
-          import json
-          with open('pip-audit-report.json') as f:
-              data = json.load(f)
-          high_critical = [v for v in data.get('vulnerabilities', []) if v.get('severity', '').upper() in ['HIGH', 'CRITICAL']]
-          print(len(high_critical))
-          ")
+          # Use jq if available, otherwise use python3
+          if command -v jq > /dev/null 2>&1; then
+            high_critical_count=$(jq '[.vulnerabilities[]? | select(.severity | ascii_upcase | test("HIGH|CRITICAL"))] | length' pip-audit-report.json)
+          else
+            # Use simple inline Python command to avoid YAML issues
+            high_critical_count=$(python3 -c "import json; data=json.load(open('pip-audit-report.json')); print(len([v for v in data.get('vulnerabilities', []) if v.get('severity', '').upper() in ['HIGH', 'CRITICAL']]))")
+          fi
 
           if [ "$high_critical_count" -gt 0 ]; then
             echo "❌ Found $high_critical_count high/critical vulnerabilities"
@@ -99,18 +99,7 @@ jobs:
 
         # Check for high/critical vulnerabilities
         if [ -f trivy-fs-report.json ]; then
-          high_critical_count=$(python -c "
-          import json
-          with open('trivy-fs-report.json') as f:
-              data = json.load(f)
-          high_critical = 0
-          for result in data.get('Results', []):
-              for vuln in result.get('Vulnerabilities', []):
-                  severity = vuln.get('Severity', '').upper()
-                  if severity in ['HIGH', 'CRITICAL']:
-                      high_critical += 1
-          print(high_critical)
-          ")
+          high_critical_count=$(python3 -c "import json; data=json.load(open('trivy-fs-report.json')); print(sum(1 for result in data.get('Results', []) for vuln in result.get('Vulnerabilities', []) if vuln.get('Severity', '').upper() in ['HIGH', 'CRITICAL']))")
 
           if [ "$high_critical_count" -gt 0 ]; then
             echo "❌ Found $high_critical_count high/critical filesystem vulnerabilities"

@@ -6,7 +6,15 @@ from typing import Any
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import ORJSONResponse
-from ocn_common.trace import trace_middleware
+
+try:
+    from ocn_common.trace import trace_middleware
+except ImportError:
+    # Fallback when ocn-common is not available
+    def trace_middleware(app):
+        return app
+
+
 from pydantic import BaseModel, Field, ValidationError
 
 from src.orca.logging_setup import get_traced_logger, setup_logging

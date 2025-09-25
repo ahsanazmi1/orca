@@ -13,7 +13,12 @@ import logging
 import re
 from typing import Any, Dict, Optional
 
-from ocn_common.trace import get_current_trace_id
+try:
+    from ocn_common.trace import get_current_trace_id
+except ImportError:
+    # Fallback when ocn-common is not available
+    def get_current_trace_id():
+        return "no-trace-id"
 
 
 class RedactionFilter(logging.Filter):
