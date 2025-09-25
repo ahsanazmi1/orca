@@ -13,11 +13,15 @@ from typing import Any
 
 
 def find_files_by_pattern(directory: str, pattern: str) -> list[Path]:
-    """Find files matching a glob pattern in directory."""
+    """Find files matching a glob pattern in directory (recursive)."""
     path = Path(directory)
     if not path.exists():
         return []
-    return list(path.glob(pattern))
+    # Use rglob for recursive search if pattern doesn't already contain **
+    if "**" in pattern:
+        return list(path.glob(pattern))
+    else:
+        return list(path.rglob(pattern))
 
 
 def find_files_by_name(directory: str, filename: str) -> list[Path]:
