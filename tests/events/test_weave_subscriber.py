@@ -195,7 +195,32 @@ class TestWeaveSubscriber:
             "type": "ocn.orca.decision.v1",
             "subject": "txn_1234567890abcdef",
             "time": datetime.now(UTC).isoformat(),
-            "data": {"ap2_version": "0.1.0"},
+            "datacontenttype": "application/json",
+            "dataschema": "https://schemas.ocn.ai/ap2/v1/decision.schema.json",
+            "data": {
+                "ap2_version": "0.1.0",
+                "intent": {
+                    "actor": {"id": "customer_123", "type": "individual"},
+                    "channel": "web",
+                    "geo": {},
+                    "metadata": {},
+                },
+                "cart": {"amount": "100.00", "currency": "USD", "items": [], "geo": {}},
+                "payment": {
+                    "method": "card",
+                    "modality": "immediate",
+                    "auth_requirements": [],
+                    "metadata": {},
+                },
+                "decision": {
+                    "result": "APPROVE",
+                    "risk_score": 0.15,
+                    "reasons": [],
+                    "actions": [],
+                    "meta": {},
+                },
+                "signing": {"vc_proof": None, "receipt_hash": "sha256:abc123"},
+            },
         }
 
         with patch("weave.subscriber.weave_client") as mock_weave:
@@ -280,7 +305,32 @@ class TestSchemaValidator:
             "type": "ocn.orca.decision.v1",
             "subject": "txn_1234567890abcdef",
             "time": datetime.now(UTC).isoformat(),
-            "data": {"ap2_version": "0.1.0"},
+            "datacontenttype": "application/json",
+            "dataschema": "https://schemas.ocn.ai/ap2/v1/decision.schema.json",
+            "data": {
+                "ap2_version": "0.1.0",
+                "intent": {
+                    "actor": {"id": "customer_123", "type": "individual"},
+                    "channel": "web",
+                    "geo": {},
+                    "metadata": {},
+                },
+                "cart": {"amount": "100.00", "currency": "USD", "items": [], "geo": {}},
+                "payment": {
+                    "method": "card",
+                    "modality": "immediate",
+                    "auth_requirements": [],
+                    "metadata": {},
+                },
+                "decision": {
+                    "result": "APPROVE",
+                    "risk_score": 0.15,
+                    "reasons": [],
+                    "actions": [],
+                    "meta": {},
+                },
+                "signing": {"vc_proof": None, "receipt_hash": "sha256:abc123"},
+            },
         }
 
         # Create mock CloudEventRequest
