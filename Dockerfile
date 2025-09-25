@@ -23,7 +23,7 @@ RUN pip install uv
 WORKDIR /app
 
 # Copy requirements and install Python dependencies
-COPY pyproject.toml ./
+COPY pyproject.toml README.md ./
 RUN uv pip install --system -e .
 
 # Model training stage (optional - can be skipped if models exist)
@@ -47,7 +47,7 @@ RUN pip install uv
 WORKDIR /app
 
 # Copy requirements and install Python dependencies
-COPY pyproject.toml ./
+COPY pyproject.toml README.md ./
 RUN uv pip install --system -e .
 
 # Copy source code for model training
