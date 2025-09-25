@@ -45,11 +45,11 @@ jobs:
 
         # Try to import ocn-common if available
         python -c "
-        try:
-            import ocn_common
-            print('✅ ocn-common available for validation')
-        except ImportError:
-            print('ℹ️ ocn-common not available, running basic JSON validation')
+          try:
+              import ocn_common
+              print('✅ ocn-common available for validation')
+          except ImportError:
+              print('ℹ️ ocn-common not available, running basic JSON validation')
         " || echo "ℹ️ ocn-common not available, running basic JSON validation"
 
         # Validate JSON files in examples/schemas/samples
