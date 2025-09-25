@@ -53,35 +53,12 @@ jobs:
         " || echo "ℹ️ ocn-common not available, running basic JSON validation"
 
         # Validate JSON files in examples/schemas/samples
-        python -c "
-          import json
-          import os
-          from pathlib import Path
-
-          # Check common directories
-          dirs_to_check = ['examples', 'schemas', 'samples']
-          json_files = []
-
-          for dir_name in dirs_to_check:
-              if os.path.exists(dir_name):
-                  for json_file in Path(dir_name).rglob('*.json'):
-                      json_files.append(json_file)
-
-          print(f'Found {len(json_files)} JSON files to validate')
-
-          for json_file in json_files:
-              try:
-                  with open(json_file) as f:
-                      json.load(f)
-                  print(f'✅ {json_file} - Valid JSON')
-              except json.JSONDecodeError as e:
-                  print(f'❌ {json_file} - Invalid JSON: {e}')
-                  exit(1)
-              except Exception as e:
-                  print(f'⚠️ {json_file} - Error: {e}')
-
-          print('✅ All JSON files are valid')
-        "
+        find examples schemas samples -name "*.json" 2>/dev/null | while read -r file; do
+          if [ -f "$file" ]; then
+            python3 -m json.tool "$file" > /dev/null && echo "✅ $file - Valid JSON" || (echo "❌ $file - Invalid JSON" && exit 1)
+          fi
+        done
+        echo "✅ All JSON files are valid"
 
     - name: Run placeholder validation
       if: steps.check-examples.outputs.examples-exist == 'false'
