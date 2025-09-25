@@ -1,23 +1,33 @@
 """FastAPI service for Orca Core decision engine."""
 
-import logging
 import os
 from datetime import datetime
 from typing import Any
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import ORJSONResponse
+
+try:
+    from ocn_common.trace import trace_middleware
+except ImportError:
+    # Fallback when ocn-common is not available
+    def trace_middleware(app):
+        return app
+
+
 from pydantic import BaseModel, Field, ValidationError
 
+from src.orca.logging_setup import get_traced_logger, setup_logging
 from src.orca_core.config import get_settings
 from src.orca_core.engine import evaluate_rules
 from src.orca_core.explanations import generate_human_explanation
 from src.orca_core.llm.explain import get_llm_explainer, is_llm_configured
 from src.orca_core.models import DecisionRequest, DecisionResponse
+from mcp import router as mcp_router
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+# Set up structured logging with redaction
+setup_logging(level="INFO", format_type="json")
+logger = get_traced_logger(__name__)
 
 # Create FastAPI app with orjson response class
 app = FastAPI(
@@ -26,6 +36,12 @@ app = FastAPI(
     version="0.1.0",
     default_response_class=ORJSONResponse,
 )
+
+# Add trace middleware for automatic trace ID propagation
+app = trace_middleware(app)
+
+# Include MCP router
+app.include_router(mcp_router)
 
 
 # Pydantic models for API requests/responses

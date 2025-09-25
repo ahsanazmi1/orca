@@ -1,0 +1,110 @@
+{
+    "ap2_version": "0.1.0",
+    "intent": {
+        "actor": {
+            "id": "user_99999",
+            "type": "user",
+            "profile": {
+                "identity": {
+                    "verified": false,
+                    "verification_level": "basic",
+                    "kyc_status": "pending"
+                },
+                "risk_profile": {
+                    "risk_score": 0.85,
+                    "risk_category": "high",
+                    "velocity_flags": [
+                        "high_velocity",
+                        "unusual_pattern"
+                    ]
+                },
+                "preferences": {
+                    "language": "en-US",
+                    "currency": "USD",
+                    "timezone": "America/New_York"
+                },
+                "metadata": {
+                    "member_since": "2024-01-01",
+                    "total_transactions": 5
+                }
+            }
+        },
+        "channel": "mobile",
+        "geo": {
+            "country": "US",
+            "region": "NY",
+            "city": "New York",
+            "timezone": "America/New_York"
+        },
+        "metadata": {
+            "session_id": "sess_xyz789",
+            "device_id": "device_456",
+            "app_version": "2.1.0"
+        }
+    },
+    "cart": {
+        "amount": "2500.00",
+        "currency": "USD",
+        "items": [
+            {
+                "id": "item_003",
+                "name": "High-Value Electronics",
+                "amount": "2500.00",
+                "quantity": 1,
+                "category": "Electronics",
+                "mcc": "5732"
+            }
+        ],
+        "geo": {
+            "country": "US",
+            "region": "NY",
+            "city": "New York"
+        },
+        "metadata": {
+            "merchant_id": "merchant_789",
+            "order_id": "order_999"
+        }
+    },
+    "payment": {
+        "method": "card",
+        "modality": {
+            "type": "immediate",
+            "description": "Immediate payment processing"
+        },
+        "auth_requirements": [
+            "pin"
+        ],
+        "metadata": {
+            "card_brand": "mastercard",
+            "last_four": "5678"
+        }
+    },
+    "decision": {
+        "result": "DECLINE",
+        "risk_score": 0.85,
+        "reasons": [
+            "High risk score detected",
+            "Unverified user attempting high-value transaction",
+            "Velocity violations detected",
+            "Unusual spending pattern"
+        ],
+        "actions": [
+            "Decline transaction",
+            "Flag for manual review",
+            "Request additional verification"
+        ],
+        "meta": {
+            "model_version": "0.1.0",
+            "processing_time_ms": 32,
+            "rules_triggered": [
+                "high_risk_threshold",
+                "velocity_check",
+                "unverified_user"
+            ]
+        }
+    },
+    "signing": {
+        "vc_proof": null,
+        "receipt_hash": "sha256:xyz789abc123def"
+    }
+}

@@ -18,7 +18,7 @@ jobs:
       - run: ruff check . --config pyproject.toml
       - run: black --check .
       - run: mypy src
-      - run: pytest tests/ -q --maxfail=1 --disable-warnings
+      - run: pytest tests/ -q --maxfail=1 --disable-warnings --cov=src --cov-report=term-missing --cov-fail-under=80
 
   # Schema validation for AP2 and legacy contracts
   schema-validation:
@@ -415,7 +415,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.12'
       - run: pip install -e .[dev]
 
       - name: Generate SHAP snapshots

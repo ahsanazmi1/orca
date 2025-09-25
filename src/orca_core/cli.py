@@ -14,6 +14,9 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
+from src.orca.core.ce import get_cloud_event_emitter
+from src.orca.logging_setup import get_traced_logger, setup_logging
+
 from .config import decision_mode, get_settings, is_ai_enabled, validate_configuration
 from .core.explainer import explain_decision
 from .core.ml_hooks import get_model, train_model
@@ -26,6 +29,10 @@ from .models import DecisionRequest
 
 app = typer.Typer(help="Orca Core Decision Engine CLI")
 console = Console()
+
+# Set up structured logging with redaction
+setup_logging(level="INFO", format_type="json")
+logger = get_traced_logger(__name__)
 
 
 @app.command()
@@ -221,6 +228,7 @@ def decide(
     rail: str = typer.Option(None, "--rail", help="Override rail type (Card or ACH)"),
     channel: str = typer.Option(None, "--channel", help="Override channel (online or pos)"),
     output_format: str = typer.Option("json", "--format", "-f", help="Output format: json, table"),
+    emit_ce: bool = typer.Option(False, "--emit-ce", help="Emit CloudEvents to subscriber URL"),
 ) -> None:
     """
     Evaluate a decision request and return the response.
@@ -282,6 +290,10 @@ def decide(
         # Evaluate rules
         response = evaluate_rules(request)
 
+        # Emit CloudEvents if requested
+        if emit_ce:
+            _emit_decision_cloud_event(response)
+
         # Format output based on requested format
         if output_format.lower() == "table":
             _display_decision_table(response)
@@ -309,6 +321,7 @@ def decide_file(
     rail: str = typer.Option(None, "--rail", help="Override rail type (Card or ACH)"),
     channel: str = typer.Option(None, "--channel", help="Override channel (online or pos)"),
     output_format: str = typer.Option("json", "--format", "-f", help="Output format: json, table"),
+    emit_ce: bool = typer.Option(False, "--emit-ce", help="Emit CloudEvents to subscriber URL"),
 ) -> None:
     """
     Evaluate a decision request from a JSON file and return the response.
@@ -360,6 +373,10 @@ def decide_file(
 
         # Evaluate rules
         response = evaluate_rules(request)
+
+        # Emit CloudEvents if requested
+        if emit_ce:
+            _emit_decision_cloud_event(response)
 
         # Format output based on requested format
         if output_format.lower() == "table":
@@ -791,6 +808,70 @@ def _display_decision_table(response: Any) -> None:
             table.add_row("LLM Confidence", f"{llm_data.get('confidence', 0.0):.2f}")
 
     console.print(table)
+
+
+def _emit_decision_cloud_event(response: Any) -> None:
+    """Helper function to emit decision CloudEvent."""
+    try:
+        emitter = get_cloud_event_emitter()
+
+        # Extract trace_id from response metadata
+        trace_id = response.meta.get("transaction_id")
+        if not trace_id:
+            console.print(
+                "[yellow]Warning: No transaction_id found in response, skipping CloudEvent emission[/yellow]"
+            )
+            return
+
+        # Convert response to AP2 format for CloudEvent
+        decision_data = _convert_response_to_ap2_format(response)
+
+        # Emit decision CloudEvent
+        ce = emitter.emit_decision_event(decision_data, trace_id)
+
+        if ce:
+            console.print(
+                f"[green]✅ Emitted decision CloudEvent {ce.id} for trace_id {trace_id}[/green]"
+            )
+        else:
+            console.print("[red]❌ Failed to emit decision CloudEvent[/red]")
+
+    except Exception as e:
+        console.print(f"[red]❌ Error emitting CloudEvent: {e}[/red]")
+
+
+def _convert_response_to_ap2_format(response: Any) -> dict[str, Any]:
+    """Convert DecisionResponse to AP2 format for CloudEvent."""
+    # This is a simplified conversion - in production, you'd want a more comprehensive adapter
+    return {
+        "ap2_version": "0.1.0",
+        "intent": {
+            "actor": {"id": "unknown", "type": "individual", "metadata": {}},
+            "channel": response.meta.get("channel", "online"),
+            "geo": {},
+            "metadata": {},
+        },
+        "cart": {
+            "amount": str(response.meta.get("cart_total", 0.0)),
+            "currency": "USD",
+            "items": [],
+            "geo": {},
+        },
+        "payment": {
+            "method": "card",
+            "modality": "immediate",
+            "auth_requirements": [],
+            "metadata": {},
+        },
+        "decision": {
+            "result": response.decision,
+            "risk_score": response.meta.get("risk_score", 0.0),
+            "reasons": response.reasons,
+            "actions": response.actions,
+            "meta": response.meta,
+        },
+        "signing": {"vc_proof": None, "receipt_hash": response.meta.get("receipt_hash", "")},
+    }
 
 
 if __name__ == "__main__":

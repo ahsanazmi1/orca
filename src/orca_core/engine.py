@@ -1,7 +1,14 @@
 """Decision engine for Orca Core."""
 
-import uuid
 from datetime import datetime
+
+try:
+    from ocn_common.trace import new_trace_id
+except ImportError:
+    # Fallback when ocn-common is not available
+    def new_trace_id():
+        return f"trace_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}"
+
 
 from .config import decision_mode, get_settings, is_ai_enabled
 from .explanations import generate_human_explanation
@@ -90,8 +97,9 @@ def evaluate_rules(request: DecisionRequest) -> DecisionResponse:
     # Start with APPROVE
     final_decision: str = "APPROVE"
 
-    # Generate transaction metadata
-    transaction_id = f"txn_{uuid.uuid4().hex[:16]}"
+    # Generate transaction metadata using centralized trace utility
+    trace_id = new_trace_id()
+    transaction_id = f"txn_{trace_id.replace('-', '')[:16]}"
     timestamp = datetime.now()
 
     # Create structured metadata

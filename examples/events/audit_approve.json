@@ -1,0 +1,37 @@
+{
+    "specversion": "1.0",
+    "id": "evt_audit_001",
+    "source": "https://weave.ocn.ai/v1",
+    "type": "ocn.weave.audit.v1",
+    "subject": "txn_approve_123",
+    "time": "2024-01-21T12:00:02Z",
+    "datacontenttype": "application/vnd.ocn.ap2+json; version=1",
+    "dataschema": "https://schemas.ocn.ai/events/v1/weave.audit.v1.schema.json",
+    "data": {
+        "audit_version": "0.1.0",
+        "trace_id": "txn_approve_123",
+        "receipt_hash": "sha256:def456789abc123",
+        "event_type": "ocn.orca.decision.v1",
+        "block_height": 1234567,
+        "transaction_hash": "0xabc123def456789",
+        "status": "confirmed",
+        "original_event_id": "evt_decision_001",
+        "storage_metadata": {
+            "storage_provider": "weave_v1",
+            "replication_factor": 3,
+            "encryption": {
+                "algorithm": "AES-256",
+                "key_id": "key_789"
+            }
+        },
+        "verification": {
+            "verified": true,
+            "verification_method": "merkle_proof",
+            "verification_timestamp": "2024-01-21T12:00:05Z"
+        },
+        "metadata": {
+            "network": "mainnet",
+            "gas_used": 21000
+        }
+    }
+}

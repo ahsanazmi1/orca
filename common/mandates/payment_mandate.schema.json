@@ -1,0 +1,130 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://schemas.ocn.ai/mandates/payment_mandate.schema.json",
+    "title": "Payment Mandate",
+    "description": "Schema for payment mandate in AP2 format",
+    "type": "object",
+    "required": [
+        "method",
+        "modality",
+        "auth_requirements",
+        "metadata"
+    ],
+    "properties": {
+        "method": {
+            "type": "string",
+            "enum": [
+                "card",
+                "ach",
+                "wallet",
+                "crypto",
+                "cash",
+                "check"
+            ],
+            "description": "Payment method type"
+        },
+        "modality": {
+            "$ref": "modality.schema.json"
+        },
+        "auth_requirements": {
+            "type": "array",
+            "description": "Required authentication factors",
+            "items": {
+                "type": "string",
+                "enum": [
+                    "pin",
+                    "biometric",
+                    "otp",
+                    "signature",
+                    "password",
+                    "none"
+                ]
+            }
+        },
+        "metadata": {
+            "type": "object",
+            "description": "Payment method metadata",
+            "properties": {
+                "card_brand": {
+                    "type": "string",
+                    "enum": [
+                        "visa",
+                        "mastercard",
+                        "amex",
+                        "discover"
+                    ],
+                    "description": "Card brand (if applicable)"
+                },
+                "wallet_type": {
+                    "type": "string",
+                    "enum": [
+                        "apple_pay",
+                        "google_pay",
+                        "paypal",
+                        "venmo"
+                    ],
+                    "description": "Wallet type (if applicable)"
+                },
+                "bank_name": {
+                    "type": "string",
+                    "description": "Bank name (if applicable)"
+                },
+                "account_type": {
+                    "type": "string",
+                    "enum": [
+                        "checking",
+                        "savings"
+                    ],
+                    "description": "Account type (if applicable)"
+                }
+            },
+            "additionalProperties": true
+        }
+    },
+    "examples": [
+        {
+            "method": "card",
+            "modality": {
+                "type": "immediate",
+                "description": "Immediate payment processing"
+            },
+            "auth_requirements": [
+                "pin",
+                "biometric"
+            ],
+            "metadata": {
+                "card_brand": "visa",
+                "last_four": "1234"
+            }
+        },
+        {
+            "method": "wallet",
+            "modality": {
+                "type": "immediate",
+                "description": "Immediate payment processing"
+            },
+            "auth_requirements": [
+                "biometric"
+            ],
+            "metadata": {
+                "wallet_type": "apple_pay",
+                "device_id": "device_789"
+            }
+        },
+        {
+            "method": "ach",
+            "modality": {
+                "type": "scheduled",
+                "description": "Scheduled payment processing",
+                "scheduled_date": "2024-01-15"
+            },
+            "auth_requirements": [
+                "password"
+            ],
+            "metadata": {
+                "bank_name": "Chase Bank",
+                "account_type": "checking"
+            }
+        }
+    ]
+}

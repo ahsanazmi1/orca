@@ -1,0 +1,143 @@
+name: Security Validation
+
+on:
+  pull_request:
+  push:
+    branches: [main, phase-1-foundations]
+  schedule:
+    # Run security checks daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+env:
+  PYTHON_VERSION: '3.12'
+
+jobs:
+  # Python dependency security audit
+  python-security-audit:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Install dependencies
+      run: |
+        pip install -e .[dev]
+        pip install pip-audit
+
+    - name: Run pip-audit for known vulnerabilities
+      run: |
+        echo "🔒 Running pip-audit for known vulnerabilities..."
+        pip-audit --format=json --output=pip-audit-report.json || true
+
+        # Check if there are any high/critical vulnerabilities
+        if [ -f pip-audit-report.json ]; then
+          # Use jq if available, otherwise use python3
+          if command -v jq > /dev/null 2>&1; then
+            high_critical_count=$(jq '[.vulnerabilities[]? | select(.severity | ascii_upcase | test("HIGH|CRITICAL"))] | length' pip-audit-report.json)
+          else
+            # Use simple inline Python command to avoid YAML issues
+            high_critical_count=$(python3 -c "import json; data=json.load(open('pip-audit-report.json')); print(len([v for v in data.get('vulnerabilities', []) if v.get('severity', '').upper() in ['HIGH', 'CRITICAL']]))")
+          fi
+
+          if [ "$high_critical_count" -gt 0 ]; then
+            echo "❌ Found $high_critical_count high/critical vulnerabilities"
+            echo "::error::High or critical security vulnerabilities found in dependencies"
+            exit 1
+          else
+            echo "✅ No high or critical vulnerabilities found"
+          fi
+        else
+          echo "✅ pip-audit completed successfully with no vulnerabilities"
+        fi
+
+    - name: Upload security reports
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: python-security-reports
+        path: pip-audit-report.json
+        retention-days: 30
+
+  # Container security scan (if Dockerfile exists)
+  container-security-scan:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Check for Dockerfile
+      id: check-dockerfile
+      run: |
+        if [ -f "Dockerfile" ]; then
+          echo "dockerfile-exists=true" >> $GITHUB_OUTPUT
+        else
+          echo "dockerfile-exists=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Install Trivy
+      if: steps.check-dockerfile.outputs.dockerfile-exists == 'true'
+      run: |
+        echo "🔧 Installing Trivy..."
+        sudo apt-get update
+        sudo apt-get install wget apt-transport-https gnupg lsb-release
+        wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+        echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+        sudo apt-get update
+        sudo apt-get install trivy
+
+    - name: Run Trivy filesystem scan
+      if: steps.check-dockerfile.outputs.dockerfile-exists == 'true'
+      run: |
+        echo "🔍 Running Trivy filesystem scan..."
+        trivy fs --format json --output trivy-fs-report.json . || true
+
+        # Check for high/critical vulnerabilities
+        if [ -f trivy-fs-report.json ]; then
+          high_critical_count=$(python3 -c "import json; data=json.load(open('trivy-fs-report.json')); print(sum(1 for result in data.get('Results', []) for vuln in result.get('Vulnerabilities', []) if vuln.get('Severity', '').upper() in ['HIGH', 'CRITICAL']))")
+
+          if [ "$high_critical_count" -gt 0 ]; then
+            echo "❌ Found $high_critical_count high/critical filesystem vulnerabilities"
+            echo "::error::High or critical filesystem vulnerabilities found"
+            exit 1
+          else
+            echo "✅ No high or critical filesystem vulnerabilities found"
+          fi
+        else
+          echo "✅ Trivy filesystem scan completed successfully"
+        fi
+
+    - name: Upload container security reports
+      uses: actions/upload-artifact@v4
+      if: always() && steps.check-dockerfile.outputs.dockerfile-exists == 'true'
+      with:
+        name: container-security-reports
+        path: trivy-fs-report.json
+        retention-days: 30
+
+  # Security summary
+  security-summary:
+    runs-on: ubuntu-latest
+    needs: [python-security-audit, container-security-scan]
+    if: always()
+    steps:
+    - name: Security Validation Summary
+      run: |
+        echo "🔒 Security Validation Summary"
+        echo "=============================="
+        echo "✅ Python dependency security audit (pip-audit)"
+        echo "✅ Container security scan (Trivy)"
+        echo ""
+        echo "All security validation jobs completed!"
+
+        # Check if any job failed
+        if [ "${{ needs.python-security-audit.result }}" != "success" ] || \
+           [ "${{ needs.container-security-scan.result }}" != "success" ]; then
+          echo "::error::One or more security validation jobs failed"
+          exit 1
+        fi

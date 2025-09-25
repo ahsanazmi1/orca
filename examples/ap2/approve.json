@@ -1,0 +1,112 @@
+{
+    "ap2_version": "0.1.0",
+    "intent": {
+        "actor": {
+            "id": "user_12345",
+            "type": "user",
+            "profile": {
+                "identity": {
+                    "verified": true,
+                    "verification_level": "enhanced",
+                    "kyc_status": "approved"
+                },
+                "risk_profile": {
+                    "risk_score": 0.15,
+                    "risk_category": "low",
+                    "velocity_flags": []
+                },
+                "preferences": {
+                    "language": "en-US",
+                    "currency": "USD",
+                    "timezone": "America/Los_Angeles"
+                },
+                "metadata": {
+                    "member_since": "2023-01-15",
+                    "total_transactions": 150
+                }
+            }
+        },
+        "channel": "web",
+        "geo": {
+            "country": "US",
+            "region": "CA",
+            "city": "San Francisco",
+            "timezone": "America/Los_Angeles"
+        },
+        "metadata": {
+            "session_id": "sess_abc123",
+            "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+        }
+    },
+    "cart": {
+        "amount": "99.99",
+        "currency": "USD",
+        "items": [
+            {
+                "id": "item_001",
+                "name": "Wireless Headphones",
+                "amount": "79.99",
+                "quantity": 1,
+                "category": "Electronics",
+                "mcc": "5733"
+            },
+            {
+                "id": "item_002",
+                "name": "Shipping",
+                "amount": "20.00",
+                "quantity": 1,
+                "category": "Shipping"
+            }
+        ],
+        "geo": {
+            "country": "US",
+            "region": "CA",
+            "city": "San Francisco"
+        },
+        "metadata": {
+            "merchant_id": "merchant_123",
+            "order_id": "order_456"
+        }
+    },
+    "payment": {
+        "method": "card",
+        "modality": {
+            "type": "immediate",
+            "description": "Immediate payment processing"
+        },
+        "auth_requirements": [
+            "pin",
+            "biometric"
+        ],
+        "metadata": {
+            "card_brand": "visa",
+            "last_four": "1234"
+        }
+    },
+    "decision": {
+        "result": "APPROVE",
+        "risk_score": 0.15,
+        "reasons": [
+            "Low risk transaction",
+            "Verified user with good history",
+            "Amount within normal limits",
+            "No velocity violations detected"
+        ],
+        "actions": [
+            "Process payment immediately",
+            "Update user transaction history"
+        ],
+        "meta": {
+            "model_version": "0.1.0",
+            "processing_time_ms": 45,
+            "rules_triggered": [
+                "low_risk_threshold",
+                "verified_user"
+            ]
+        }
+    },
+    "signing": {
+        "vc_proof": null,
+        "receipt_hash": "sha256:abc123def456789"
+    }
+}

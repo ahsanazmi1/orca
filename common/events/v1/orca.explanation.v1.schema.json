@@ -1,0 +1,211 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://schemas.ocn.ai/events/v1/orca.explanation.v1.schema.json",
+    "title": "Orca Explanation CloudEvent",
+    "description": "Schema for Orca explanation events, following CloudEvents v1.0 specification",
+    "type": "object",
+    "required": [
+        "specversion",
+        "id",
+        "source",
+        "type",
+        "subject",
+        "time",
+        "data"
+    ],
+    "properties": {
+        "specversion": {
+            "type": "string",
+            "enum": [
+                "1.0"
+            ],
+            "description": "The version of the CloudEvents specification which the event uses"
+        },
+        "id": {
+            "type": "string",
+            "description": "A unique identifier for the event"
+        },
+        "source": {
+            "type": "string",
+            "format": "uri-reference",
+            "description": "The context in which the event happened. Often a URI"
+        },
+        "type": {
+            "type": "string",
+            "enum": [
+                "ocn.orca.explanation.v1"
+            ],
+            "description": "The type of event, e.g., 'ocn.orca.explanation.v1'"
+        },
+        "subject": {
+            "type": "string",
+            "description": "The subject of the event in the context of the event producer (e.g., trace_id)"
+        },
+        "time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The time when the event occurred as a UTC ISO 8601 timestamp"
+        },
+        "datacontenttype": {
+            "type": "string",
+            "enum": [
+                "application/vnd.ocn.ap2+json; version=1"
+            ],
+            "description": "Content type of the data payload"
+        },
+        "dataschema": {
+            "type": "string",
+            "format": "uri",
+            "description": "A link to the schema that the data adheres to"
+        },
+        "data": {
+            "type": "object",
+            "description": "The explanation payload",
+            "required": [
+                "explanation_version",
+                "trace_id",
+                "decision_id",
+                "explanation"
+            ],
+            "properties": {
+                "explanation_version": {
+                    "type": "string",
+                    "description": "Explanation contract version"
+                },
+                "trace_id": {
+                    "type": "string",
+                    "description": "Transaction trace identifier"
+                },
+                "decision_id": {
+                    "type": "string",
+                    "description": "Related decision event identifier"
+                },
+                "explanation": {
+                    "type": "object",
+                    "description": "Explanation details",
+                    "required": [
+                        "reason",
+                        "key_signals",
+                        "mitigation",
+                        "confidence"
+                    ],
+                    "properties": {
+                        "reason": {
+                            "type": "string",
+                            "description": "Primary explanation reason"
+                        },
+                        "key_signals": {
+                            "type": "array",
+                            "description": "Key signals that influenced the decision",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "signal": {
+                                        "type": "string",
+                                        "description": "Signal name"
+                                    },
+                                    "value": {
+                                        "type": [
+                                            "string",
+                                            "number",
+                                            "boolean"
+                                        ],
+                                        "description": "Signal value"
+                                    },
+                                    "impact": {
+                                        "type": "string",
+                                        "enum": [
+                                            "positive",
+                                            "negative",
+                                            "neutral"
+                                        ],
+                                        "description": "Impact on decision"
+                                    },
+                                    "weight": {
+                                        "type": "number",
+                                        "minimum": 0,
+                                        "maximum": 1,
+                                        "description": "Signal weight"
+                                    }
+                                }
+                            }
+                        },
+                        "mitigation": {
+                            "type": "array",
+                            "description": "Risk mitigation strategies",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "confidence": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1,
+                            "description": "Explanation confidence score"
+                        }
+                    }
+                },
+                "metadata": {
+                    "type": "object",
+                    "description": "Additional explanation metadata",
+                    "additionalProperties": true
+                }
+            }
+        }
+    },
+    "examples": [
+        {
+            "specversion": "1.0",
+            "id": "evt_54321",
+            "source": "https://orca.ocn.ai/v1",
+            "type": "ocn.orca.explanation.v1",
+            "subject": "txn_67890",
+            "time": "2024-01-21T12:00:01Z",
+            "datacontenttype": "application/vnd.ocn.ap2+json; version=1",
+            "dataschema": "https://schemas.ocn.ai/ap2/v1/explanation.schema.json",
+            "data": {
+                "explanation_version": "0.1.0",
+                "trace_id": "txn_67890",
+                "decision_id": "evt_12345",
+                "explanation": {
+                    "reason": "Transaction approved based on low risk profile and verified user identity",
+                    "key_signals": [
+                        {
+                            "signal": "user_verification_status",
+                            "value": "verified",
+                            "impact": "positive",
+                            "weight": 0.3
+                        },
+                        {
+                            "signal": "transaction_amount",
+                            "value": 99.99,
+                            "impact": "positive",
+                            "weight": 0.2
+                        },
+                        {
+                            "signal": "velocity_check",
+                            "value": "normal",
+                            "impact": "positive",
+                            "weight": 0.25
+                        },
+                        {
+                            "signal": "merchant_risk_score",
+                            "value": 0.05,
+                            "impact": "positive",
+                            "weight": 0.25
+                        }
+                    ],
+                    "mitigation": [
+                        "Enhanced monitoring for high-value transactions",
+                        "Regular velocity checks"
+                    ],
+                    "confidence": 0.92
+                },
+                "metadata": {
+                    "model_version": "0.1.0",
+                    "explanation_method": "rule_based"
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,217 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://schemas.ocn.ai/events/v1/weave.audit.v1.schema.json",
+    "title": "Weave Audit CloudEvent",
+    "description": "Schema for Weave audit events, following CloudEvents v1.0 specification",
+    "type": "object",
+    "required": [
+        "specversion",
+        "id",
+        "source",
+        "type",
+        "subject",
+        "time",
+        "data"
+    ],
+    "properties": {
+        "specversion": {
+            "type": "string",
+            "enum": [
+                "1.0"
+            ],
+            "description": "The version of the CloudEvents specification which the event uses"
+        },
+        "id": {
+            "type": "string",
+            "description": "A unique identifier for the event"
+        },
+        "source": {
+            "type": "string",
+            "format": "uri-reference",
+            "description": "The context in which the event happened. Often a URI"
+        },
+        "type": {
+            "type": "string",
+            "enum": [
+                "ocn.weave.audit.v1"
+            ],
+            "description": "The type of event, e.g., 'ocn.weave.audit.v1'"
+        },
+        "subject": {
+            "type": "string",
+            "description": "The subject of the event in the context of the event producer (e.g., trace_id)"
+        },
+        "time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The time when the event occurred as a UTC ISO 8601 timestamp"
+        },
+        "datacontenttype": {
+            "type": "string",
+            "enum": [
+                "application/vnd.ocn.ap2+json; version=1"
+            ],
+            "description": "Content type of the data payload"
+        },
+        "dataschema": {
+            "type": "string",
+            "format": "uri",
+            "description": "A link to the schema that the data adheres to"
+        },
+        "data": {
+            "type": "object",
+            "description": "The audit payload",
+            "required": [
+                "audit_version",
+                "trace_id",
+                "receipt_hash",
+                "event_type",
+                "block_height",
+                "transaction_hash",
+                "status"
+            ],
+            "properties": {
+                "audit_version": {
+                    "type": "string",
+                    "description": "Audit contract version"
+                },
+                "trace_id": {
+                    "type": "string",
+                    "description": "Original transaction trace identifier"
+                },
+                "receipt_hash": {
+                    "type": "string",
+                    "description": "Hash of the stored receipt"
+                },
+                "event_type": {
+                    "type": "string",
+                    "enum": [
+                        "ocn.orca.decision.v1",
+                        "ocn.orca.explanation.v1"
+                    ],
+                    "description": "Type of the original event"
+                },
+                "block_height": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "Block height where receipt was stored"
+                },
+                "transaction_hash": {
+                    "type": "string",
+                    "description": "Blockchain transaction hash"
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "stored",
+                        "confirmed",
+                        "failed"
+                    ],
+                    "description": "Storage status"
+                },
+                "original_event_id": {
+                    "type": "string",
+                    "description": "ID of the original CloudEvent"
+                },
+                "storage_metadata": {
+                    "type": "object",
+                    "description": "Storage-specific metadata",
+                    "properties": {
+                        "storage_provider": {
+                            "type": "string",
+                            "description": "Storage provider identifier"
+                        },
+                        "replication_factor": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "description": "Number of storage replicas"
+                        },
+                        "encryption": {
+                            "type": "object",
+                            "description": "Encryption details",
+                            "properties": {
+                                "algorithm": {
+                                    "type": "string",
+                                    "description": "Encryption algorithm"
+                                },
+                                "key_id": {
+                                    "type": "string",
+                                    "description": "Encryption key identifier"
+                                }
+                            }
+                        }
+                    },
+                    "additionalProperties": true
+                },
+                "verification": {
+                    "type": "object",
+                    "description": "Verification information",
+                    "properties": {
+                        "verified": {
+                            "type": "boolean",
+                            "description": "Whether the receipt is verified"
+                        },
+                        "verification_method": {
+                            "type": "string",
+                            "enum": [
+                                "merkle_proof",
+                                "signature",
+                                "consensus"
+                            ],
+                            "description": "Verification method used"
+                        },
+                        "verification_timestamp": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "When verification was completed"
+                        }
+                    }
+                },
+                "metadata": {
+                    "type": "object",
+                    "description": "Additional audit metadata",
+                    "additionalProperties": true
+                }
+            }
+        }
+    },
+    "examples": [
+        {
+            "specversion": "1.0",
+            "id": "evt_98765",
+            "source": "https://weave.ocn.ai/v1",
+            "type": "ocn.weave.audit.v1",
+            "subject": "txn_67890",
+            "time": "2024-01-21T12:00:02Z",
+            "datacontenttype": "application/vnd.ocn.ap2+json; version=1",
+            "dataschema": "https://schemas.ocn.ai/audit/v1/audit.schema.json",
+            "data": {
+                "audit_version": "0.1.0",
+                "trace_id": "txn_67890",
+                "receipt_hash": "sha256:def456789",
+                "event_type": "ocn.orca.decision.v1",
+                "block_height": 1234567,
+                "transaction_hash": "0xabc123def456789",
+                "status": "confirmed",
+                "original_event_id": "evt_12345",
+                "storage_metadata": {
+                    "storage_provider": "weave_v1",
+                    "replication_factor": 3,
+                    "encryption": {
+                        "algorithm": "AES-256",
+                        "key_id": "key_789"
+                    }
+                },
+                "verification": {
+                    "verified": true,
+                    "verification_method": "merkle_proof",
+                    "verification_timestamp": "2024-01-21T12:00:05Z"
+                },
+                "metadata": {
+                    "network": "mainnet",
+                    "gas_used": 21000
+                }
+            }
+        }
+    ]
+}

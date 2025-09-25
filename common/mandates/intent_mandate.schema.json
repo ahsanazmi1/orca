@@ -1,0 +1,98 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://schemas.ocn.ai/mandates/intent_mandate.schema.json",
+    "title": "Intent Mandate",
+    "description": "Schema for payment intent mandate in AP2 format",
+    "type": "object",
+    "required": [
+        "actor",
+        "channel",
+        "geo",
+        "metadata"
+    ],
+    "properties": {
+        "actor": {
+            "type": "object",
+            "description": "Actor performing the transaction",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "Unique identifier for the actor"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "user",
+                        "merchant",
+                        "agent"
+                    ],
+                    "description": "Type of actor"
+                },
+                "profile": {
+                    "$ref": "actor_profile.schema.json"
+                }
+            }
+        },
+        "channel": {
+            "type": "string",
+            "enum": [
+                "web",
+                "mobile",
+                "pos",
+                "api",
+                "voice"
+            ],
+            "description": "Transaction channel"
+        },
+        "geo": {
+            "type": "object",
+            "description": "Geographic context",
+            "properties": {
+                "country": {
+                    "type": "string",
+                    "pattern": "^[A-Z]{2}$",
+                    "description": "ISO 3166-1 alpha-2 country code"
+                },
+                "region": {
+                    "type": "string",
+                    "description": "State or province"
+                },
+                "city": {
+                    "type": "string",
+                    "description": "City name"
+                },
+                "timezone": {
+                    "type": "string",
+                    "description": "IANA timezone identifier"
+                }
+            }
+        },
+        "metadata": {
+            "type": "object",
+            "description": "Additional context metadata",
+            "additionalProperties": true
+        }
+    },
+    "examples": [
+        {
+            "actor": {
+                "id": "user_12345",
+                "type": "user"
+            },
+            "channel": "web",
+            "geo": {
+                "country": "US",
+                "region": "CA",
+                "city": "San Francisco",
+                "timezone": "America/Los_Angeles"
+            },
+            "metadata": {
+                "session_id": "sess_abc123",
+                "user_agent": "Mozilla/5.0..."
+            }
+        }
+    ]
+}

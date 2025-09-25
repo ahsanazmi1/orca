@@ -90,6 +90,7 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 
 # Copy application code
 COPY src/ ./src/
+COPY mcp/ ./mcp/
 
 # Copy model artifacts from model-trainer stage
 COPY --from=model-trainer /app/models/ ./models/

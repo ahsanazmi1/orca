@@ -1,0 +1,115 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://schemas.ocn.ai/mandates/actor_profile.schema.json",
+    "title": "Actor Profile",
+    "description": "Schema for actor profile in AP2 format",
+    "type": "object",
+    "properties": {
+        "identity": {
+            "type": "object",
+            "description": "Identity information",
+            "properties": {
+                "verified": {
+                    "type": "boolean",
+                    "description": "Whether identity is verified"
+                },
+                "verification_level": {
+                    "type": "string",
+                    "enum": [
+                        "none",
+                        "basic",
+                        "enhanced",
+                        "full"
+                    ],
+                    "description": "Level of identity verification"
+                },
+                "kyc_status": {
+                    "type": "string",
+                    "enum": [
+                        "pending",
+                        "approved",
+                        "rejected",
+                        "expired"
+                    ],
+                    "description": "Know Your Customer status"
+                }
+            }
+        },
+        "risk_profile": {
+            "type": "object",
+            "description": "Risk assessment profile",
+            "properties": {
+                "risk_score": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "description": "Risk score between 0 and 1"
+                },
+                "risk_category": {
+                    "type": "string",
+                    "enum": [
+                        "low",
+                        "medium",
+                        "high"
+                    ],
+                    "description": "Risk category"
+                },
+                "velocity_flags": {
+                    "type": "array",
+                    "description": "Velocity-based risk flags",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "preferences": {
+            "type": "object",
+            "description": "User preferences and settings",
+            "properties": {
+                "language": {
+                    "type": "string",
+                    "pattern": "^[a-z]{2}(-[A-Z]{2})?$",
+                    "description": "Preferred language code"
+                },
+                "currency": {
+                    "type": "string",
+                    "pattern": "^[A-Z]{3}$",
+                    "description": "Preferred currency"
+                },
+                "timezone": {
+                    "type": "string",
+                    "description": "IANA timezone identifier"
+                }
+            }
+        },
+        "metadata": {
+            "type": "object",
+            "description": "Additional profile metadata",
+            "additionalProperties": true
+        }
+    },
+    "examples": [
+        {
+            "identity": {
+                "verified": true,
+                "verification_level": "enhanced",
+                "kyc_status": "approved"
+            },
+            "risk_profile": {
+                "risk_score": 0.15,
+                "risk_category": "low",
+                "velocity_flags": []
+            },
+            "preferences": {
+                "language": "en-US",
+                "currency": "USD",
+                "timezone": "America/Los_Angeles"
+            },
+            "metadata": {
+                "member_since": "2023-01-15",
+                "total_transactions": 150
+            }
+        }
+    ]
+}

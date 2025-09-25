@@ -1,0 +1,231 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://schemas.ocn.ai/events/v1/orca.decision.v1.schema.json",
+    "title": "Orca Decision CloudEvent",
+    "description": "Schema for Orca decision events, following CloudEvents v1.0 specification",
+    "type": "object",
+    "required": [
+        "specversion",
+        "id",
+        "source",
+        "type",
+        "subject",
+        "time",
+        "data"
+    ],
+    "properties": {
+        "specversion": {
+            "type": "string",
+            "enum": [
+                "1.0"
+            ],
+            "description": "The version of the CloudEvents specification which the event uses"
+        },
+        "id": {
+            "type": "string",
+            "description": "A unique identifier for the event"
+        },
+        "source": {
+            "type": "string",
+            "format": "uri-reference",
+            "description": "The context in which the event happened. Often a URI"
+        },
+        "type": {
+            "type": "string",
+            "enum": [
+                "ocn.orca.decision.v1"
+            ],
+            "description": "The type of event, e.g., 'ocn.orca.decision.v1'"
+        },
+        "subject": {
+            "type": "string",
+            "description": "The subject of the event in the context of the event producer (e.g., trace_id)"
+        },
+        "time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The time when the event occurred as a UTC ISO 8601 timestamp"
+        },
+        "datacontenttype": {
+            "type": "string",
+            "enum": [
+                "application/vnd.ocn.ap2+json; version=1"
+            ],
+            "description": "Content type of the data payload"
+        },
+        "dataschema": {
+            "type": "string",
+            "format": "uri",
+            "description": "A link to the schema that the data adheres to"
+        },
+        "data": {
+            "type": "object",
+            "description": "The AP2 decision payload",
+            "required": [
+                "ap2_version",
+                "intent",
+                "cart",
+                "payment",
+                "decision",
+                "signing"
+            ],
+            "properties": {
+                "ap2_version": {
+                    "type": "string",
+                    "description": "AP2 contract version"
+                },
+                "intent": {
+                    "$ref": "../mandates/intent_mandate.schema.json"
+                },
+                "cart": {
+                    "$ref": "../mandates/cart_mandate.schema.json"
+                },
+                "payment": {
+                    "$ref": "../mandates/payment_mandate.schema.json"
+                },
+                "decision": {
+                    "type": "object",
+                    "description": "Decision result",
+                    "required": [
+                        "result",
+                        "risk_score",
+                        "reasons",
+                        "actions",
+                        "meta"
+                    ],
+                    "properties": {
+                        "result": {
+                            "type": "string",
+                            "enum": [
+                                "APPROVE",
+                                "DECLINE",
+                                "REVIEW"
+                            ],
+                            "description": "Decision result"
+                        },
+                        "risk_score": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1,
+                            "description": "Risk score between 0 and 1"
+                        },
+                        "reasons": {
+                            "type": "array",
+                            "description": "Decision reasoning",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "actions": {
+                            "type": "array",
+                            "description": "Recommended actions",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "meta": {
+                            "type": "object",
+                            "description": "Additional decision metadata",
+                            "additionalProperties": true
+                        }
+                    }
+                },
+                "signing": {
+                    "type": "object",
+                    "description": "Digital signing information",
+                    "properties": {
+                        "vc_proof": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "description": "Verifiable credential proof"
+                        },
+                        "receipt_hash": {
+                            "type": "string",
+                            "description": "Receipt hash for audit trail"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "examples": [
+        {
+            "specversion": "1.0",
+            "id": "evt_12345",
+            "source": "https://orca.ocn.ai/v1",
+            "type": "ocn.orca.decision.v1",
+            "subject": "txn_67890",
+            "time": "2024-01-21T12:00:00Z",
+            "datacontenttype": "application/vnd.ocn.ap2+json; version=1",
+            "dataschema": "https://schemas.ocn.ai/ap2/v1/decision.schema.json",
+            "data": {
+                "ap2_version": "0.1.0",
+                "intent": {
+                    "actor": {
+                        "id": "user_12345",
+                        "type": "user"
+                    },
+                    "channel": "web",
+                    "geo": {
+                        "country": "US",
+                        "region": "CA",
+                        "city": "San Francisco"
+                    },
+                    "metadata": {}
+                },
+                "cart": {
+                    "amount": "99.99",
+                    "currency": "USD",
+                    "items": [
+                        {
+                            "id": "item_001",
+                            "name": "Wireless Headphones",
+                            "amount": "99.99",
+                            "quantity": 1,
+                            "category": "Electronics"
+                        }
+                    ],
+                    "geo": {
+                        "country": "US",
+                        "region": "CA",
+                        "city": "San Francisco"
+                    },
+                    "metadata": {}
+                },
+                "payment": {
+                    "method": "card",
+                    "modality": {
+                        "type": "immediate",
+                        "description": "Immediate payment"
+                    },
+                    "auth_requirements": [
+                        "pin"
+                    ],
+                    "metadata": {
+                        "card_brand": "visa"
+                    }
+                },
+                "decision": {
+                    "result": "APPROVE",
+                    "risk_score": 0.15,
+                    "reasons": [
+                        "Low risk transaction",
+                        "Verified user"
+                    ],
+                    "actions": [
+                        "Process payment"
+                    ],
+                    "meta": {
+                        "model_version": "0.1.0"
+                    }
+                },
+                "signing": {
+                    "vc_proof": null,
+                    "receipt_hash": "sha256:abc123"
+                }
+            }
+        }
+    ]
+}

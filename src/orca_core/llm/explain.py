@@ -14,7 +14,7 @@ from datetime import datetime
 from typing import Any
 
 # Azure OpenAI imports
-from openai import AzureOpenAI
+from openai import AzureOpenAI  # type: ignore
 
 # Import guardrails
 from .guardrails import ValidationResult, validate_llm_explanation
@@ -235,15 +235,15 @@ GUARDRAILS:
 
 DECISION: {request.decision}
 RISK SCORE: {request.risk_score:.3f}
-REASON CODES: {', '.join(request.reason_codes)}
+REASON CODES: {", ".join(request.reason_codes)}
 MODEL TYPE: {request.model_type} (v{request.model_version})
 
 TRANSACTION CONTEXT:
-- Amount: ${request.transaction_data.get('amount', 0):.2f}
-- Channel: {request.transaction_data.get('channel', 'unknown')}
-- Rail: {request.transaction_data.get('rail', 'unknown')}
+- Amount: ${request.transaction_data.get("amount", 0):.2f}
+- Channel: {request.transaction_data.get("channel", "unknown")}
+- Rail: {request.transaction_data.get("rail", "unknown")}
 
-RULES EVALUATED: {', '.join(request.rules_evaluated) if request.rules_evaluated else 'None'}
+RULES EVALUATED: {", ".join(request.rules_evaluated) if request.rules_evaluated else "None"}
 
 Please provide a JSON response following the schema above."""
 

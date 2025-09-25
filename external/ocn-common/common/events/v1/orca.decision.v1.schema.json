@@ -1,0 +1,192 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://schemas.ocn.ai/events/v1/orca.decision.v1.schema.json",
+    "title": "Orca Decision CloudEvent",
+    "description": "CloudEvent schema for Orca decision events",
+    "type": "object",
+    "required": [
+        "specversion",
+        "id",
+        "source",
+        "type",
+        "subject",
+        "time",
+        "data"
+    ],
+    "properties": {
+        "specversion": {
+            "type": "string",
+            "const": "1.0",
+            "description": "CloudEvents specification version"
+        },
+        "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier for the event"
+        },
+        "source": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^https://orca\\.ocn\\.ai/",
+            "description": "URI identifying the event producer"
+        },
+        "type": {
+            "type": "string",
+            "const": "ocn.orca.decision.v1",
+            "description": "Event type identifier"
+        },
+        "subject": {
+            "type": "string",
+            "pattern": "^txn_[a-f0-9]{16}$",
+            "description": "Transaction ID (trace_id) for correlation"
+        },
+        "time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Event timestamp in RFC3339 format"
+        },
+        "datacontenttype": {
+            "type": "string",
+            "const": "application/json",
+            "description": "Content type of the data payload"
+        },
+        "dataschema": {
+            "type": "string",
+            "format": "uri",
+            "const": "https://schemas.ocn.ai/ap2/v1/decision.schema.json",
+            "description": "Schema URI for the data payload"
+        },
+        "data": {
+            "type": "object",
+            "description": "Decision payload following AP2 contract",
+            "required": [
+                "ap2_version",
+                "intent",
+                "cart",
+                "payment",
+                "decision",
+                "signing"
+            ],
+            "properties": {
+                "ap2_version": {
+                    "type": "string",
+                    "const": "0.1.0"
+                },
+                "intent": {
+                    "type": "object",
+                    "properties": {
+                        "actor": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string"
+                                },
+                                "type": {
+                                    "type": "string",
+                                    "enum": [
+                                        "individual",
+                                        "business",
+                                        "system"
+                                    ]
+                                },
+                                "metadata": {
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "channel": {
+                            "type": "string",
+                            "enum": [
+                                "web",
+                                "pos",
+                                "mobile"
+                            ]
+                        },
+                        "geo": {
+                            "type": "object"
+                        },
+                        "metadata": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "cart": {
+                    "type": "object",
+                    "properties": {
+                        "amount": {
+                            "type": "string"
+                        },
+                        "currency": {
+                            "type": "string"
+                        },
+                        "items": {
+                            "type": "array"
+                        },
+                        "geo": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "payment": {
+                    "type": "object",
+                    "properties": {
+                        "method": {
+                            "type": "string"
+                        },
+                        "modality": {
+                            "type": "string"
+                        },
+                        "auth_requirements": {
+                            "type": "array"
+                        },
+                        "metadata": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "decision": {
+                    "type": "object",
+                    "properties": {
+                        "result": {
+                            "type": "string",
+                            "enum": [
+                                "APPROVE",
+                                "DECLINE",
+                                "REVIEW"
+                            ]
+                        },
+                        "risk_score": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1
+                        },
+                        "reasons": {
+                            "type": "array"
+                        },
+                        "actions": {
+                            "type": "array"
+                        },
+                        "meta": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "signing": {
+                    "type": "object",
+                    "properties": {
+                        "vc_proof": {
+                            "type": [
+                                "object",
+                                "null"
+                            ]
+                        },
+                        "receipt_hash": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "additionalProperties": false
+}
