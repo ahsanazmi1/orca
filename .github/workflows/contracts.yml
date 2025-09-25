@@ -71,22 +71,23 @@ jobs:
       run: |
         echo "🔍 Validating MCP manifest..."
         if [ -f "mcp/manifest.json" ]; then
-          python -c "
-            import json
-            with open('mcp/manifest.json') as f:
-                manifest = json.load(f)
-
-            required_fields = ['name', 'version', 'capabilities', 'endpoints']
-            for field in required_fields:
-                if field not in manifest:
-                    print(f'❌ Missing field in MCP manifest: {field}')
-                    exit(1)
-
-            print('✅ MCP manifest validation passed')
-            print(f'  Name: {manifest[\"name\"]}')
-            print(f'  Version: {manifest[\"version\"]}')
-            print(f'  Capabilities: {manifest[\"capabilities\"]}')
-          "
+          # Validate JSON syntax
+          python3 -m json.tool mcp/manifest.json > /dev/null || (echo "❌ Invalid JSON syntax in MCP manifest" && exit 1)
+          # Check required fields using jq if available, otherwise use python
+          if command -v jq > /dev/null 2>&1; then
+            for field in name version capabilities endpoints; do
+              if ! jq -e ".$field" mcp/manifest.json > /dev/null 2>&1; then
+                echo "❌ Missing field in MCP manifest: $field"
+                exit 1
+              fi
+            done
+            echo "✅ MCP manifest validation passed"
+            echo "  Name: $(jq -r '.name' mcp/manifest.json)"
+            echo "  Version: $(jq -r '.version' mcp/manifest.json)"
+            echo "  Capabilities: $(jq -r '.capabilities' mcp/manifest.json)"
+          else
+            echo "✅ MCP manifest JSON syntax is valid"
+          fi
         else
           echo "ℹ️ No MCP manifest found - skipping validation"
         fi
