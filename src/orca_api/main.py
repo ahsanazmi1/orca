@@ -579,7 +579,7 @@ async def web_demo():
                 channel: document.getElementById('channel').value === "ecommerce" ? "online" : "pos",
                 features: {
                     amount: parseFloat(document.getElementById('amount').value),
-                    risk_score: document.getElementById('riskTier').value === 'low' ? 0.2 : 
+                    risk_score: document.getElementById('riskTier').value === 'low' ? 0.2 :
                                document.getElementById('riskTier').value === 'medium' ? 0.5 : 0.8
                 },
                 context: {
@@ -600,16 +600,34 @@ async def web_demo():
                     const outcome = result.decision || result.status || 'unknown';
                     const traceId = result.meta?.transaction_id || result.meta_structured?.transaction_id || 'N/A';
                     const explanation = result.explanation || result.explanation_human || '';
-                    
+                    const railSelection = result.meta_structured?.rail_selection || result.meta?.rail_selection;
+
+                    // Build rail selection info
+                    let railInfo = '';
+                    if (railSelection) {
+                        const selectedRail = railSelection.selected_rail;
+                        const originalRail = railSelection.original_rail;
+                        const wasOptimized = railSelection.was_optimized;
+                        const reason = railSelection.reason;
+                        const cost = railSelection.cost;
+                        const speedHours = railSelection.speed_hours;
+
+                        if (wasOptimized) {
+                            railInfo = `<br>🚀 <strong>Rail Optimized:</strong> ${originalRail} → ${selectedRail}<br>💰 Cost: $${cost} | ⏱️ Speed: ${speedHours}h | 📋 Reason: ${reason}`;
+                        } else {
+                            railInfo = `<br>🚀 <strong>Rail Selected:</strong> ${selectedRail}<br>💰 Cost: $${cost} | ⏱️ Speed: ${speedHours}h | 📋 Reason: ${reason}`;
+                        }
+                    }
+
                     if (outcome === 'APPROVE' || outcome === 'approve') {
                         resultDiv.className = 'result success';
-                        resultDiv.innerHTML = `🎉 <strong>OUTCOME: APPROVE</strong><br>Transaction ID: ${traceId}<br>${explanation ? '<br>Explanation: ' + explanation : ''}`;
+                        resultDiv.innerHTML = `🎉 <strong>OUTCOME: APPROVE</strong><br>Transaction ID: ${traceId}${railInfo}${explanation ? '<br><br>📝 <strong>Explanation:</strong> ' + explanation : ''}`;
                     } else if (outcome === 'DECLINE' || outcome === 'decline') {
                         resultDiv.className = 'result error';
-                        resultDiv.innerHTML = `❌ <strong>OUTCOME: DECLINE</strong><br>Transaction ID: ${traceId}<br>${explanation ? '<br>Explanation: ' + explanation : ''}`;
+                        resultDiv.innerHTML = `❌ <strong>OUTCOME: DECLINE</strong><br>Transaction ID: ${traceId}${explanation ? '<br><br>📝 <strong>Explanation:</strong> ' + explanation : ''}`;
                     } else {
                         resultDiv.className = 'result warning';
-                        resultDiv.innerHTML = `⚠️ <strong>OUTCOME: ${outcome.toUpperCase()}</strong><br>Transaction ID: ${traceId}<br>${explanation ? '<br>Explanation: ' + explanation : ''}`;
+                        resultDiv.innerHTML = `⚠️ <strong>OUTCOME: ${outcome.toUpperCase()}</strong><br>Transaction ID: ${traceId}${explanation ? '<br><br>📝 <strong>Explanation:</strong> ' + explanation : ''}`;
                     }
                 } else {
                     resultDiv.className = 'result error';

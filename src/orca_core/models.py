@@ -64,6 +64,7 @@ class DecisionMeta(BaseModel):
         default_factory=list, description="List of rules that were evaluated"
     )
     approved_amount: float | None = Field(None, description="Amount approved (if applicable)")
+    rail_selection: dict | None = Field(None, description="Rail selection and optimization details")
 
 
 class DecisionResponse(BaseModel):

@@ -436,7 +436,9 @@ def get_model_registry() -> ModelRegistry:
     """Get global model registry instance."""
     global _model_registry
     if _model_registry is None:
-        _model_registry = ModelRegistry()
+        # Read model directory from environment variable
+        model_dir = os.getenv("ORCA_MODEL_DIR", "models/xgb")
+        _model_registry = ModelRegistry(model_dir=model_dir)
     return _model_registry
 
 

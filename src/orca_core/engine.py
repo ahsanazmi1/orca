@@ -42,6 +42,99 @@ def determine_routing_hint(decision: str, request: DecisionRequest, meta: dict) 
         return "PROCESS_NORMALLY"
 
 
+def determine_optimal_rail(request: DecisionRequest, risk_score: float, decision: str) -> dict | None:
+    """Determine optimal payment rail based on transaction characteristics and risk."""
+    if decision != "APPROVE":
+        return None
+
+    amount = request.cart_total
+    channel = request.channel
+    original_rail = request.rail
+
+    # Rail characteristics (cost, speed, limits)
+    rails = {
+        "ACH": {
+            "cost": 0.25,
+            "speed_hours": 24,
+            "limit": 25000,
+            "risk_tolerance": 0.7,
+            "description": "Low cost, slower, high limits"
+        },
+        "Card": {
+            "cost": 2.9,
+            "speed_hours": 0.1,
+            "limit": 10000,
+            "risk_tolerance": 0.5,
+            "description": "Higher cost, instant, moderate limits"
+        },
+        "Wire": {
+            "cost": 15.0,
+            "speed_hours": 4,
+            "limit": 100000,
+            "risk_tolerance": 0.8,
+            "description": "High cost, fast, very high limits"
+        },
+        "RTP": {
+            "cost": 0.50,
+            "speed_hours": 0.1,
+            "limit": 25000,
+            "risk_tolerance": 0.6,
+            "description": "Low cost, instant, high limits"
+        }
+    }
+
+    # Filter rails based on amount limits
+    available_rails = {rail: info for rail, info in rails.items() if amount <= info["limit"]}
+
+    if not available_rails:
+        return None
+
+    # Score rails based on cost, speed, and risk compatibility
+    scored_rails = []
+    for rail, info in available_rails.items():
+        # Cost score (lower is better) - normalized to 0-1
+        cost_score = max(0, 1 - (info["cost"] / 15.0))
+
+        # Speed score (faster is better) - normalized to 0-1
+        speed_score = max(0, 1 - (info["speed_hours"] / 24.0))
+
+        # Risk compatibility score (higher risk tolerance for higher risk scores)
+        risk_score_compatibility = 1 - abs(risk_score - info["risk_tolerance"])
+
+        # Weighted total score
+        total_score = (cost_score * 0.4) + (speed_score * 0.3) + (risk_score_compatibility * 0.3)
+
+        scored_rails.append({
+            "rail": rail,
+            "score": total_score,
+            "cost": info["cost"],
+            "speed_hours": info["speed_hours"],
+            "reason": info["description"]
+        })
+
+    # Sort by score (highest first)
+    scored_rails.sort(key=lambda x: x["score"], reverse=True)
+
+    if not scored_rails:
+        return None
+
+    best_rail = scored_rails[0]
+
+    # Determine if rail was optimized
+    was_optimized = best_rail["rail"] != original_rail
+
+    return {
+        "selected_rail": best_rail["rail"],
+        "original_rail": original_rail,
+        "was_optimized": was_optimized,
+        "score": best_rail["score"],
+        "cost": best_rail["cost"],
+        "speed_hours": best_rail["speed_hours"],
+        "reason": best_rail["reason"],
+        "alternatives": scored_rails[1:3] if len(scored_rails) > 1 else []
+    }
+
+
 def generate_explanation(
     decision: str, reasons: list[str], request: DecisionRequest, meta: dict
 ) -> str:
@@ -189,6 +282,20 @@ def evaluate_rules(request: DecisionRequest) -> DecisionResponse:
         meta_structured.approved_amount = request.cart_total
         meta["approved_amount"] = request.cart_total
 
+    # Add rail selection and optimization logic
+    rail_selection = determine_optimal_rail(request, risk_score, final_decision)
+    if rail_selection:
+        meta["rail_selection"] = rail_selection
+        meta_structured.rail_selection = rail_selection
+
+        # Add rail-specific reasoning
+        if rail_selection["selected_rail"] != request.rail:
+            reasons.append(f"Rail optimized: {request.rail} → {rail_selection['selected_rail']} for better cost/speed")
+        else:
+            reasons.append(f"Rail {rail_selection['selected_rail']} selected: {rail_selection['reason']}")
+
+        actions.append(f"Route via {rail_selection['selected_rail']}")
+
     # Remove duplicate reasons while preserving order, but keep duplicate actions
     unique_reasons = list(dict.fromkeys(reasons))
     # For actions, we want to preserve duplicates for backward compatibility with tests
@@ -203,10 +310,15 @@ def evaluate_rules(request: DecisionRequest) -> DecisionResponse:
     # Generate human-readable explanation using templates
     # Enhanced with AI/LLM for RULES_PLUS_AI mode
     if is_ai_enabled():
-        # TODO: Integrate with Azure OpenAI for enhanced explanations
-        explanation_human = generate_human_explanation(
-            unique_reasons, final_decision, request.context
-        )
+        # Use LLM explanation if available, otherwise fall back to templates
+        if "llm_explanation" in meta.get("ai", {}):
+            explanation_human = meta["ai"]["llm_explanation"]["explanation"]
+            # Also update the main explanation field with LLM explanation
+            explanation = explanation_human
+        else:
+            explanation_human = generate_human_explanation(
+                unique_reasons, final_decision, request.context
+            )
     else:
         # Use template-based explanations for RULES_ONLY mode
         explanation_human = generate_human_explanation(

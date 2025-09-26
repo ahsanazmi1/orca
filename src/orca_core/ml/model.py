@@ -8,16 +8,13 @@ and deterministic ML stub based on configuration.
 import os
 from typing import Any
 
-# Import the new real ML system
+# Import the working XGB inference module
 try:
-    from src.orca.ml.model_registry import get_model_registry
-    from src.orca.ml.predict_risk import predict_risk as predict_risk_real
+    from .xgb_infer import XGBoostInference, get_xgb_model_info
 
     REAL_ML_AVAILABLE = True
 except ImportError:
     REAL_ML_AVAILABLE = False
-
-from .xgb_infer import get_xgb_model_info
 
 
 def predict_risk(features: dict[str, float]) -> dict[str, Any]:
@@ -42,24 +39,29 @@ def predict_risk(features: dict[str, float]) -> dict[str, Any]:
 
     if use_real_ml and REAL_ML_AVAILABLE:
         try:
-            # Ensure model is loaded
-            registry = get_model_registry()
-            if not registry.is_loaded:
-                registry.load_model()
+            # Use the working XGB inference module
+            model_dir = os.getenv("ORCA_MODEL_DIR", "models")
+            xgb_infer = XGBoostInference(model_dir)
 
-            # Use real XGBoost model with calibration
-            result = predict_risk_real(features)
+            if not xgb_infer.is_loaded:
+                print("⚠️ XGB model not loaded, falling back to stub")
+                return predict_risk_stub(features)
 
-            # Convert to legacy format for compatibility
+            # Use XGBoost model
+            result = xgb_infer.predict_risk(features)
+
+            # Convert to expected format
             return {
                 "risk_score": result["risk_score"],
-                "reason_codes": [
-                    signal["feature_name"].upper() for signal in result["key_signals"][:3]
-                ],
+                "reason_codes": result["reason_codes"],
                 "version": result["version"],
                 "model_type": result["model_type"],
-                "key_signals": result["key_signals"],
-                "model_meta": result["model_meta"],
+                "key_signals": result.get("feature_contributions", {}),
+                "model_meta": {
+                    "model_version": result["version"],
+                    "model_type": result["model_type"],
+                    "trained_on": "xgb_infer",
+                },
             }
         except Exception as e:
             import traceback
