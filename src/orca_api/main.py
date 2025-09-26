@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import Any
 
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import ORJSONResponse
+from fastapi.responses import ORJSONResponse, HTMLResponse
 
 try:
     from ocn_common.trace import trace_middleware
@@ -299,10 +299,339 @@ async def explain_decision(request: ExplainRequest) -> ExplainResponse:
         ) from e
 
 
-@app.exception_handler(ValidationError)
-async def validation_exception_handler(request: Any, exc: ValidationError) -> ORJSONResponse:
-    """Handle Pydantic validation errors."""
-    return ORJSONResponse(status_code=422, content={"detail": f"Validation error: {exc}"})
+@app.get("/demo", response_class=HTMLResponse)
+async def web_demo():
+    """Serve the web demo interface."""
+    html_content = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐋 Orca AI Decision Engine Demo</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+        }
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid #667eea;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e1e5e9;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #5a67d8;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .status-card {
+            text-align: center;
+            padding: 15px;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+        .status-healthy {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .links {
+            margin-top: 30px;
+            text-align: center;
+        }
+        .links a {
+            color: #667eea;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: 600;
+        }
+        .links a:hover {
+            text-decoration: underline;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐋 Orca AI Decision Engine Demo</h1>
+        <p style="text-align: center; color: #666; margin-bottom: 30px;">
+            Open Checkout Network - AI Explainability Demo
+        </p>
+
+        <div class="grid">
+            <div class="card">
+                <h3>📊 Test Decision</h3>
+                <form id="decisionForm">
+                    <div class="form-group">
+                        <label for="amount">Transaction Amount</label>
+                        <input type="number" id="amount" value="125.50" step="0.01" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="traceId">Trace ID</label>
+                        <input type="text" id="traceId" value="demo-trace-001">
+                    </div>
+                    <div class="form-group">
+                        <label for="riskTier">Risk Tier</label>
+                        <select id="riskTier">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="channel">Channel</label>
+                        <select id="channel">
+                            <option value="ecommerce" selected>E-commerce</option>
+                            <option value="pos">POS</option>
+                            <option value="mobile">Mobile</option>
+                            <option value="atm">ATM</option>
+                        </select>
+                    </div>
+                    <button type="submit">🚀 Make Decision</button>
+                </form>
+
+                <div id="result" class="result"></div>
+            </div>
+
+            <div class="card">
+                <h3>🎯 System Status</h3>
+                <div class="status-grid">
+                    <div class="status-card" id="orcaStatus">
+                        <h4>🐋 Orca</h4>
+                        <p>Checking...</p>
+                    </div>
+                    <div class="status-card" id="orionStatus">
+                        <h4>🚀 Orion</h4>
+                        <p>Checking...</p>
+                    </div>
+                    <div class="status-card" id="weaveStatus">
+                        <h4>🌊 Weave</h4>
+                        <p>Checking...</p>
+                    </div>
+                </div>
+
+                <h4 style="margin-top: 20px;">📈 Recent Demo Data</h4>
+                <pre id="demoData">Loading demo data...</pre>
+            </div>
+        </div>
+
+        <div class="links">
+            <a href="http://localhost:8081/docs" target="_blank">🚀 Orion API Docs</a>
+            <a href="http://localhost:8082/docs" target="_blank">🌊 Weave API Docs</a>
+            <a href="http://localhost:8080/health" target="_blank">🐋 Orca Health</a>
+        </div>
+    </div>
+
+    <script>
+        // Check system status
+        async function checkStatus() {
+            const services = [
+                { name: 'orca', url: 'http://localhost:8080/health', element: 'orcaStatus' },
+                { name: 'orion', url: 'http://localhost:8081/health', element: 'orionStatus' },
+                { name: 'weave', url: 'http://localhost:8082/health', element: 'weaveStatus' }
+            ];
+
+            for (const service of services) {
+                try {
+                    const response = await fetch(service.url);
+                    const element = document.getElementById(service.element);
+                    if (response.ok) {
+                        element.className = 'status-card status-healthy';
+                        element.querySelector('p').textContent = '✅ Healthy';
+                    } else {
+                        element.className = 'status-card status-error';
+                        element.querySelector('p').textContent = '❌ Error';
+                    }
+                } catch (error) {
+                    const element = document.getElementById(service.element);
+                    element.className = 'status-card status-error';
+                    element.querySelector('p').textContent = '❌ Offline';
+                }
+            }
+        }
+
+        // Load demo data
+        async function loadDemoData() {
+            try {
+                const response = await fetch('http://localhost:8081/optimize?emit_ce=true', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        amount: 2500.00,
+                        vendor_id: "demo_vendor",
+                        urgency: "standard",
+                        metadata: { demo: true, trace_id: "web-demo-001" }
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('demoData').textContent = JSON.stringify(data, null, 2);
+                } else {
+                    document.getElementById('demoData').textContent = 'Demo data unavailable - services starting up';
+                }
+            } catch (error) {
+                document.getElementById('demoData').textContent = 'Demo data unavailable - services starting up';
+            }
+        }
+
+        // Handle decision form submission
+        document.getElementById('decisionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result';
+            resultDiv.innerHTML = '⏳ Processing decision...';
+
+            const formData = {
+                cart_total: parseFloat(document.getElementById('amount').value),
+                currency: "USD",
+                rail: "Card",
+                channel: document.getElementById('channel').value === "ecommerce" ? "online" : "pos",
+                features: {
+                    amount: parseFloat(document.getElementById('amount').value),
+                    risk_score: document.getElementById('riskTier').value === 'low' ? 0.2 : 
+                               document.getElementById('riskTier').value === 'medium' ? 0.5 : 0.8
+                },
+                context: {
+                    trace_id: document.getElementById('traceId').value,
+                    demo: true
+                }
+            };
+
+            try {
+                const response = await fetch('http://localhost:8080/decision', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    const outcome = result.decision || result.status || 'unknown';
+                    const traceId = result.meta?.transaction_id || result.meta_structured?.transaction_id || 'N/A';
+                    const explanation = result.explanation || result.explanation_human || '';
+                    
+                    if (outcome === 'APPROVE' || outcome === 'approve') {
+                        resultDiv.className = 'result success';
+                        resultDiv.innerHTML = `🎉 <strong>OUTCOME: APPROVE</strong><br>Transaction ID: ${traceId}<br>${explanation ? '<br>Explanation: ' + explanation : ''}`;
+                    } else if (outcome === 'DECLINE' || outcome === 'decline') {
+                        resultDiv.className = 'result error';
+                        resultDiv.innerHTML = `❌ <strong>OUTCOME: DECLINE</strong><br>Transaction ID: ${traceId}<br>${explanation ? '<br>Explanation: ' + explanation : ''}`;
+                    } else {
+                        resultDiv.className = 'result warning';
+                        resultDiv.innerHTML = `⚠️ <strong>OUTCOME: ${outcome.toUpperCase()}</strong><br>Transaction ID: ${traceId}<br>${explanation ? '<br>Explanation: ' + explanation : ''}`;
+                    }
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `❌ API Error: ${response.status}<br>Make sure Orca is running on port 8080`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `❌ Connection Error<br>Make sure 'make up' is running`;
+            }
+        });
+
+        // Initialize page
+        checkStatus();
+        loadDemoData();
+
+        // Refresh status every 30 seconds
+        setInterval(checkStatus, 30000);
+    </script>
+</body>
+</html>
+    """
+    return HTMLResponse(content=html_content)
 
 
 @app.exception_handler(Exception)
