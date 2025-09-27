@@ -7,9 +7,9 @@ Shared schemas, utilities, and contracts for the Open Checkout Network (OCN) eco
 Contracts for bidding/constraints signals.
 
 ### Phase 3 — Negotiation & Live Fee Bidding
-- [ ] CloudEvent schemas: ocn.weave.bid_request.v1, ocn.weave.bid_response.v1
-- [ ] CloudEvent schemas: ocn.oasis.constraint.v1, ocn.onyx.trust_signal.v1
-- [ ] Examples in /examples/events/ and CI validation tests
+- [x] CloudEvent schemas: ocn.weave.bid_request.v1, ocn.weave.bid_response.v1
+- [x] CloudEvent schemas: ocn.oasis.constraint.v1, ocn.onyx.trust_signal.v1
+- [x] Examples in /examples/events/ and CI validation tests
 
 ## CloudEvents Schemas
 
