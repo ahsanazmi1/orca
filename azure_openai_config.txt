@@ -1,8 +1,8 @@
 # Azure OpenAI Configuration for Orca Phase 3
 # This file contains the Azure OpenAI configuration for LLM-powered explanations
 
-# Azure OpenAI Endpoint
-AZURE_OPENAI_ENDPOINT=https://orca-openai.openai.azure.com/
+# Azure OpenAI Endpoint (Updated to new working endpoint)
+AZURE_OPENAI_ENDPOINT=https://ahsan-mg2o4k7e-eastus2.services.ai.azure.com/
 
 # Azure OpenAI API Key (replace with your actual key)
 AZURE_OPENAI_API_KEY=your-api-key-here
