@@ -270,5 +270,15 @@ logger.info("Processing payment for user@example.com with card ending in 1111")
 - **[Keys & Secrets](docs/keys.md)** - Cryptographic key management
 - **[Roadmap](docs/roadmap.md)** - Development roadmap and milestones
 
+## Phase 3 — Negotiation & Live Fee Bidding
+
+Adds merchant-side rail scoring & negotiation with ML risk and LLM explanations.
+
+### Phase 3 — Negotiation & Live Fee Bidding
+- [ ] Proposes cheapest merchant path (ACH, debit, credit) with weights cost=0.4, speed=0.3, risk=0.3
+- [ ] Integrates ML risk into effective cost calculation
+- [ ] Emits LLM explanation: why a rail chosen/declined (ocn.orca.explanation.v1)
+- [ ] Deterministic + risk-adjusted tests for negotiation outcomes
+
 ## Contributing
 See [CONTRIBUTING.md](CONTRIBUTING.md). Star/watch the repo to follow progress.
