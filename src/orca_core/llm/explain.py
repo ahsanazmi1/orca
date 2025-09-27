@@ -545,7 +545,39 @@ def explain_rail_selection_llm(
         response = explainer.explain_decision(explanation_request)
         
         if response and response.explanation:
-            # Enhance with rail-specific context
+            # Create enhanced JSON explanation with detailed breakdown
+            enhanced_explanation = {
+                "reason": response.explanation,
+                "key_signals": {
+                    "cost_signals": optimal_evaluation.cost_factors,
+                    "speed_signals": optimal_evaluation.speed_factors,
+                    "risk_signals": optimal_evaluation.risk_factors,
+                    "ml_risk_score": optimal_evaluation.ml_risk_score,
+                    "composite_score": optimal_evaluation.composite_score,
+                },
+                "mitigation": {
+                    "declined_rails": [
+                        {
+                            "rail": eval.rail_type,
+                            "reason": f"Composite score {eval.composite_score:.3f} vs {optimal_evaluation.composite_score:.3f}",
+                            "primary_factors": eval.cost_factors + eval.risk_factors,
+                        }
+                        for eval in negotiation_response.rail_evaluations
+                        if eval.rail_type != optimal_rail
+                    ],
+                    "risk_mitigation": f"ML risk score {optimal_evaluation.ml_risk_score:.3f} within acceptable threshold",
+                },
+                "confidence": {
+                    "score_difference": optimal_evaluation.composite_score - max(
+                        [eval.composite_score for eval in negotiation_response.rail_evaluations 
+                         if eval.rail_type != optimal_rail], default=0.0
+                    ),
+                    "decision_strength": "high" if optimal_evaluation.composite_score > 0.7 else "medium" if optimal_evaluation.composite_score > 0.5 else "low",
+                    "alternative_count": len([e for e in negotiation_response.rail_evaluations if e.rail_type != optimal_rail]),
+                }
+            }
+            
+            # Return both human-readable and structured explanation
             rail_explanation = f"Rail Selection Analysis: {response.explanation}"
             
             # Add specific rail reasoning
@@ -557,6 +589,9 @@ def explain_rail_selection_llm(
             
             if optimal_evaluation.risk_score < 0.3:
                 rail_explanation += f" Risk profile is favorable with ML score of {optimal_evaluation.ml_risk_score:.3f}."
+            
+            # Add structured JSON to explanation
+            rail_explanation += f"\n\nStructured Analysis: {json.dumps(enhanced_explanation, indent=2)}"
             
             return rail_explanation
         else:

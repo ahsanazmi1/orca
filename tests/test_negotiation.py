@@ -13,6 +13,7 @@ from src.orca_core.models import NegotiationRequest, NegotiationResponse, RailEv
 from src.orca_core.engine import (
     determine_optimal_rail,
     evaluate_rail,
+    evaluate_rail_with_weights,
     get_rail_cost_data,
     get_rail_speed_score,
     get_rail_risk_score,
@@ -595,6 +596,352 @@ class TestDeterministicOutcomes:
         credit_speed_eval = next(e for e in speed_response.rail_evaluations if e.rail_type == "Credit")
         
         assert credit_speed_eval.composite_score > ach_speed_eval.composite_score
+
+
+class TestEnhancedNegotiationSystem:
+    """Test the enhanced negotiation system with precise weights and deterministic seeds."""
+    
+    def test_precise_weight_enforcement(self):
+        """Test that weights are enforced as cost=0.4, speed=0.3, risk=0.3."""
+        request = NegotiationRequest(
+            cart_total=1000.0,
+            features={"transaction_amount": 1000.0, "merchant_risk_score": 0.3},
+            context={"deterministic_seed": 42},
+            available_rails=["ACH", "Debit", "Credit"],
+            cost_weight=0.8,  # This should be overridden
+            speed_weight=0.1,  # This should be overridden
+            risk_weight=0.1,   # This should be overridden
+        )
+        
+        response = determine_optimal_rail(request)
+        
+        # Check that normalized weights are used
+        assert response.negotiation_metadata["weights"]["cost"] == 0.4
+        assert response.negotiation_metadata["weights"]["speed"] == 0.3
+        assert response.negotiation_metadata["weights"]["risk"] == 0.3
+        
+        # Check that original weights are preserved
+        assert response.negotiation_metadata["original_weights"]["cost"] == 0.8
+        assert response.negotiation_metadata["original_weights"]["speed"] == 0.1
+        assert response.negotiation_metadata["original_weights"]["risk"] == 0.1
+    
+    def test_deterministic_seed_consistency(self):
+        """Test that deterministic seed produces consistent results."""
+        request = NegotiationRequest(
+            cart_total=1000.0,
+            features={"transaction_amount": 1000.0, "merchant_risk_score": 0.5},
+            context={"deterministic_seed": 123},
+            available_rails=["ACH", "Debit", "Credit"],
+        )
+        
+        # Run multiple times with same seed
+        response1 = determine_optimal_rail(request)
+        response2 = determine_optimal_rail(request)
+        
+        # Results should be identical
+        assert response1.optimal_rail == response2.optimal_rail
+        assert response1.trace_id != response2.trace_id  # Trace IDs should be different
+        assert response1.negotiation_metadata["deterministic_seed"] == 123
+        
+        # Check that composite scores are identical
+        for eval1, eval2 in zip(response1.rail_evaluations, response2.rail_evaluations):
+            assert eval1.composite_score == eval2.composite_score
+            assert eval1.rail_type == eval2.rail_type
+    
+    def test_rail_evaluation_with_weights(self):
+        """Test rail evaluation with specific weights."""
+        request = NegotiationRequest(
+            cart_total=1000.0,
+            features={"transaction_amount": 1000.0, "merchant_risk_score": 0.3},
+            context={"deterministic_seed": 42},
+        )
+        
+        weights = {"cost": 0.6, "speed": 0.3, "risk": 0.1}
+        
+        # Test ACH evaluation with custom weights
+        ach_eval = evaluate_rail_with_weights("ACH", request, 0.3, weights)
+        
+        # ACH should have high cost score (low cost), low speed, low risk
+        assert ach_eval.cost_score > 0.9  # Very low cost
+        assert ach_eval.speed_score == 0.3  # 2-day settlement (slower)
+        assert ach_eval.risk_score < 0.5  # Low risk
+        
+        # Composite score should reflect weight emphasis on cost
+        expected_composite = (ach_eval.cost_score * 0.6 + 
+                            ach_eval.speed_score * 0.3 + 
+                            (1.0 - ach_eval.risk_score) * 0.1)
+        assert abs(ach_eval.composite_score - expected_composite) < 0.001
+
+
+class TestPureCostWinner:
+    """Test scenarios where cost optimization wins."""
+    
+    def test_ach_wins_on_pure_cost(self):
+        """Test that ACH has the best cost score due to lowest processing cost."""
+        request = NegotiationRequest(
+            cart_total=10000.0,  # Large transaction
+            features={"transaction_amount": 10000.0, "merchant_risk_score": 0.2},
+            context={"deterministic_seed": 42},
+            available_rails=["ACH", "Debit", "Credit"],
+        )
+        
+        response = determine_optimal_rail(request)
+        
+        # ACH should have the best cost score (lowest actual cost)
+        ach_eval = next(e for e in response.rail_evaluations if e.rail_type == "ACH")
+        debit_eval = next(e for e in response.rail_evaluations if e.rail_type == "Debit")
+        credit_eval = next(e for e in response.rail_evaluations if e.rail_type == "Credit")
+        
+        assert ach_eval.cost_score > debit_eval.cost_score
+        assert ach_eval.cost_score > credit_eval.cost_score
+        assert ach_eval.cost_score > 0.9  # Very high cost score (low actual cost)
+        
+        # ACH should have the lowest base cost
+        assert ach_eval.base_cost < debit_eval.base_cost
+        assert ach_eval.base_cost < credit_eval.base_cost
+    
+    def test_volume_discount_cost_advantage(self):
+        """Test that volume discounts affect cost scoring."""
+        # Large transaction should get volume discount
+        large_request = NegotiationRequest(
+            cart_total=50000.0,
+            features={"transaction_amount": 50000.0, "merchant_risk_score": 0.3},
+            context={"deterministic_seed": 42},
+            available_rails=["ACH", "Credit"],
+        )
+        
+        # Small transaction
+        small_request = NegotiationRequest(
+            cart_total=100.0,
+            features={"transaction_amount": 100.0, "merchant_risk_score": 0.3},
+            context={"deterministic_seed": 42},
+            available_rails=["ACH", "Credit"],
+        )
+        
+        large_response = determine_optimal_rail(large_request)
+        small_response = determine_optimal_rail(small_request)
+        
+        # Get ACH evaluations
+        large_ach = next(e for e in large_response.rail_evaluations if e.rail_type == "ACH")
+        small_ach = next(e for e in small_response.rail_evaluations if e.rail_type == "ACH")
+        
+        # Large transaction ACH should have better cost score due to volume discount
+        assert large_ach.cost_score > small_ach.cost_score
+
+
+class TestRiskPenalizedReversal:
+    """Test scenarios where risk penalties cause rail selection reversals."""
+    
+    def test_high_risk_penalizes_ach(self):
+        """Test that high ML risk score penalizes ACH selection."""
+        # Low risk scenario
+        low_risk_request = NegotiationRequest(
+            cart_total=1000.0,
+            features={"transaction_amount": 1000.0, "merchant_risk_score": 0.1},
+            context={"deterministic_seed": 42},
+            available_rails=["ACH", "Credit"],
+        )
+        
+        # High risk scenario
+        high_risk_request = NegotiationRequest(
+            cart_total=1000.0,
+            features={"transaction_amount": 1000.0, "merchant_risk_score": 0.9},
+            context={"deterministic_seed": 42},
+            available_rails=["ACH", "Credit"],
+        )
+        
+        low_risk_response = determine_optimal_rail(low_risk_request)
+        high_risk_response = determine_optimal_rail(high_risk_request)
+        
+        # Low risk should favor ACH (cost optimization)
+        if low_risk_response.optimal_rail == "ACH":
+            ach_low = next(e for e in low_risk_response.rail_evaluations if e.rail_type == "ACH")
+            credit_low = next(e for e in low_risk_response.rail_evaluations if e.rail_type == "Credit")
+            assert ach_low.composite_score > credit_low.composite_score
+        
+        # High risk should potentially favor Credit (risk mitigation)
+        ach_high = next(e for e in high_risk_response.rail_evaluations if e.rail_type == "ACH")
+        credit_high = next(e for e in high_risk_response.rail_evaluations if e.rail_type == "Credit")
+        
+        # ACH should have higher risk score in high-risk scenario
+        assert ach_high.risk_score > credit_high.risk_score
+    
+    def test_online_channel_risk_penalty(self):
+        """Test that online channel adds risk penalty to ACH."""
+        online_request = NegotiationRequest(
+            cart_total=1000.0,
+            features={"transaction_amount": 1000.0, "merchant_risk_score": 0.3},
+            channel="online",
+            context={"deterministic_seed": 42},
+            available_rails=["ACH", "Credit"],
+        )
+        
+        pos_request = NegotiationRequest(
+            cart_total=1000.0,
+            features={"transaction_amount": 1000.0, "merchant_risk_score": 0.3},
+            channel="pos",
+            context={"deterministic_seed": 42},
+            available_rails=["ACH", "Credit"],
+        )
+        
+        online_response = determine_optimal_rail(online_request)
+        pos_response = determine_optimal_rail(pos_request)
+        
+        # Get ACH evaluations
+        online_ach = next(e for e in online_response.rail_evaluations if e.rail_type == "ACH")
+        pos_ach = next(e for e in pos_response.rail_evaluations if e.rail_type == "ACH")
+        
+        # Online ACH should have higher risk score due to channel penalty
+        assert online_ach.risk_score > pos_ach.risk_score
+
+
+class TestTieBreakers:
+    """Test tie-breaking scenarios in rail selection."""
+    
+    def test_identical_scores_tie_breaker(self):
+        """Test tie-breaking when rails have identical composite scores."""
+        # Create scenario where two rails might have very similar scores
+        request = NegotiationRequest(
+            cart_total=1000.0,
+            features={"transaction_amount": 1000.0, "merchant_risk_score": 0.5},
+            context={"deterministic_seed": 42},
+            available_rails=["Debit", "Credit"],
+        )
+        
+        response = determine_optimal_rail(request)
+        
+        # Should still select one rail (no ties in practice due to floating point precision)
+        assert response.optimal_rail in ["Debit", "Credit"]
+        
+        # All evaluations should be present
+        assert len(response.rail_evaluations) == 2
+        
+        # One should have higher score
+        scores = [e.composite_score for e in response.rail_evaluations]
+        assert len(set(scores)) == len(scores)  # All scores should be unique
+    
+    def test_rail_ordering_consistency(self):
+        """Test that rail ordering is consistent across runs."""
+        request = NegotiationRequest(
+            cart_total=1000.0,
+            features={"transaction_amount": 1000.0, "merchant_risk_score": 0.4},
+            context={"deterministic_seed": 999},
+            available_rails=["ACH", "Debit", "Credit"],
+        )
+        
+        response = determine_optimal_rail(request)
+        
+        # Rails should be sorted by composite score (highest first)
+        scores = [e.composite_score for e in response.rail_evaluations]
+        assert scores == sorted(scores, reverse=True)
+        
+        # First rail should be the optimal one
+        assert response.optimal_rail == response.rail_evaluations[0].rail_type
+
+
+class TestLLMExplanationJSON:
+    """Test LLM explanation JSON structure and content."""
+    
+    @patch('src.orca_core.llm.explain.is_llm_configured', return_value=True)
+    @patch('src.orca_core.llm.explain.get_llm_explainer')
+    def test_llm_explanation_json_structure(self, mock_get_explainer, mock_is_configured):
+        """Test that LLM explanations include structured JSON with required fields."""
+        # Mock the LLM explainer
+        mock_explainer = MagicMock()
+        mock_explainer.is_configured.return_value = True
+        mock_explainer.explain_decision.return_value = MagicMock(
+            explanation="ACH selected for cost efficiency"
+        )
+        mock_get_explainer.return_value = mock_explainer
+        
+        request = NegotiationRequest(
+            cart_total=1000.0,
+            features={"transaction_amount": 1000.0, "merchant_risk_score": 0.3},
+            context={"deterministic_seed": 42},
+            available_rails=["ACH", "Credit"],
+        )
+        
+        response = determine_optimal_rail(request)
+        
+        # Check that explanation contains structured JSON
+        assert "Structured Analysis:" in response.explanation
+        assert "reason" in response.explanation
+        assert "key_signals" in response.explanation
+        assert "mitigation" in response.explanation
+        assert "confidence" in response.explanation
+    
+    @patch('src.orca_core.llm.explain.is_llm_configured', return_value=False)
+    def test_fallback_explanation_when_llm_unavailable(self, mock_is_configured):
+        """Test that fallback explanation is used when LLM is unavailable."""
+        request = NegotiationRequest(
+            cart_total=1000.0,
+            features={"transaction_amount": 1000.0, "merchant_risk_score": 0.3},
+            context={"deterministic_seed": 42},
+            available_rails=["ACH", "Credit"],
+        )
+        
+        response = determine_optimal_rail(request)
+        
+        # Should have some explanation (fallback)
+        assert len(response.explanation) > 0
+        assert response.optimal_rail in response.explanation
+    
+    def test_explanation_includes_rail_details(self):
+        """Test that explanations include specific rail details."""
+        request = NegotiationRequest(
+            cart_total=1000.0,
+            features={"transaction_amount": 1000.0, "merchant_risk_score": 0.3},
+            context={"deterministic_seed": 42},
+            available_rails=["ACH", "Credit"],
+        )
+        
+        response = determine_optimal_rail(request)
+        
+        # Explanation should mention the selected rail
+        assert response.optimal_rail in response.explanation
+        
+        # Should include some reasoning about why it was selected
+        explanation_lower = response.explanation.lower()
+        reasoning_indicators = ["cost", "speed", "risk", "selected", "chosen"]
+        assert any(indicator in explanation_lower for indicator in reasoning_indicators)
+
+
+class TestMCPIntegration:
+    """Test MCP verb integration for negotiateCheckout."""
+    
+    def test_mcp_negotiate_checkout_structure(self):
+        """Test that MCP negotiateCheckout returns expected structure."""
+        # This would typically be tested via the MCP server endpoint
+        # For now, we test the underlying negotiation logic
+        
+        request = NegotiationRequest(
+            cart_total=1000.0,
+            features={"transaction_amount": 1000.0, "merchant_risk_score": 0.3},
+            context={"deterministic_seed": 42},
+            available_rails=["ACH", "Debit", "Credit"],
+        )
+        
+        response = determine_optimal_rail(request)
+        
+        # Verify response has all required fields for MCP
+        assert response.optimal_rail is not None
+        assert len(response.rail_evaluations) > 0
+        assert response.explanation is not None
+        assert response.trace_id is not None
+        assert response.timestamp is not None
+        assert response.ml_model_used is not None
+        assert response.negotiation_metadata is not None
+        
+        # Check that each evaluation has required fields
+        for eval in response.rail_evaluations:
+            assert eval.rail_type is not None
+            assert eval.cost_score is not None
+            assert eval.speed_score is not None
+            assert eval.risk_score is not None
+            assert eval.composite_score is not None
+            assert eval.base_cost is not None
+            assert eval.settlement_days is not None
+            assert eval.ml_risk_score is not None
 
 
 if __name__ == "__main__":
