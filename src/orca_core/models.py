@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field
 DecisionStatus = Literal["APPROVE", "DECLINE", "ROUTE"]
 
 # Define valid rail types
-RailType = Literal["Card", "ACH"]
+RailType = Literal["Card", "ACH", "Debit", "Credit"]
 
 # Define valid channel types
 ChannelType = Literal["online", "pos"]
@@ -102,3 +102,58 @@ class DecisionResponse(BaseModel):
         None, description="[DEPRECATED] Use meta_structured.timestamp"
     )
     rail: RailType | None = Field(None, description="[DEPRECATED] Use meta_structured.rail")
+
+
+# Phase 3 - Negotiation & Live Fee Bidding Models
+
+class RailEvaluation(BaseModel):
+    """Evaluation of a payment rail for negotiation."""
+    
+    rail_type: RailType = Field(..., description="Type of payment rail")
+    cost_score: float = Field(..., description="Cost score (0.0-1.0, higher = better)", ge=0.0, le=1.0)
+    speed_score: float = Field(..., description="Speed score (0.0-1.0, higher = better)", ge=0.0, le=1.0)
+    risk_score: float = Field(..., description="Risk score (0.0-1.0, higher = worse)", ge=0.0, le=1.0)
+    composite_score: float = Field(..., description="Weighted composite score", ge=0.0, le=1.0)
+    
+    # Detailed breakdown
+    base_cost: float = Field(..., description="Base processing cost in basis points")
+    settlement_days: int = Field(..., description="Days to settlement", ge=0)
+    ml_risk_score: float = Field(..., description="ML model risk score", ge=0.0, le=1.0)
+    
+    # Explanation data
+    cost_factors: list[str] = Field(default_factory=list, description="Factors affecting cost")
+    speed_factors: list[str] = Field(default_factory=list, description="Factors affecting speed")
+    risk_factors: list[str] = Field(default_factory=list, description="Factors affecting risk")
+
+
+class NegotiationRequest(BaseModel):
+    """Request for rail negotiation evaluation."""
+    
+    cart_total: float = Field(..., description="Total cart value", gt=0)
+    currency: str = Field(default="USD", description="Currency code")
+    channel: ChannelType = Field(default="online", description="Transaction channel")
+    features: dict[str, float] = Field(default_factory=dict, description="Feature values for ML risk")
+    context: dict[str, Any] = Field(default_factory=dict, description="Additional context")
+    
+    # Negotiation parameters
+    available_rails: list[RailType] = Field(
+        default_factory=lambda: ["ACH", "Debit", "Credit"], 
+        description="Available payment rails to evaluate"
+    )
+    cost_weight: float = Field(default=0.4, description="Weight for cost in composite score", ge=0.0, le=1.0)
+    speed_weight: float = Field(default=0.3, description="Weight for speed in composite score", ge=0.0, le=1.0)
+    risk_weight: float = Field(default=0.3, description="Weight for risk in composite score", ge=0.0, le=1.0)
+
+
+class NegotiationResponse(BaseModel):
+    """Response from rail negotiation evaluation."""
+    
+    optimal_rail: RailType = Field(..., description="Recommended payment rail")
+    rail_evaluations: list[RailEvaluation] = Field(..., description="All rail evaluations")
+    explanation: str = Field(..., description="LLM-generated explanation of rail selection")
+    trace_id: str = Field(..., description="Transaction trace ID")
+    timestamp: datetime = Field(..., description="Evaluation timestamp")
+    
+    # Metadata
+    ml_model_used: str = Field(..., description="ML model identifier used")
+    negotiation_metadata: dict[str, Any] = Field(default_factory=dict, description="Additional metadata")

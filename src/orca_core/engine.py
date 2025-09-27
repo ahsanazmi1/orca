@@ -12,9 +12,10 @@ except ImportError:
 
 from .config import decision_mode, get_settings, is_ai_enabled
 from .explanations import generate_human_explanation
-from .llm.explain import explain_decision_llm, is_llm_configured
+from .llm.explain import explain_decision_llm, is_llm_configured, explain_rail_selection_llm
 from .ml.model import predict_risk
-from .models import DecisionMeta, DecisionRequest, DecisionResponse, DecisionStatus
+from .models import DecisionMeta, DecisionRequest, DecisionResponse, DecisionStatus, NegotiationRequest, NegotiationResponse, RailEvaluation, RailType
+from .events import emit_negotiation_explanation_event
 from .rules.registry import run_rules
 
 
@@ -250,3 +251,260 @@ def evaluate_rules(request: DecisionRequest) -> DecisionResponse:
         timestamp=timestamp,
         rail=request.rail,
     )
+
+
+# Phase 3 - Negotiation & Live Fee Bidding Functions
+
+def get_rail_cost_data(rail_type: RailType, cart_total: float) -> dict[str, float]:
+    """Get cost data for a specific rail type."""
+    # Base costs in basis points (1 basis point = 0.01%)
+    rail_costs = {
+        "ACH": {"base_cost": 5.0, "settlement_days": 2},  # 5 bps, 2 days
+        "Debit": {"base_cost": 25.0, "settlement_days": 1},  # 25 bps, 1 day
+        "Credit": {"base_cost": 150.0, "settlement_days": 1},  # 150 bps, 1 day
+        "Card": {"base_cost": 150.0, "settlement_days": 1},  # Alias for Credit
+    }
+    
+    base_data = rail_costs.get(rail_type, rail_costs["Credit"])
+    
+    # Adjust cost based on transaction size (volume discounts)
+    if cart_total > 10000:  # Large transactions get volume discount
+        cost_multiplier = 0.8
+    elif cart_total > 1000:  # Medium transactions get small discount
+        cost_multiplier = 0.9
+    else:
+        cost_multiplier = 1.0
+    
+    return {
+        "base_cost": base_data["base_cost"] * cost_multiplier,
+        "settlement_days": base_data["settlement_days"],
+    }
+
+
+def get_rail_speed_score(rail_type: RailType, channel: str) -> float:
+    """Calculate speed score for a rail type."""
+    # Speed scoring: 1.0 = fastest, 0.0 = slowest
+    speed_scores = {
+        "ACH": 0.3,  # Slower settlement
+        "Debit": 0.9,  # Fast settlement
+        "Credit": 0.95,  # Very fast settlement
+        "Card": 0.95,  # Alias for Credit
+    }
+    
+    base_score = speed_scores.get(rail_type, 0.5)
+    
+    # Adjust for channel
+    if channel == "pos" and rail_type in ["Debit", "Credit", "Card"]:
+        base_score += 0.05  # POS is slightly faster for card rails
+    
+    return min(base_score, 1.0)
+
+
+def get_rail_risk_score(rail_type: RailType, ml_risk_score: float, channel: str) -> float:
+    """Calculate risk-adjusted score for a rail type."""
+    # Base risk by rail type (higher = more risky)
+    rail_risk_base = {
+        "ACH": 0.2,  # Lower risk, but higher fraud potential
+        "Debit": 0.4,  # Medium risk
+        "Credit": 0.7,  # Higher risk, chargebacks
+        "Card": 0.7,  # Alias for Credit
+    }
+    
+    base_risk = rail_risk_base.get(rail_type, 0.5)
+    
+    # Incorporate ML risk score (weighted)
+    ml_weight = 0.6  # ML risk contributes 60% to final risk score
+    rail_weight = 0.4  # Rail base risk contributes 40%
+    
+    combined_risk = (ml_risk_score * ml_weight) + (base_risk * rail_weight)
+    
+    # Adjust for channel
+    if channel == "online" and rail_type in ["ACH"]:
+        combined_risk += 0.1  # Online ACH is riskier
+    
+    return min(combined_risk, 1.0)
+
+
+def evaluate_rail(rail_type: RailType, request: NegotiationRequest, ml_risk_score: float) -> RailEvaluation:
+    """Evaluate a single payment rail."""
+    cost_data = get_rail_cost_data(rail_type, request.cart_total)
+    
+    # Calculate scores (higher = better for cost and speed, lower = better for risk)
+    cost_score = max(0.0, 1.0 - (cost_data["base_cost"] / 200.0))  # Normalize to 0-1
+    speed_score = get_rail_speed_score(rail_type, request.channel)
+    risk_score = get_rail_risk_score(rail_type, ml_risk_score, request.channel)
+    
+    # Calculate composite score with weights
+    composite_score = (
+        cost_score * request.cost_weight +
+        speed_score * request.speed_weight +
+        (1.0 - risk_score) * request.risk_weight  # Invert risk (lower risk = higher score)
+    )
+    
+    # Generate explanation factors
+    cost_factors = []
+    if cost_data["base_cost"] < 50:
+        cost_factors.append("low processing cost")
+    elif cost_data["base_cost"] > 100:
+        cost_factors.append("high processing cost")
+    
+    speed_factors = []
+    if cost_data["settlement_days"] <= 1:
+        speed_factors.append("instant settlement")
+    elif cost_data["settlement_days"] <= 2:
+        speed_factors.append("fast settlement")
+    else:
+        speed_factors.append("delayed settlement")
+    
+    risk_factors = []
+    if ml_risk_score > 0.7:
+        risk_factors.append("high ML risk score")
+    if rail_type in ["Credit", "Card"]:
+        risk_factors.append("chargeback risk")
+    if rail_type == "ACH" and request.channel == "online":
+        risk_factors.append("ACH fraud risk")
+    
+    return RailEvaluation(
+        rail_type=rail_type,
+        cost_score=cost_score,
+        speed_score=speed_score,
+        risk_score=risk_score,
+        composite_score=composite_score,
+        base_cost=cost_data["base_cost"],
+        settlement_days=cost_data["settlement_days"],
+        ml_risk_score=ml_risk_score,
+        cost_factors=cost_factors,
+        speed_factors=speed_factors,
+        risk_factors=risk_factors,
+    )
+
+
+def determine_optimal_rail(request: NegotiationRequest) -> NegotiationResponse:
+    """
+    Determine the optimal payment rail using weighted scoring.
+    
+    Weights: cost=0.4, speed=0.3, risk=0.3
+    
+    Args:
+        request: Negotiation request with cart details and preferences
+        
+    Returns:
+        NegotiationResponse with optimal rail and evaluations
+    """
+    # Generate trace ID
+    trace_id = new_trace_id()
+    timestamp = datetime.now()
+    
+    # Get ML risk score
+    ml_result = predict_risk(request.features)
+    ml_risk_score = ml_result["risk_score"]
+    ml_model_used = ml_result.get("model_type", "xgboost")
+    
+    # Evaluate all available rails
+    rail_evaluations = []
+    for rail_type in request.available_rails:
+        evaluation = evaluate_rail(rail_type, request, ml_risk_score)
+        rail_evaluations.append(evaluation)
+    
+    # Sort by composite score (highest first)
+    rail_evaluations.sort(key=lambda x: x.composite_score, reverse=True)
+    optimal_rail = rail_evaluations[0].rail_type if rail_evaluations else "Credit"
+    
+    # Generate explanation (try LLM first, fallback to deterministic)
+    if is_llm_configured():
+        try:
+            # Create temporary response for LLM explanation
+            temp_response = NegotiationResponse(
+                optimal_rail=optimal_rail,
+                rail_evaluations=rail_evaluations,
+                explanation="",  # Will be filled by LLM
+                trace_id=trace_id,
+                timestamp=timestamp,
+                ml_model_used=ml_model_used,
+                negotiation_metadata={
+                    "weights": {
+                        "cost": request.cost_weight,
+                        "speed": request.speed_weight,
+                        "risk": request.risk_weight,
+                    },
+                    "ml_risk_score": ml_risk_score,
+                    "rails_evaluated": len(rail_evaluations),
+                },
+            )
+            explanation = explain_rail_selection_llm(temp_response, request)
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"LLM rail explanation failed, using fallback: {e}")
+            explanation = generate_rail_explanation(optimal_rail, rail_evaluations, request)
+    else:
+        explanation = generate_rail_explanation(optimal_rail, rail_evaluations, request)
+    
+    # Create negotiation response
+    response = NegotiationResponse(
+        optimal_rail=optimal_rail,
+        rail_evaluations=rail_evaluations,
+        explanation=explanation,
+        trace_id=trace_id,
+        timestamp=timestamp,
+        ml_model_used=ml_model_used,
+        negotiation_metadata={
+            "weights": {
+                "cost": request.cost_weight,
+                "speed": request.speed_weight,
+                "risk": request.risk_weight,
+            },
+            "ml_risk_score": ml_risk_score,
+            "rails_evaluated": len(rail_evaluations),
+        },
+    )
+    
+    # Emit CloudEvent for negotiation explanation
+    try:
+        emit_negotiation_explanation_event(response, trace_id)
+    except Exception as e:
+        # Log error but don't fail the negotiation
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Failed to emit negotiation explanation event: {e}")
+    
+    return response
+
+
+def generate_rail_explanation(optimal_rail: RailType, evaluations: list[RailEvaluation], request: NegotiationRequest) -> str:
+    """Generate human-readable explanation for rail selection."""
+    optimal_eval = next((e for e in evaluations if e.rail_type == optimal_rail), None)
+    if not optimal_eval:
+        return f"Selected {optimal_rail} as the default payment rail."
+    
+    # Build explanation
+    reasons = []
+    
+    # Cost reasoning
+    if optimal_eval.cost_score > 0.7:
+        reasons.append(f"{optimal_rail} offers the lowest cost at {optimal_eval.base_cost:.1f} basis points")
+    
+    # Speed reasoning
+    if optimal_eval.speed_score > 0.8:
+        reasons.append(f"{optimal_rail} provides fastest settlement in {optimal_eval.settlement_days} day(s)")
+    
+    # Risk reasoning
+    if optimal_eval.risk_score < 0.4:
+        reasons.append(f"{optimal_rail} has the lowest risk profile")
+    
+    # Explain why other rails were not chosen
+    declined_reasons = []
+    for eval_rail in evaluations:
+        if eval_rail.rail_type != optimal_rail:
+            if eval_rail.composite_score < optimal_eval.composite_score * 0.8:
+                if eval_rail.cost_score < optimal_eval.cost_score * 0.8:
+                    declined_reasons.append(f"{eval_rail.rail_type} declined due to higher cost ({eval_rail.base_cost:.1f} bps)")
+                elif eval_rail.risk_score > optimal_eval.risk_score * 1.5:
+                    declined_reasons.append(f"{eval_rail.rail_type} declined due to higher risk ({eval_rail.risk_score:.2f})")
+    
+    explanation_parts = [f"Selected {optimal_rail} because: " + ", ".join(reasons)]
+    
+    if declined_reasons:
+        explanation_parts.append("Other rails declined: " + "; ".join(declined_reasons[:2]))
+    
+    return ". ".join(explanation_parts) + "."

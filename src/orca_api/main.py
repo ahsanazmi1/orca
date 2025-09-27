@@ -19,10 +19,10 @@ from pydantic import BaseModel, Field, ValidationError
 
 from src.orca.logging_setup import get_traced_logger, setup_logging
 from src.orca_core.config import get_settings
-from src.orca_core.engine import evaluate_rules
+from src.orca_core.engine import evaluate_rules, determine_optimal_rail
 from src.orca_core.explanations import generate_human_explanation
 from src.orca_core.llm.explain import get_llm_explainer, is_llm_configured
-from src.orca_core.models import DecisionRequest, DecisionResponse
+from src.orca_core.models import DecisionRequest, DecisionResponse, NegotiationRequest, NegotiationResponse
 from mcp import router as mcp_router
 
 # Set up structured logging with redaction
@@ -297,6 +297,113 @@ async def explain_decision(request: ExplainRequest) -> ExplainResponse:
         raise HTTPException(
             status_code=500, detail=f"Failed to generate explanation: {str(e)}"
         ) from e
+
+
+# Phase 3 - Negotiation & Live Fee Bidding Endpoints
+
+@app.post("/negotiate", response_model=NegotiationResponse)
+async def negotiate_rails(request: NegotiationRequest) -> NegotiationResponse:
+    """
+    Negotiate optimal payment rail based on cost, speed, and risk.
+    
+    This endpoint implements Phase 3 negotiation logic with weighted scoring:
+    - Cost weight: 0.4 (default)
+    - Speed weight: 0.3 (default) 
+    - Risk weight: 0.3 (default)
+    
+    Integrates XGBoost ML risk scoring and emits CloudEvents for explanations.
+    """
+    try:
+        logger.info(
+            f"Starting rail negotiation",
+            extra={
+                "cart_total": request.cart_total,
+                "available_rails": request.available_rails,
+                "weights": {
+                    "cost": request.cost_weight,
+                    "speed": request.speed_weight,
+                    "risk": request.risk_weight,
+                }
+            }
+        )
+        
+        # Determine optimal rail using Phase 3 negotiation logic
+        response = determine_optimal_rail(request)
+        
+        logger.info(
+            f"Rail negotiation completed",
+            extra={
+                "optimal_rail": response.optimal_rail,
+                "trace_id": response.trace_id,
+                "ml_model_used": response.ml_model_used,
+                "composite_scores": {
+                    eval.rail_type: eval.composite_score 
+                    for eval in response.rail_evaluations
+                }
+            }
+        )
+        
+        return response
+        
+    except Exception as e:
+        logger.error(f"Rail negotiation failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Negotiation failed: {str(e)}")
+
+
+@app.get("/negotiation/status")
+async def get_negotiation_status() -> dict[str, Any]:
+    """
+    Get negotiation service status and configuration.
+    """
+    try:
+        # Check ML model availability
+        ml_status = "unknown"
+        try:
+            from src.orca_core.ml.model import predict_risk
+            # Test with dummy features
+            test_result = predict_risk({"velocity": 0.5, "amount": 1000.0})
+            ml_status = f"available ({test_result.get('model_type', 'unknown')})"
+        except Exception:
+            ml_status = "unavailable"
+        
+        # Check LLM availability
+        llm_status = "unknown"
+        try:
+            llm_configured = is_llm_configured()
+            llm_status = "configured" if llm_configured else "not configured"
+        except Exception:
+            llm_status = "unavailable"
+        
+        # Check CloudEvents availability
+        cloudevents_status = "unknown"
+        try:
+            import cloudevents.http
+            cloudevents_status = "available"
+        except ImportError:
+            cloudevents_status = "unavailable (fallback mode)"
+        
+        return {
+            "service": "orca-negotiation",
+            "version": "0.3.0",
+            "status": "operational",
+            "phase": "Phase 3 - Negotiation & Live Fee Bidding",
+            "capabilities": {
+                "rail_evaluation": True,
+                "ml_risk_scoring": ml_status,
+                "llm_explanations": llm_status,
+                "cloudevents_emission": cloudevents_status,
+            },
+            "supported_rails": ["ACH", "Debit", "Credit"],
+            "default_weights": {
+                "cost": 0.4,
+                "speed": 0.3,
+                "risk": 0.3,
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to get negotiation status: {e}")
+        raise HTTPException(status_code=500, detail=f"Status check failed: {str(e)}")
 
 
 @app.exception_handler(ValidationError)

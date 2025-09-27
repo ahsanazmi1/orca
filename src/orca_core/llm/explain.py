@@ -19,6 +19,13 @@ from openai import AzureOpenAI  # type: ignore
 # Import guardrails
 from .guardrails import ValidationResult, validate_llm_explanation
 
+# Import negotiation models for rail selection explanations
+try:
+    from ..models import NegotiationRequest, NegotiationResponse, RailEvaluation
+    NEGOTIATION_MODELS_AVAILABLE = True
+except ImportError:
+    NEGOTIATION_MODELS_AVAILABLE = False
+
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -442,3 +449,177 @@ def get_llm_configuration_status() -> dict[str, Any]:
     """Get LLM configuration status."""
     explainer = get_llm_explainer()
     return explainer.get_configuration_status()
+
+
+# Phase 3 - Rail Selection LLM Explanations
+
+def explain_rail_selection_llm(
+    negotiation_response: NegotiationResponse,
+    request: NegotiationRequest
+) -> str:
+    """
+    Generate LLM-powered explanation for rail selection in negotiation.
+    
+    Args:
+        negotiation_response: Response from rail negotiation
+        request: Original negotiation request
+        
+    Returns:
+        Human-readable explanation of rail selection reasoning
+    """
+    if not NEGOTIATION_MODELS_AVAILABLE:
+        return "Rail selection explanation not available (models not imported)"
+    
+    explainer = get_llm_explainer()
+    if not explainer.is_configured():
+        return "LLM explanation service not configured"
+    
+    # Build context for LLM explanation
+    optimal_rail = negotiation_response.optimal_rail
+    optimal_evaluation = next(
+        (e for e in negotiation_response.rail_evaluations if e.rail_type == optimal_rail), 
+        None
+    )
+    
+    if not optimal_evaluation:
+        return f"Selected {optimal_rail} as default payment rail."
+    
+    # Create detailed context for LLM
+    context_data = {
+        "transaction": {
+            "cart_total": request.cart_total,
+            "currency": request.currency,
+            "channel": request.channel,
+            "available_rails": request.available_rails,
+        },
+        "weights": {
+            "cost_weight": request.cost_weight,
+            "speed_weight": request.speed_weight,
+            "risk_weight": request.risk_weight,
+        },
+        "optimal_rail": {
+            "rail_type": optimal_evaluation.rail_type,
+            "cost_score": optimal_evaluation.cost_score,
+            "speed_score": optimal_evaluation.speed_score,
+            "risk_score": optimal_evaluation.risk_score,
+            "composite_score": optimal_evaluation.composite_score,
+            "base_cost": optimal_evaluation.base_cost,
+            "settlement_days": optimal_evaluation.settlement_days,
+            "ml_risk_score": optimal_evaluation.ml_risk_score,
+            "cost_factors": optimal_evaluation.cost_factors,
+            "speed_factors": optimal_evaluation.speed_factors,
+            "risk_factors": optimal_evaluation.risk_factors,
+        },
+        "alternative_rails": [
+            {
+                "rail_type": eval.rail_type,
+                "composite_score": eval.composite_score,
+                "base_cost": eval.base_cost,
+                "risk_score": eval.risk_score,
+                "cost_factors": eval.cost_factors,
+                "risk_factors": eval.risk_factors,
+            }
+            for eval in negotiation_response.rail_evaluations
+            if eval.rail_type != optimal_rail
+        ],
+        "ml_model": {
+            "model_used": negotiation_response.ml_model_used,
+            "risk_score": optimal_evaluation.ml_risk_score,
+        }
+    }
+    
+    # Create explanation request
+    explanation_request = ExplanationRequest(
+        decision=f"SELECT_RAIL_{optimal_rail}",
+        risk_score=optimal_evaluation.ml_risk_score,
+        reason_codes=optimal_evaluation.risk_factors,
+        transaction_data=context_data,
+        model_type=negotiation_response.ml_model_used,
+        model_version="1.0",
+        rules_evaluated=[],  # Not applicable for rail selection
+        meta_data=negotiation_response.negotiation_metadata,
+    )
+    
+    try:
+        # Generate LLM explanation
+        response = explainer.explain_decision(explanation_request)
+        
+        if response and response.explanation:
+            # Enhance with rail-specific context
+            rail_explanation = f"Rail Selection Analysis: {response.explanation}"
+            
+            # Add specific rail reasoning
+            if optimal_evaluation.cost_score > 0.8:
+                rail_explanation += f" {optimal_rail} was chosen primarily for cost efficiency at {optimal_evaluation.base_cost:.1f} basis points."
+            
+            if optimal_evaluation.speed_score > 0.8:
+                rail_explanation += f" Settlement speed is optimal at {optimal_evaluation.settlement_days} day(s)."
+            
+            if optimal_evaluation.risk_score < 0.3:
+                rail_explanation += f" Risk profile is favorable with ML score of {optimal_evaluation.ml_risk_score:.3f}."
+            
+            return rail_explanation
+        else:
+            return f"LLM explanation failed, using fallback: {negotiation_response.explanation}"
+            
+    except Exception as e:
+        logger.error(f"LLM rail selection explanation failed: {e}")
+        return f"LLM explanation unavailable: {negotiation_response.explanation}"
+
+
+def explain_rail_decline_llm(
+    declined_rail: str,
+    decline_reasons: list[str],
+    optimal_rail: str,
+    ml_risk_score: float
+) -> str:
+    """
+    Generate LLM-powered explanation for why a rail was declined.
+    
+    Args:
+        declined_rail: Rail type that was declined
+        decline_reasons: List of reasons for decline
+        optimal_rail: Rail that was selected instead
+        ml_risk_score: ML risk score used in evaluation
+        
+    Returns:
+        Human-readable explanation of rail decline reasoning
+    """
+    if not NEGOTIATION_MODELS_AVAILABLE:
+        return f"{declined_rail} declined due to: {', '.join(decline_reasons)}"
+    
+    explainer = get_llm_explainer()
+    if not explainer.is_configured():
+        return f"{declined_rail} declined due to: {', '.join(decline_reasons)}"
+    
+    # Create context for decline explanation
+    context_data = {
+        "declined_rail": declined_rail,
+        "decline_reasons": decline_reasons,
+        "selected_rail": optimal_rail,
+        "ml_risk_score": ml_risk_score,
+        "analysis_type": "rail_decline",
+    }
+    
+    explanation_request = ExplanationRequest(
+        decision=f"DECLINE_RAIL_{declined_rail}",
+        risk_score=ml_risk_score,
+        reason_codes=decline_reasons,
+        transaction_data=context_data,
+        model_type="rail_negotiation",
+        model_version="1.0",
+        rules_evaluated=[],
+        meta_data={"decline_analysis": True},
+    )
+    
+    try:
+        response = explainer.explain_decision(explanation_request)
+        
+        if response and response.explanation:
+            return f"Rail Decline Analysis: {response.explanation}"
+        else:
+            return f"{declined_rail} declined due to: {', '.join(decline_reasons)}"
+            
+    except Exception as e:
+        logger.error(f"LLM rail decline explanation failed: {e}")
+        return f"{declined_rail} declined due to: {', '.join(decline_reasons)}"
