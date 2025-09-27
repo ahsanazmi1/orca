@@ -310,27 +310,13 @@ class LLMExplainer:
 
     def explain_decision(
         self,
-        decision: str,
-        risk_score: float,
-        reason_codes: list[str],
-        transaction_data: dict[str, Any],
-        model_type: str = "unknown",
-        model_version: str = "unknown",
-        rules_evaluated: list[str] | None = None,
-        meta_data: dict[str, Any] | None = None,
+        request: ExplanationRequest,
     ) -> ExplanationResponse | None:
         """
         Generate explanation for a decision.
 
         Args:
-            decision: The decision made (APPROVE, DECLINE, REVIEW)
-            risk_score: Risk score from ML model
-            reason_codes: List of reason codes
-            transaction_data: Transaction context data
-            model_type: Type of ML model used
-            model_version: Version of ML model
-            rules_evaluated: List of rules that were evaluated
-            meta_data: Additional metadata
+            request: ExplanationRequest with all required parameters
 
         Returns:
             ExplanationResponse if successful, None if LLM not available
@@ -352,18 +338,6 @@ class LLMExplainer:
             )
 
         try:
-            # Build request
-            request = ExplanationRequest(
-                decision=decision,
-                risk_score=risk_score,
-                reason_codes=reason_codes,
-                transaction_data=transaction_data,
-                model_type=model_type,
-                model_version=model_version,
-                rules_evaluated=rules_evaluated or [],
-                meta_data=meta_data or {},
-            )
-
             # Generate explanation
             response = self.client.generate_explanation(request)
 
@@ -427,16 +401,20 @@ def explain_decision_llm(
     This is the main entry point for LLM explanation generation.
     """
     explainer = get_llm_explainer()
-    return explainer.explain_decision(
+    
+    # Create ExplanationRequest object
+    explanation_request = ExplanationRequest(
         decision=decision,
         risk_score=risk_score,
         reason_codes=reason_codes,
         transaction_data=transaction_data,
         model_type=model_type,
         model_version=model_version,
-        rules_evaluated=rules_evaluated,
-        meta_data=meta_data,
+        rules_evaluated=rules_evaluated or [],
+        meta_data=meta_data or {},
     )
+    
+    return explainer.explain_decision(explanation_request)
 
 
 def is_llm_configured() -> bool:
