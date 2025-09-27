@@ -60,6 +60,8 @@ jobs:
           "weave.bid_response.v1.schema.json"
           "oasis.constraint.v1.schema.json"
           "onyx.trust_signal.v1.schema.json"
+          "opal.explanation.v1.schema.json"
+          "olive.policy_applied.v1.schema.json"
         )
         
         for schema in "${required_schemas[@]}"; do
@@ -77,6 +79,8 @@ jobs:
           "weave.bid_response.example.json"
           "oasis.constraint.example.json"
           "onyx.trust_signal.example.json"
+          "opal.explanation.example.json"
+          "olive.policy_applied.example.json"
         )
         
         for example in "${required_examples[@]}"; do

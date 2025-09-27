@@ -51,6 +51,8 @@ def test_phase3_schemas():
         ("weave.bid_response.v1.schema.json", "weave.bid_response.example.json"),
         ("oasis.constraint.v1.schema.json", "oasis.constraint.example.json"),
         ("onyx.trust_signal.v1.schema.json", "onyx.trust_signal.example.json"),
+        ("opal.explanation.v1.schema.json", "opal.explanation.example.json"),
+        ("olive.policy_applied.v1.schema.json", "olive.policy_applied.example.json"),
     ]
     
     # Get the base directory (this script's directory)

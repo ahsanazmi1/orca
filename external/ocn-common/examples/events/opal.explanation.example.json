@@ -1,0 +1,80 @@
+{
+  "specversion": "1.0",
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "source": "https://opal.ocn.ai/negotiation",
+  "type": "ocn.opal.explanation.v1",
+  "subject": "actor_consumer_12345",
+  "time": "2024-01-15T14:30:00Z",
+  "datacontenttype": "application/json",
+  "dataschema": "https://schemas.ocn.ai/events/v1/opal.explanation.v1.schema.json",
+  "data": {
+    "actor_id": "consumer_12345",
+    "trace_id": "txn_20240115_143000_abc123",
+    "merchant_context": {
+      "merchant_id": "merchant_tech_store_001",
+      "merchant_name": "TechStore Pro",
+      "mcc": "5732",
+      "channel": "online"
+    },
+    "cart_summary": {
+      "total_amount": 1299.99,
+      "currency": "USD",
+      "item_count": 3,
+      "transaction_type": "purchase"
+    },
+    "rail_candidates": [
+      {
+        "rail_type": "Credit",
+        "instrument_id": "cc_visa_1234",
+        "provider": "Visa",
+        "last_four": "1234"
+      },
+      {
+        "rail_type": "BNPL",
+        "instrument_id": "bnpl_klarna_5678",
+        "provider": "Klarna",
+        "last_four": "5678"
+      },
+      {
+        "rail_type": "Debit",
+        "instrument_id": "dc_checking_9012",
+        "provider": "Bank of America",
+        "last_four": "9012"
+      }
+    ],
+    "scores": {
+      "cost": 0.8,
+      "speed": 0.9,
+      "risk": 0.3,
+      "rewards": 0.95,
+      "preference": 0.85
+    },
+    "selected_instrument": {
+      "instrument_type": "credit_card",
+      "instrument_id": "cc_visa_1234",
+      "provider": "Visa",
+      "last_four": "1234",
+      "total_reward_value": 25.99,
+      "out_of_pocket_cost": 0.0,
+      "net_value": 25.99,
+      "loyalty_tier": "Gold",
+      "loyalty_multiplier": 1.2
+    },
+    "explanation": "Selected Visa credit card ending in 1234 for $25.99 in rewards with no immediate out-of-pocket cost plus Gold loyalty bonus. Declined BNPL due to lower rewards. Countering merchant's Credit proposal.",
+    "negotiation_metadata": {
+      "weights": {
+        "reward_weight": 0.6,
+        "cost_weight": 0.2,
+        "preference_weight": 0.2
+      },
+      "consumer_preferences": {
+        "prefer_rewards": true,
+        "avoid_fees": true,
+        "loyalty_priority": "high"
+      },
+      "win_win_score": 0.78,
+      "instruments_evaluated": 3,
+      "evaluation_time_ms": 45
+    }
+  }
+}

@@ -1,0 +1,299 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Olive Policy Applied CloudEvent Schema",
+  "description": "Schema for Olive policy enforcement and application events",
+  "type": "object",
+  "properties": {
+    "specversion": {
+      "type": "string",
+      "const": "1.0",
+      "description": "CloudEvents specification version"
+    },
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique identifier for this event"
+    },
+    "source": {
+      "type": "string",
+      "format": "uri",
+      "description": "URI identifying the event source"
+    },
+    "type": {
+      "type": "string",
+      "const": "ocn.olive.policy_applied.v1",
+      "description": "Event type identifier"
+    },
+    "subject": {
+      "type": "string",
+      "description": "Event subject, typically merchant or policy identifier"
+    },
+    "time": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Event timestamp in ISO 8601 format"
+    },
+    "datacontenttype": {
+      "type": "string",
+      "const": "application/json",
+      "description": "Content type of the data payload"
+    },
+    "dataschema": {
+      "type": "string",
+      "format": "uri",
+      "description": "Schema URI for the data payload"
+    },
+    "data": {
+      "type": "object",
+      "description": "Policy application event data",
+      "properties": {
+        "merchant_id": {
+          "type": "string",
+          "description": "Merchant identifier"
+        },
+        "trace_id": {
+          "type": "string",
+          "description": "Transaction trace identifier for correlation"
+        },
+        "merchant_context": {
+          "type": "object",
+          "description": "Merchant context information",
+          "properties": {
+            "merchant_name": {
+              "type": "string",
+              "description": "Merchant display name"
+            },
+            "mcc": {
+              "type": "string",
+              "description": "Merchant Category Code"
+            },
+            "channel": {
+              "type": "string",
+              "enum": ["online", "pos", "mobile", "phone"],
+              "description": "Transaction channel"
+            },
+            "business_type": {
+              "type": "string",
+              "description": "Type of business"
+            },
+            "risk_profile": {
+              "type": "string",
+              "enum": ["low", "medium", "high"],
+              "description": "Merchant risk profile"
+            }
+          },
+          "required": ["merchant_name", "channel"]
+        },
+        "cart_summary": {
+          "type": "object",
+          "description": "Cart and transaction summary",
+          "properties": {
+            "total_amount": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Total cart amount"
+            },
+            "currency": {
+              "type": "string",
+              "pattern": "^[A-Z]{3}$",
+              "description": "Currency code (ISO 4217)"
+            },
+            "item_count": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Number of items in cart"
+            },
+            "transaction_type": {
+              "type": "string",
+              "enum": ["purchase", "refund", "adjustment"],
+              "description": "Type of transaction"
+            }
+          },
+          "required": ["total_amount", "currency"]
+        },
+        "policy_rule": {
+          "type": "object",
+          "description": "Policy rule that was applied",
+          "properties": {
+            "rule_id": {
+              "type": "string",
+              "description": "Unique policy rule identifier"
+            },
+            "rule_name": {
+              "type": "string",
+              "description": "Human-readable rule name"
+            },
+            "rule_type": {
+              "type": "string",
+              "enum": ["routing", "discount", "loyalty", "early_pay", "risk_mitigation"],
+              "description": "Type of policy rule"
+            },
+            "policy_dsl": {
+              "type": "string",
+              "description": "Policy DSL expression that was evaluated"
+            },
+            "priority": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "description": "Rule priority (1=highest)"
+            }
+          },
+          "required": ["rule_id", "rule_name", "rule_type", "policy_dsl"]
+        },
+        "rail_candidates": {
+          "type": "array",
+          "description": "Payment rail candidates affected by policy",
+          "items": {
+            "type": "object",
+            "properties": {
+              "rail_type": {
+                "type": "string",
+                "enum": ["ACH", "Debit", "Credit", "BNPL", "Wallet"],
+                "description": "Payment rail type"
+              },
+              "original_cost": {
+                "type": "number",
+                "description": "Original processing cost in basis points"
+              },
+              "adjusted_cost": {
+                "type": "number",
+                "description": "Policy-adjusted cost in basis points"
+              },
+              "discount_applied": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Discount applied in basis points"
+              },
+              "loyalty_points": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Loyalty points awarded"
+              },
+              "early_pay_terms": {
+                "type": "object",
+                "properties": {
+                  "discount_rate": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "settlement_days": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                }
+              }
+            },
+            "required": ["rail_type"]
+          }
+        },
+        "scores": {
+          "type": "object",
+          "description": "Policy evaluation scores",
+          "properties": {
+            "cost": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Cost score (0.0-1.0, higher = better)"
+            },
+            "speed": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Speed score (0.0-1.0, higher = better)"
+            },
+            "risk": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Risk score (0.0-1.0, higher = worse)"
+            },
+            "loyalty": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Loyalty score (0.0-1.0, higher = better)"
+            },
+            "policy_compliance": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Policy compliance score"
+            }
+          }
+        },
+        "explanation": {
+          "type": "string",
+          "description": "Human-readable explanation of policy application and effects"
+        },
+        "policy_metadata": {
+          "type": "object",
+          "description": "Additional policy metadata",
+          "properties": {
+            "policy_version": {
+              "type": "string",
+              "description": "Policy version identifier"
+            },
+            "evaluation_time_ms": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Policy evaluation time in milliseconds"
+            },
+            "rules_evaluated": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Number of rules evaluated"
+            },
+            "rules_matched": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Number of rules that matched"
+            },
+            "merchant_savings": {
+              "type": "number",
+              "description": "Total merchant cost savings from policy application"
+            },
+            "consumer_benefits": {
+              "type": "object",
+              "properties": {
+                "discounts": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "loyalty_points": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "cashback": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              }
+            }
+          }
+        }
+      },
+      "required": [
+        "merchant_id",
+        "trace_id",
+        "merchant_context",
+        "cart_summary",
+        "policy_rule",
+        "rail_candidates",
+        "scores",
+        "explanation"
+      ]
+    }
+  },
+  "required": [
+    "specversion",
+    "id",
+    "source",
+    "type",
+    "time",
+    "datacontenttype",
+    "data"
+  ]
+}

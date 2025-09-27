@@ -1,0 +1,78 @@
+{
+  "specversion": "1.0",
+  "id": "550e8400-e29b-41d4-a716-446655440001",
+  "source": "https://olive.ocn.ai/policy",
+  "type": "ocn.olive.policy_applied.v1",
+  "subject": "merchant_tech_store_001",
+  "time": "2024-01-15T14:30:00Z",
+  "datacontenttype": "application/json",
+  "dataschema": "https://schemas.ocn.ai/events/v1/olive.policy_applied.v1.schema.json",
+  "data": {
+    "merchant_id": "merchant_tech_store_001",
+    "trace_id": "txn_20240115_143000_abc123",
+    "merchant_context": {
+      "merchant_name": "TechStore Pro",
+      "mcc": "5732",
+      "channel": "online",
+      "business_type": "electronics_retailer",
+      "risk_profile": "medium"
+    },
+    "cart_summary": {
+      "total_amount": 1299.99,
+      "currency": "USD",
+      "item_count": 3,
+      "transaction_type": "purchase"
+    },
+    "policy_rule": {
+      "rule_id": "rule_tech_loyalty_001",
+      "rule_name": "Tech Store Loyalty Program",
+      "rule_type": "loyalty",
+      "policy_dsl": "IF merchant.mcc == '5732' AND cart.total_amount > 1000 THEN apply_loyalty_points(2x) AND discount_processing_fee(0.5%)",
+      "priority": 15
+    },
+    "rail_candidates": [
+      {
+        "rail_type": "Credit",
+        "original_cost": 150.0,
+        "adjusted_cost": 143.0,
+        "discount_applied": 7.0,
+        "loyalty_points": 2599.98,
+        "early_pay_terms": {
+          "discount_rate": 0.005,
+          "settlement_days": 1
+        }
+      },
+      {
+        "rail_type": "Debit",
+        "original_cost": 25.0,
+        "adjusted_cost": 20.0,
+        "discount_applied": 5.0,
+        "loyalty_points": 1299.99,
+        "early_pay_terms": {
+          "discount_rate": 0.002,
+          "settlement_days": 0
+        }
+      }
+    ],
+    "scores": {
+      "cost": 0.85,
+      "speed": 0.9,
+      "risk": 0.2,
+      "loyalty": 0.95,
+      "policy_compliance": 1.0
+    },
+    "explanation": "Applied Tech Store Loyalty Program policy: 2x loyalty points (2,599.98 points) and 0.5% processing fee discount for electronics purchases over $1,000. Credit rail receives 7 basis point discount, debit rail receives 5 basis point discount.",
+    "policy_metadata": {
+      "policy_version": "v2.1.0",
+      "evaluation_time_ms": 12,
+      "rules_evaluated": 8,
+      "rules_matched": 1,
+      "merchant_savings": 12.0,
+      "consumer_benefits": {
+        "discounts": 12.0,
+        "loyalty_points": 2599.98,
+        "cashback": 0.0
+      }
+    }
+  }
+}

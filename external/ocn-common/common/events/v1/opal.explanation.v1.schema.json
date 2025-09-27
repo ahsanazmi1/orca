@@ -1,0 +1,279 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Opal Consumer Explanation CloudEvent Schema",
+  "description": "Schema for Opal consumer counter-negotiation explanation events",
+  "type": "object",
+  "properties": {
+    "specversion": {
+      "type": "string",
+      "const": "1.0",
+      "description": "CloudEvents specification version"
+    },
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique identifier for this event"
+    },
+    "source": {
+      "type": "string",
+      "format": "uri",
+      "description": "URI identifying the event source"
+    },
+    "type": {
+      "type": "string",
+      "const": "ocn.opal.explanation.v1",
+      "description": "Event type identifier"
+    },
+    "subject": {
+      "type": "string",
+      "description": "Event subject, typically actor or transaction identifier"
+    },
+    "time": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Event timestamp in ISO 8601 format"
+    },
+    "datacontenttype": {
+      "type": "string",
+      "const": "application/json",
+      "description": "Content type of the data payload"
+    },
+    "dataschema": {
+      "type": "string",
+      "format": "uri",
+      "description": "Schema URI for the data payload"
+    },
+    "data": {
+      "type": "object",
+      "description": "Consumer explanation event data",
+      "properties": {
+        "actor_id": {
+          "type": "string",
+          "description": "Consumer actor identifier"
+        },
+        "trace_id": {
+          "type": "string",
+          "description": "Transaction trace identifier for correlation"
+        },
+        "merchant_context": {
+          "type": "object",
+          "description": "Merchant context information",
+          "properties": {
+            "merchant_id": {
+              "type": "string",
+              "description": "Merchant identifier"
+            },
+            "merchant_name": {
+              "type": "string",
+              "description": "Merchant display name"
+            },
+            "mcc": {
+              "type": "string",
+              "description": "Merchant Category Code"
+            },
+            "channel": {
+              "type": "string",
+              "enum": ["online", "pos", "mobile", "phone"],
+              "description": "Transaction channel"
+            }
+          },
+          "required": ["merchant_id", "channel"]
+        },
+        "cart_summary": {
+          "type": "object",
+          "description": "Cart and transaction summary",
+          "properties": {
+            "total_amount": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Total cart amount"
+            },
+            "currency": {
+              "type": "string",
+              "pattern": "^[A-Z]{3}$",
+              "description": "Currency code (ISO 4217)"
+            },
+            "item_count": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Number of items in cart"
+            },
+            "transaction_type": {
+              "type": "string",
+              "enum": ["purchase", "refund", "adjustment"],
+              "description": "Type of transaction"
+            }
+          },
+          "required": ["total_amount", "currency"]
+        },
+        "rail_candidates": {
+          "type": "array",
+          "description": "Available payment rail candidates evaluated",
+          "items": {
+            "type": "object",
+            "properties": {
+              "rail_type": {
+                "type": "string",
+                "enum": ["ACH", "Debit", "Credit", "BNPL", "Wallet"],
+                "description": "Payment rail type"
+              },
+              "instrument_id": {
+                "type": "string",
+                "description": "Consumer instrument identifier"
+              },
+              "provider": {
+                "type": "string",
+                "description": "Payment provider name"
+              },
+              "last_four": {
+                "type": "string",
+                "pattern": "^[0-9]{4}$",
+                "description": "Last four digits of instrument"
+              }
+            },
+            "required": ["rail_type", "instrument_id"]
+          }
+        },
+        "scores": {
+          "type": "object",
+          "description": "Consumer scoring metrics",
+          "properties": {
+            "cost": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Cost score (0.0-1.0, higher = better)"
+            },
+            "speed": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Speed score (0.0-1.0, higher = better)"
+            },
+            "risk": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Risk score (0.0-1.0, higher = worse)"
+            },
+            "rewards": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Rewards score (0.0-1.0, higher = better)"
+            },
+            "preference": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Consumer preference score (0.0-1.0, higher = better)"
+            }
+          }
+        },
+        "selected_instrument": {
+          "type": "object",
+          "description": "Selected consumer instrument details",
+          "properties": {
+            "instrument_type": {
+              "type": "string",
+              "enum": ["credit_card", "debit_card", "bnpl", "wallet", "bank_transfer", "rewards_card"],
+              "description": "Type of selected instrument"
+            },
+            "instrument_id": {
+              "type": "string",
+              "description": "Selected instrument identifier"
+            },
+            "provider": {
+              "type": "string",
+              "description": "Payment provider"
+            },
+            "total_reward_value": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Total reward value for this transaction"
+            },
+            "out_of_pocket_cost": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Out-of-pocket cost to consumer"
+            },
+            "net_value": {
+              "type": "number",
+              "description": "Net value to consumer (rewards - out-of-pocket)"
+            },
+            "loyalty_tier": {
+              "type": ["string", "null"],
+              "description": "Consumer loyalty tier"
+            },
+            "loyalty_multiplier": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 5,
+              "description": "Loyalty tier multiplier"
+            }
+          },
+          "required": ["instrument_type", "instrument_id", "net_value"]
+        },
+        "explanation": {
+          "type": "string",
+          "description": "Human-readable explanation of consumer instrument selection"
+        },
+        "negotiation_metadata": {
+          "type": "object",
+          "description": "Additional negotiation metadata",
+          "properties": {
+            "weights": {
+              "type": "object",
+              "properties": {
+                "reward_weight": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "cost_weight": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "preference_weight": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                }
+              }
+            },
+            "consumer_preferences": {
+              "type": "object",
+              "description": "Consumer preferences used in evaluation"
+            },
+            "win_win_score": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Overall win-win score for both parties"
+            }
+          }
+        }
+      },
+      "required": [
+        "actor_id",
+        "trace_id",
+        "merchant_context",
+        "cart_summary",
+        "rail_candidates",
+        "scores",
+        "selected_instrument",
+        "explanation"
+      ]
+    }
+  },
+  "required": [
+    "specversion",
+    "id",
+    "source",
+    "type",
+    "time",
+    "datacontenttype",
+    "data"
+  ]
+}

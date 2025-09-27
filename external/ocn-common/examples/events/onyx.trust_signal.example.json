@@ -69,6 +69,44 @@
             "verification_provider": "onyx_kyb_engine",
             "last_updated": "2024-01-21T12:30:00Z",
             "data_sources": ["business_registry", "aml_database", "sanctions_list"]
-        }
+        },
+        "trace_id": "txn_abc1234567890abc",
+        "merchant_context": {
+            "merchant_id": "merchant_oxfords_001",
+            "merchant_name": "Oxford's Clothing",
+            "mcc": "5651",
+            "channel": "online"
+        },
+        "cart_summary": {
+            "total_amount": 700.0,
+            "currency": "USD",
+            "item_count": 2,
+            "transaction_type": "purchase"
+        },
+        "rail_candidates": [
+            {
+                "rail_type": "Credit",
+                "trust_level": "high",
+                "risk_factors": ["low_risk_merchant", "verified_business"]
+            },
+            {
+                "rail_type": "Debit",
+                "trust_level": "high",
+                "risk_factors": ["established_account", "normal_patterns"]
+            },
+            {
+                "rail_type": "ACH",
+                "trust_level": "medium",
+                "risk_factors": ["new_relationship", "higher_amount"]
+            }
+        ],
+        "scores": {
+            "overall_trust": 0.85,
+            "kyb_score": 0.92,
+            "aml_score": 0.95,
+            "reputation_score": 0.88,
+            "compliance_score": 0.90
+        },
+        "explanation": "Oxford's Clothing demonstrates strong trust signals with verified KYB status (0.92) and clear AML screening (0.95). Credit and debit rails approved with high trust levels. ACH restricted due to new business relationship, but transaction approved with moderate trust level. Overall trust score 0.85 supports favorable negotiation terms."
     }
 }

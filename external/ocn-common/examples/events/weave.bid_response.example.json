@@ -54,6 +54,38 @@
         "metadata": {
             "bid_submitted_at": "2024-01-21T12:36:30Z",
             "processor_version": "v2.1.0"
-        }
+        },
+        "trace_id": "txn_abc1234567890abc",
+        "merchant_context": {
+            "merchant_id": "merchant_oxfords_001",
+            "merchant_name": "Oxford's Clothing",
+            "mcc": "5651",
+            "channel": "online"
+        },
+        "cart_summary": {
+            "total_amount": 700.0,
+            "currency": "USD",
+            "item_count": 2,
+            "transaction_type": "purchase"
+        },
+        "rail_candidates": [
+            {
+                "rail_type": "Credit",
+                "processor_cost": 290.0,
+                "settlement_days": 1
+            },
+            {
+                "rail_type": "Debit",
+                "processor_cost": 250.0,
+                "settlement_days": 0
+            }
+        ],
+        "scores": {
+            "cost": 0.85,
+            "speed": 0.95,
+            "risk": 0.18,
+            "reliability": 0.98
+        },
+        "explanation": "Stripe accepted bid with competitive 2.9% rate for $700 transaction. Tiered pricing provides 2.6% rate for amounts over $1000. Same-day settlement with ACH, 0.17% total rebates available. Low risk assessment (0.18) supports favorable terms."
     }
 }
