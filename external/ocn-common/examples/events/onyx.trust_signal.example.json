@@ -1,0 +1,74 @@
+{
+    "specversion": "1.0",
+    "id": "550e8400-e29b-41d4-a716-446655440004",
+    "source": "https://onyx.ocn.ai/v1",
+    "type": "ocn.onyx.trust_signal.v1",
+    "subject": "txn_abc1234567890abc",
+    "time": "2024-01-21T12:34:56Z",
+    "datacontenttype": "application/json",
+    "dataschema": "https://schemas.ocn.ai/events/v1/onyx.trust_signal.v1.schema.json",
+    "data": {
+        "signal_id": "signal_1234567890abcdef",
+        "entity_id": "example_supplier_001",
+        "entity_type": "merchant",
+        "signal_type": "kyb_verification",
+        "trust_score": 0.85,
+        "confidence_level": 0.92,
+        "risk_factors": [
+            {
+                "factor": "new_business_relationship",
+                "severity": "medium",
+                "impact": "warning",
+                "description": "Business relationship established less than 6 months ago"
+            },
+            {
+                "factor": "high_transaction_amount",
+                "severity": "low",
+                "impact": "informational",
+                "description": "Transaction amount exceeds typical range for merchant category"
+            }
+        ],
+        "verification_status": {
+            "kyb_status": "verified",
+            "aml_status": "clear",
+            "sanctions_status": "clear",
+            "regulatory_status": "compliant"
+        },
+        "behavioral_signals": {
+            "transaction_frequency": "normal",
+            "amount_patterns": "typical",
+            "geographic_consistency": "consistent",
+            "time_patterns": "business_hours"
+        },
+        "rail_preferences": {
+            "preferred_rails": ["card", "ach"],
+            "restricted_rails": ["wire"],
+            "rail_reasoning": {
+                "card": "preferred",
+                "ach": "preferred",
+                "wire": "blocked",
+                "rtp": "acceptable",
+                "v_card": "acceptable"
+            }
+        },
+        "recommendations": [
+            {
+                "action": "approve",
+                "reason": "Strong trust signals with verified KYB status",
+                "priority": "high",
+                "impact_on_negotiation": "moderate"
+            },
+            {
+                "action": "limit_amount",
+                "reason": "New business relationship requires gradual trust building",
+                "priority": "medium",
+                "impact_on_negotiation": "minor"
+            }
+        ],
+        "metadata": {
+            "verification_provider": "onyx_kyb_engine",
+            "last_updated": "2024-01-21T12:30:00Z",
+            "data_sources": ["business_registry", "aml_database", "sanctions_list"]
+        }
+    }
+}

@@ -1,0 +1,59 @@
+{
+    "specversion": "1.0",
+    "id": "550e8400-e29b-41d4-a716-446655440002",
+    "source": "https://weave.ocn.ai/v1",
+    "type": "ocn.weave.bid_response.v1",
+    "subject": "txn_abc1234567890abc",
+    "time": "2024-01-21T12:36:45Z",
+    "datacontenttype": "application/json",
+    "dataschema": "https://schemas.ocn.ai/events/v1/weave.bid_response.v1.schema.json",
+    "data": {
+        "bid_request_id": "bid_1234567890abcdef",
+        "processor_id": "stripe",
+        "bid_status": "accepted",
+        "fees": {
+            "base_rate": 2.9,
+            "fixed_fee": 0.30,
+            "interchange_plus": false,
+            "tiered_rates": [
+                {
+                    "min_amount": 0,
+                    "max_amount": 100,
+                    "rate": 3.2
+                },
+                {
+                    "min_amount": 100,
+                    "max_amount": 1000,
+                    "rate": 2.9
+                },
+                {
+                    "min_amount": 1000,
+                    "rate": 2.6
+                }
+            ]
+        },
+        "settlement_terms": {
+            "settlement_time": "same_day",
+            "settlement_method": "ach",
+            "net_settlement": true
+        },
+        "rebates": {
+            "volume_rebate": 0.1,
+            "loyalty_rebate": 0.05,
+            "early_settlement_rebate": 0.02
+        },
+        "risk_assessment": {
+            "risk_score": 0.18,
+            "risk_factors": ["low_risk_merchant", "established_business"]
+        },
+        "processing_capabilities": {
+            "payment_methods": ["card", "ach"],
+            "geographic_coverage": ["US", "CA", "EU"],
+            "processing_speed": "real_time"
+        },
+        "metadata": {
+            "bid_submitted_at": "2024-01-21T12:36:30Z",
+            "processor_version": "v2.1.0"
+        }
+    }
+}

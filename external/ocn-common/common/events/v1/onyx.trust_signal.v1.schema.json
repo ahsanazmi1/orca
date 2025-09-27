@@ -1,0 +1,254 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://schemas.ocn.ai/events/v1/onyx.trust_signal.v1.schema.json",
+    "title": "Onyx Trust Signal CloudEvent",
+    "description": "CloudEvent schema for Onyx trust signal events",
+    "type": "object",
+    "required": [
+        "specversion",
+        "id",
+        "source",
+        "type",
+        "subject",
+        "time",
+        "data"
+    ],
+    "properties": {
+        "specversion": {
+            "type": "string",
+            "const": "1.0",
+            "description": "CloudEvents specification version"
+        },
+        "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier for the trust signal event"
+        },
+        "source": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^https://onyx\\.ocn\\.ai/",
+            "description": "URI identifying the Onyx service"
+        },
+        "type": {
+            "type": "string",
+            "const": "ocn.onyx.trust_signal.v1",
+            "description": "Event type identifier"
+        },
+        "subject": {
+            "type": "string",
+            "pattern": "^txn_[a-f0-9]{16}$",
+            "description": "Transaction ID (trace_id) for correlation"
+        },
+        "time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Event timestamp in RFC3339 format"
+        },
+        "datacontenttype": {
+            "type": "string",
+            "const": "application/json",
+            "description": "Content type of the data payload"
+        },
+        "dataschema": {
+            "type": "string",
+            "format": "uri",
+            "const": "https://schemas.ocn.ai/events/v1/onyx.trust_signal.v1.schema.json",
+            "description": "Schema URI for the data payload"
+        },
+        "data": {
+            "type": "object",
+            "required": [
+                "signal_id",
+                "entity_id",
+                "signal_type",
+                "trust_score",
+                "confidence_level"
+            ],
+            "properties": {
+                "signal_id": {
+                    "type": "string",
+                    "pattern": "^signal_[a-f0-9]{16}$",
+                    "description": "Unique identifier for this trust signal"
+                },
+                "entity_id": {
+                    "type": "string",
+                    "description": "Identifier of the entity being assessed"
+                },
+                "entity_type": {
+                    "type": "string",
+                    "enum": ["merchant", "customer", "processor", "vendor", "bank"],
+                    "description": "Type of entity being assessed"
+                },
+                "signal_type": {
+                    "type": "string",
+                    "enum": ["kyb_verification", "aml_check", "sanctions_screening", "reputation_score", "behavioral_analysis", "regulatory_compliance"],
+                    "description": "Type of trust signal"
+                },
+                "trust_score": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "description": "Overall trust score (0=low trust, 1=high trust)"
+                },
+                "confidence_level": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "description": "Confidence in the trust assessment"
+                },
+                "risk_factors": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": ["factor", "severity", "impact"],
+                        "properties": {
+                            "factor": {
+                                "type": "string",
+                                "description": "Risk factor identifier"
+                            },
+                            "severity": {
+                                "type": "string",
+                                "enum": ["low", "medium", "high", "critical"],
+                                "description": "Severity of the risk factor"
+                            },
+                            "impact": {
+                                "type": "string",
+                                "enum": ["informational", "warning", "blocking"],
+                                "description": "Impact of the risk factor"
+                            },
+                            "description": {
+                                "type": "string",
+                                "description": "Human-readable description of the risk factor"
+                            }
+                        },
+                        "additionalProperties": false
+                    },
+                    "description": "Identified risk factors"
+                },
+                "verification_status": {
+                    "type": "object",
+                    "properties": {
+                        "kyb_status": {
+                            "type": "string",
+                            "enum": ["verified", "pending", "failed", "not_required"],
+                            "description": "Know Your Business verification status"
+                        },
+                        "aml_status": {
+                            "type": "string",
+                            "enum": ["clear", "flagged", "blocked", "not_checked"],
+                            "description": "Anti-Money Laundering check status"
+                        },
+                        "sanctions_status": {
+                            "type": "string",
+                            "enum": ["clear", "match", "false_positive", "not_checked"],
+                            "description": "Sanctions screening status"
+                        },
+                        "regulatory_status": {
+                            "type": "string",
+                            "enum": ["compliant", "non_compliant", "unknown", "not_applicable"],
+                            "description": "Regulatory compliance status"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "description": "Verification status across different checks"
+                },
+                "behavioral_signals": {
+                    "type": "object",
+                    "properties": {
+                        "transaction_frequency": {
+                            "type": "string",
+                            "enum": ["low", "normal", "high", "suspicious"],
+                            "description": "Transaction frequency assessment"
+                        },
+                        "amount_patterns": {
+                            "type": "string",
+                            "enum": ["typical", "unusual", "suspicious"],
+                            "description": "Transaction amount pattern assessment"
+                        },
+                        "geographic_consistency": {
+                            "type": "string",
+                            "enum": ["consistent", "variable", "suspicious"],
+                            "description": "Geographic transaction pattern assessment"
+                        },
+                        "time_patterns": {
+                            "type": "string",
+                            "enum": ["business_hours", "extended", "irregular", "suspicious"],
+                            "description": "Transaction timing pattern assessment"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "description": "Behavioral analysis signals"
+                },
+                "rail_preferences": {
+                    "type": "object",
+                    "properties": {
+                        "preferred_rails": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": ["card", "ach", "wire", "rtp", "v_card"]
+                            },
+                            "description": "Preferred payment rails based on trust signals"
+                        },
+                        "restricted_rails": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": ["card", "ach", "wire", "rtp", "v_card"]
+                            },
+                            "description": "Restricted payment rails due to risk factors"
+                        },
+                        "rail_reasoning": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string",
+                                "enum": ["preferred", "acceptable", "discouraged", "blocked"],
+                                "description": "Reasoning for rail preference"
+                            },
+                            "description": "Reasoning for each rail preference"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "description": "Payment rail preferences based on trust signals"
+                },
+                "recommendations": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": ["action", "reason", "priority"],
+                        "properties": {
+                            "action": {
+                                "type": "string",
+                                "enum": ["approve", "review", "require_additional_verification", "limit_amount", "decline"],
+                                "description": "Recommended action based on trust signals"
+                            },
+                            "reason": {
+                                "type": "string",
+                                "description": "Reason for the recommendation"
+                            },
+                            "priority": {
+                                "type": "string",
+                                "enum": ["low", "medium", "high", "critical"],
+                                "description": "Priority level of the recommendation"
+                            },
+                            "impact_on_negotiation": {
+                                "type": "string",
+                                "enum": ["none", "minor", "moderate", "significant"],
+                                "description": "Expected impact on negotiation outcomes"
+                            }
+                        },
+                        "additionalProperties": false
+                    },
+                    "description": "Trust-based recommendations for negotiation"
+                },
+                "metadata": {
+                    "type": "object",
+                    "description": "Additional metadata for the trust signal event"
+                }
+            },
+            "additionalProperties": false
+        }
+    },
+    "additionalProperties": false
+}

@@ -1,0 +1,216 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://schemas.ocn.ai/events/v1/weave.bid_response.v1.schema.json",
+    "title": "Weave Bid Response CloudEvent",
+    "description": "CloudEvent schema for Weave processor bid response events",
+    "type": "object",
+    "required": [
+        "specversion",
+        "id",
+        "source",
+        "type",
+        "subject",
+        "time",
+        "data"
+    ],
+    "properties": {
+        "specversion": {
+            "type": "string",
+            "const": "1.0",
+            "description": "CloudEvents specification version"
+        },
+        "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier for the bid response event"
+        },
+        "source": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^https://weave\\.ocn\\.ai/",
+            "description": "URI identifying the Weave service"
+        },
+        "type": {
+            "type": "string",
+            "const": "ocn.weave.bid_response.v1",
+            "description": "Event type identifier"
+        },
+        "subject": {
+            "type": "string",
+            "pattern": "^txn_[a-f0-9]{16}$",
+            "description": "Transaction ID (trace_id) for correlation"
+        },
+        "time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Event timestamp in RFC3339 format"
+        },
+        "datacontenttype": {
+            "type": "string",
+            "const": "application/json",
+            "description": "Content type of the data payload"
+        },
+        "dataschema": {
+            "type": "string",
+            "format": "uri",
+            "const": "https://schemas.ocn.ai/events/v1/weave.bid_response.v1.schema.json",
+            "description": "Schema URI for the data payload"
+        },
+        "data": {
+            "type": "object",
+            "required": [
+                "bid_request_id",
+                "processor_id",
+                "bid_status",
+                "fees",
+                "settlement_terms"
+            ],
+            "properties": {
+                "bid_request_id": {
+                    "type": "string",
+                    "pattern": "^bid_[a-f0-9]{16}$",
+                    "description": "Original bid request identifier"
+                },
+                "processor_id": {
+                    "type": "string",
+                    "enum": ["carat", "adyen", "stripe", "fiserv", "first_data"],
+                    "description": "Processor that submitted this bid"
+                },
+                "bid_status": {
+                    "type": "string",
+                    "enum": ["accepted", "declined", "counter_offer"],
+                    "description": "Status of the bid response"
+                },
+                "fees": {
+                    "type": "object",
+                    "required": ["base_rate", "fixed_fee"],
+                    "properties": {
+                        "base_rate": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 10,
+                            "description": "Base processing rate as percentage (e.g., 2.9 for 2.9%)"
+                        },
+                        "fixed_fee": {
+                            "type": "number",
+                            "minimum": 0,
+                            "description": "Fixed fee per transaction in currency units"
+                        },
+                        "interchange_plus": {
+                            "type": "boolean",
+                            "description": "Whether this is an interchange-plus pricing model"
+                        },
+                        "tiered_rates": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "min_amount": {"type": "number", "minimum": 0},
+                                    "max_amount": {"type": "number", "minimum": 0},
+                                    "rate": {"type": "number", "minimum": 0, "maximum": 10}
+                                },
+                                "required": ["min_amount", "rate"]
+                            },
+                            "description": "Tiered pricing structure"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "description": "Fee structure for this bid"
+                },
+                "settlement_terms": {
+                    "type": "object",
+                    "required": ["settlement_time", "settlement_method"],
+                    "properties": {
+                        "settlement_time": {
+                            "type": "string",
+                            "enum": ["immediate", "same_day", "next_day", "standard"],
+                            "description": "Settlement timing"
+                        },
+                        "settlement_method": {
+                            "type": "string",
+                            "enum": ["ach", "wire", "rtp"],
+                            "description": "Settlement method"
+                        },
+                        "net_settlement": {
+                            "type": "boolean",
+                            "description": "Whether settlement is net (fees deducted)"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "description": "Settlement terms for this bid"
+                },
+                "rebates": {
+                    "type": "object",
+                    "properties": {
+                        "volume_rebate": {
+                            "type": "number",
+                            "minimum": 0,
+                            "description": "Volume-based rebate percentage"
+                        },
+                        "loyalty_rebate": {
+                            "type": "number",
+                            "minimum": 0,
+                            "description": "Loyalty-based rebate percentage"
+                        },
+                        "early_settlement_rebate": {
+                            "type": "number",
+                            "minimum": 0,
+                            "description": "Rebate for early settlement"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "description": "Rebate structure for this bid"
+                },
+                "risk_assessment": {
+                    "type": "object",
+                    "properties": {
+                        "risk_score": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1,
+                            "description": "Processor's risk assessment"
+                        },
+                        "risk_factors": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                            "description": "Risk factors identified by processor"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "description": "Risk assessment from processor"
+                },
+                "processing_capabilities": {
+                    "type": "object",
+                    "properties": {
+                        "payment_methods": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": ["card", "ach", "wire", "rtp", "v_card"]
+                            },
+                            "description": "Supported payment methods"
+                        },
+                        "geographic_coverage": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                            "description": "Supported countries/regions"
+                        },
+                        "processing_speed": {
+                            "type": "string",
+                            "enum": ["instant", "real_time", "batch"],
+                            "description": "Processing speed capability"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "description": "Processing capabilities offered"
+                },
+                "metadata": {
+                    "type": "object",
+                    "description": "Additional metadata for the bid response"
+                }
+            },
+            "additionalProperties": false
+        }
+    },
+    "additionalProperties": false
+}

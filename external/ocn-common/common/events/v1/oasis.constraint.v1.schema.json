@@ -1,0 +1,232 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://schemas.ocn.ai/events/v1/oasis.constraint.v1.schema.json",
+    "title": "Oasis Constraint CloudEvent",
+    "description": "CloudEvent schema for Oasis treasury constraint events",
+    "type": "object",
+    "required": [
+        "specversion",
+        "id",
+        "source",
+        "type",
+        "subject",
+        "time",
+        "data"
+    ],
+    "properties": {
+        "specversion": {
+            "type": "string",
+            "const": "1.0",
+            "description": "CloudEvents specification version"
+        },
+        "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier for the constraint event"
+        },
+        "source": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^https://oasis\\.ocn\\.ai/",
+            "description": "URI identifying the Oasis service"
+        },
+        "type": {
+            "type": "string",
+            "const": "ocn.oasis.constraint.v1",
+            "description": "Event type identifier"
+        },
+        "subject": {
+            "type": "string",
+            "pattern": "^txn_[a-f0-9]{16}$",
+            "description": "Transaction ID (trace_id) for correlation"
+        },
+        "time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Event timestamp in RFC3339 format"
+        },
+        "datacontenttype": {
+            "type": "string",
+            "const": "application/json",
+            "description": "Content type of the data payload"
+        },
+        "dataschema": {
+            "type": "string",
+            "format": "uri",
+            "const": "https://schemas.ocn.ai/events/v1/oasis.constraint.v1.schema.json",
+            "description": "Schema URI for the data payload"
+        },
+        "data": {
+            "type": "object",
+            "required": [
+                "constraint_id",
+                "constraint_type",
+                "severity",
+                "current_state",
+                "constraints"
+            ],
+            "properties": {
+                "constraint_id": {
+                    "type": "string",
+                    "pattern": "^constraint_[a-f0-9]{16}$",
+                    "description": "Unique identifier for this constraint set"
+                },
+                "constraint_type": {
+                    "type": "string",
+                    "enum": ["liquidity", "reserve", "credit_limit", "risk_tolerance", "regulatory"],
+                    "description": "Type of constraint being applied"
+                },
+                "severity": {
+                    "type": "string",
+                    "enum": ["info", "warning", "critical", "blocking"],
+                    "description": "Severity level of the constraint"
+                },
+                "current_state": {
+                    "type": "object",
+                    "required": ["available_balance", "reserve_ratio"],
+                    "properties": {
+                        "available_balance": {
+                            "type": "number",
+                            "minimum": 0,
+                            "description": "Currently available balance"
+                        },
+                        "reserve_ratio": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1,
+                            "description": "Current reserve ratio"
+                        },
+                        "credit_utilization": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1,
+                            "description": "Current credit utilization ratio"
+                        },
+                        "pending_obligations": {
+                            "type": "number",
+                            "minimum": 0,
+                            "description": "Pending financial obligations"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "description": "Current treasury state"
+                },
+                "constraints": {
+                    "type": "object",
+                    "required": ["max_transaction_amount"],
+                    "properties": {
+                        "max_transaction_amount": {
+                            "type": "number",
+                            "minimum": 0,
+                            "description": "Maximum allowed transaction amount"
+                        },
+                        "min_reserve_ratio": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1,
+                            "description": "Minimum required reserve ratio"
+                        },
+                        "max_credit_utilization": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1,
+                            "description": "Maximum allowed credit utilization"
+                        },
+                        "preferred_settlement_methods": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": ["ach", "wire", "rtp", "v_card"]
+                            },
+                            "description": "Preferred settlement methods based on liquidity"
+                        },
+                        "settlement_timing_preferences": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": ["immediate", "same_day", "next_day", "standard"]
+                            },
+                            "description": "Preferred settlement timing based on cash flow"
+                        },
+                        "risk_tolerance": {
+                            "type": "string",
+                            "enum": ["conservative", "moderate", "aggressive"],
+                            "description": "Current risk tolerance setting"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "description": "Active constraints and limits"
+                },
+                "forecast": {
+                    "type": "object",
+                    "properties": {
+                        "forecast_horizon_days": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 30,
+                            "description": "Forecast horizon in days"
+                        },
+                        "projected_balance": {
+                            "type": "number",
+                            "description": "Projected balance at forecast horizon"
+                        },
+                        "confidence_level": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1,
+                            "description": "Confidence level in forecast"
+                        },
+                        "key_assumptions": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                            "description": "Key assumptions used in forecast"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "description": "Treasury forecast data"
+                },
+                "recommendations": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": ["action", "reason"],
+                        "properties": {
+                            "action": {
+                                "type": "string",
+                                "enum": ["approve", "limit_amount", "delay_settlement", "require_collateral", "decline"],
+                                "description": "Recommended action"
+                            },
+                            "reason": {
+                                "type": "string",
+                                "description": "Reason for recommendation"
+                            },
+                            "priority": {
+                                "type": "string",
+                                "enum": ["low", "medium", "high", "critical"],
+                                "description": "Priority level of recommendation"
+                            },
+                            "estimated_impact": {
+                                "type": "object",
+                                "properties": {
+                                    "liquidity_impact": {"type": "number"},
+                                    "risk_impact": {"type": "number"},
+                                    "cost_impact": {"type": "number"}
+                                },
+                                "additionalProperties": false,
+                                "description": "Estimated impact of action"
+                            }
+                        },
+                        "additionalProperties": false
+                    },
+                    "description": "Treasury management recommendations"
+                },
+                "metadata": {
+                    "type": "object",
+                    "description": "Additional metadata for the constraint event"
+                }
+            },
+            "additionalProperties": false
+        }
+    },
+    "additionalProperties": false
+}

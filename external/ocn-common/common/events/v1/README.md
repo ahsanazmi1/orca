@@ -10,6 +10,12 @@ This directory contains CloudEvents schemas for the Open Checkout Network (OCN) 
 
 ### Weave Blockchain
 - `weave.audit.v1.schema.json` - Audit CloudEvents from Weave
+- `weave.bid_request.v1.schema.json` - Processor bid request events from Weave
+- `weave.bid_response.v1.schema.json` - Processor bid response events from Weave
+
+### Phase 3 — Negotiation & Live Fee Bidding
+- `oasis.constraint.v1.schema.json` - Treasury constraint events from Oasis
+- `onyx.trust_signal.v1.schema.json` - Trust signal events from Onyx
 
 ## Usage
 

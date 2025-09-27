@@ -1,0 +1,31 @@
+{
+    "specversion": "1.0",
+    "id": "550e8400-e29b-41d4-a716-446655440001",
+    "source": "https://weave.ocn.ai/v1",
+    "type": "ocn.weave.bid_request.v1",
+    "subject": "txn_abc1234567890abc",
+    "time": "2024-01-21T12:34:56Z",
+    "datacontenttype": "application/json",
+    "dataschema": "https://schemas.ocn.ai/events/v1/weave.bid_request.v1.schema.json",
+    "data": {
+        "bid_request_id": "bid_1234567890abcdef",
+        "amount": 700.0,
+        "currency": "USD",
+        "payment_methods": ["card", "ach"],
+        "processors": ["carat", "adyen", "stripe"],
+        "deadline": "2024-01-21T12:39:56Z",
+        "merchant_context": {
+            "mcc": "5651",
+            "risk_score": 0.22,
+            "volume_tier": "medium"
+        },
+        "settlement_preferences": {
+            "urgency": "same_day",
+            "rebate_preference": true
+        },
+        "metadata": {
+            "request_source": "demo_oxfords_checkout",
+            "negotiation_round": 1
+        }
+    }
+}

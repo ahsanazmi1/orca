@@ -1,0 +1,154 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://schemas.ocn.ai/events/v1/weave.bid_request.v1.schema.json",
+    "title": "Weave Bid Request CloudEvent",
+    "description": "CloudEvent schema for Weave processor bid request events",
+    "type": "object",
+    "required": [
+        "specversion",
+        "id",
+        "source",
+        "type",
+        "subject",
+        "time",
+        "data"
+    ],
+    "properties": {
+        "specversion": {
+            "type": "string",
+            "const": "1.0",
+            "description": "CloudEvents specification version"
+        },
+        "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier for the bid request event"
+        },
+        "source": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^https://weave\\.ocn\\.ai/",
+            "description": "URI identifying the Weave service"
+        },
+        "type": {
+            "type": "string",
+            "const": "ocn.weave.bid_request.v1",
+            "description": "Event type identifier"
+        },
+        "subject": {
+            "type": "string",
+            "pattern": "^txn_[a-f0-9]{16}$",
+            "description": "Transaction ID (trace_id) for correlation"
+        },
+        "time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Event timestamp in RFC3339 format"
+        },
+        "datacontenttype": {
+            "type": "string",
+            "const": "application/json",
+            "description": "Content type of the data payload"
+        },
+        "dataschema": {
+            "type": "string",
+            "format": "uri",
+            "const": "https://schemas.ocn.ai/events/v1/weave.bid_request.v1.schema.json",
+            "description": "Schema URI for the data payload"
+        },
+        "data": {
+            "type": "object",
+            "required": [
+                "bid_request_id",
+                "amount",
+                "currency",
+                "payment_methods",
+                "processors",
+                "deadline"
+            ],
+            "properties": {
+                "bid_request_id": {
+                    "type": "string",
+                    "pattern": "^bid_[a-f0-9]{16}$",
+                    "description": "Unique identifier for this bid request"
+                },
+                "amount": {
+                    "type": "number",
+                    "minimum": 0.01,
+                    "description": "Transaction amount in currency units"
+                },
+                "currency": {
+                    "type": "string",
+                    "pattern": "^[A-Z]{3}$",
+                    "description": "ISO 4217 currency code"
+                },
+                "payment_methods": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": ["card", "ach", "wire", "rtp", "v_card"]
+                    },
+                    "minItems": 1,
+                    "description": "Accepted payment methods for bidding"
+                },
+                "processors": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": ["carat", "adyen", "stripe", "fiserv", "first_data"]
+                    },
+                    "minItems": 1,
+                    "description": "Target processors for bid requests"
+                },
+                "deadline": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Deadline for bid responses"
+                },
+                "merchant_context": {
+                    "type": "object",
+                    "properties": {
+                        "mcc": {
+                            "type": "string",
+                            "pattern": "^[0-9]{4}$",
+                            "description": "Merchant Category Code"
+                        },
+                        "risk_score": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1,
+                            "description": "Merchant risk score"
+                        },
+                        "volume_tier": {
+                            "type": "string",
+                            "enum": ["low", "medium", "high", "enterprise"],
+                            "description": "Merchant volume tier"
+                        }
+                    },
+                    "description": "Merchant context for bidding"
+                },
+                "settlement_preferences": {
+                    "type": "object",
+                    "properties": {
+                        "urgency": {
+                            "type": "string",
+                            "enum": ["immediate", "same_day", "next_day", "standard"],
+                            "description": "Settlement urgency preference"
+                        },
+                        "rebate_preference": {
+                            "type": "boolean",
+                            "description": "Whether rebates are preferred over lower fees"
+                        }
+                    },
+                    "description": "Settlement preferences for bidding"
+                },
+                "metadata": {
+                    "type": "object",
+                    "description": "Additional metadata for the bid request"
+                }
+            },
+            "additionalProperties": false
+        }
+    },
+    "additionalProperties": false
+}

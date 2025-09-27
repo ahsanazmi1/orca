@@ -1,0 +1,65 @@
+{
+    "specversion": "1.0",
+    "id": "550e8400-e29b-41d4-a716-446655440003",
+    "source": "https://oasis.ocn.ai/v1",
+    "type": "ocn.oasis.constraint.v1",
+    "subject": "txn_abc1234567890abc",
+    "time": "2024-01-21T12:34:56Z",
+    "datacontenttype": "application/json",
+    "dataschema": "https://schemas.ocn.ai/events/v1/oasis.constraint.v1.schema.json",
+    "data": {
+        "constraint_id": "constraint_1234567890abcdef",
+        "constraint_type": "liquidity",
+        "severity": "warning",
+        "current_state": {
+            "available_balance": 45000.0,
+            "reserve_ratio": 0.18,
+            "credit_utilization": 0.65,
+            "pending_obligations": 12000.0
+        },
+        "constraints": {
+            "max_transaction_amount": 5000.0,
+            "min_reserve_ratio": 0.15,
+            "max_credit_utilization": 0.70,
+            "preferred_settlement_methods": ["ach", "rtp"],
+            "settlement_timing_preferences": ["next_day", "standard"],
+            "risk_tolerance": "moderate"
+        },
+        "forecast": {
+            "forecast_horizon_days": 7,
+            "projected_balance": 52000.0,
+            "confidence_level": 0.85,
+            "key_assumptions": [
+                "Normal transaction volume",
+                "Expected vendor payments",
+                "No major market disruptions"
+            ]
+        },
+        "recommendations": [
+            {
+                "action": "limit_amount",
+                "reason": "Transaction amount approaches liquidity threshold",
+                "priority": "medium",
+                "estimated_impact": {
+                    "liquidity_impact": 0.12,
+                    "risk_impact": 0.05,
+                    "cost_impact": 0.03
+                }
+            },
+            {
+                "action": "delay_settlement",
+                "reason": "Next-day settlement would improve liquidity position",
+                "priority": "low",
+                "estimated_impact": {
+                    "liquidity_impact": 0.08,
+                    "risk_impact": 0.02,
+                    "cost_impact": -0.01
+                }
+            }
+        ],
+        "metadata": {
+            "treasury_plan_id": "oasis-treasury-v1",
+            "constraint_calculated_at": "2024-01-21T12:34:30Z"
+        }
+    }
+}
