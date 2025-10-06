@@ -1,0 +1,87 @@
+{
+  "trace_id": "trace_sepa_20241201_002",
+  "amount": 1500.00,
+  "currency": "EUR",
+  "merchant_id": "merchant_eu_001",
+  "customer_context": {
+    "customer_id": "customer_eu_67890",
+    "prefers_real_time": false,
+    "risk_tolerance": "medium",
+    "payment_history": {
+      "avg_transaction": 800.0,
+      "monthly_volume": 5000.0,
+      "success_rate": 0.97
+    }
+  },
+  "preferred_rails": ["SEPA", "ACH"],
+  "preferred_instruments": ["bank_transfer", "debit_card"],
+  "excluded_rails": ["Crypto", "Wire"],
+  "excluded_instruments": ["cash", "bnpl"],
+  "max_settlement_hours": 48,
+  "max_cost_bps": 25.0,
+  "require_real_time": false,
+  "cross_border": true,
+  "transaction_context": {
+    "merchant_category": "ecommerce",
+    "channel": "web",
+    "geography": "EU",
+    "time_of_day": "business_hours",
+    "cross_border": true,
+    "source_country": "DE",
+    "target_country": "FR"
+  },
+  "risk_tolerance": "medium",
+  "regulatory_requirements": ["KYC", "AML", "GDPR"],
+  "expected_rail_capability": {
+    "rail_type": "SEPA",
+    "supported_instruments": ["bank_transfer", "debit_card"],
+    "max_amount": 50000.0,
+    "min_amount": 0.01,
+    "settlement_time_hours": 24,
+    "cost_basis_points": 10.0,
+    "availability_24_7": false,
+    "cross_border": true,
+    "real_time": false,
+    "jurisdictions": ["EU", "EEA"]
+  },
+  "expected_instrument_capability": {
+    "instrument_type": "bank_transfer",
+    "supported_rails": ["ACH", "RTP", "FedNow", "SEPA", "Wire"],
+    "max_amount": 1000000.0,
+    "min_amount": 1.0,
+    "funding_time_hours": 24,
+    "cost_basis_points": 10.0,
+    "requires_verification": true,
+    "risk_level": "low",
+    "regulatory_requirements": ["KYC", "AML"]
+  },
+  "expected_evaluation": {
+    "rail_type": "SEPA",
+    "instrument_type": "bank_transfer",
+    "combination_id": "SEPA_bank_transfer_sepa456",
+    "total_score": 0.88,
+    "cost_score": 0.95,
+    "speed_score": 0.85,
+    "risk_score": 0.85,
+    "availability_score": 0.75,
+    "total_cost": 0.15,
+    "effective_cost_bps": 10.0,
+    "settlement_time_hours": 24,
+    "is_available": true,
+    "is_real_time": false,
+    "is_cross_border": true,
+    "risk_level": "low",
+    "compliance_status": "standard_compliance",
+    "requires_kyc": true,
+    "explanation": "SEPA rail with bank transfer, excellent cost efficiency, fast settlement, low risk level, standard availability.",
+    "confidence": 0.90
+  }
+}
+
+
+
+
+
+
+
+

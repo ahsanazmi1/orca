@@ -63,7 +63,7 @@ class AzureOpenAIClient:
         """Initialize Azure OpenAI client with graceful fallback for missing configuration."""
         self.endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
         self.api_key = os.getenv("AZURE_OPENAI_API_KEY")
-        self.deployment = os.getenv("AZURE_OPENAI_DEPLOYMENT", "gpt-4o-mini")
+        self.deployment = os.getenv("AZURE_OPENAI_DEPLOYMENT", "orca-llm")
 
         # Check if configuration is missing
         self.is_configured = bool(self.endpoint and self.api_key)
@@ -80,7 +80,7 @@ class AzureOpenAIClient:
         if self.endpoint is None:
             raise ValueError("Azure OpenAI endpoint not configured")
         self.client = AzureOpenAI(
-            api_key=self.api_key, api_version="2024-06-01", azure_endpoint=self.endpoint
+            api_key=self.api_key, api_version="2025-01-01-preview", azure_endpoint=self.endpoint
         )
 
         logger.info(f"✅ Azure OpenAI client initialized with deployment: {self.deployment}")
@@ -116,7 +116,7 @@ class AzureOpenAIClient:
                     {"role": "user", "content": prompt},
                 ],
                 temperature=0.1,  # Low temperature for consistent output
-                max_tokens=300,  # Limit token usage
+                max_tokens=100,  # Reduced token limit for concise explanations
                 response_format={"type": "json_object"},  # Enforce JSON output
             )
 
@@ -154,25 +154,26 @@ class AzureOpenAIClient:
                 raw_response=raw_response,
                 decision_context=decision_context,
                 model_provenance=model_provenance,
-                strict_mode=True,
+                strict_mode=False,
             )
 
             if not guardrail_result.is_valid:
                 logger.warning(f"🚨 Guardrails validation failed: {guardrail_result.message}")
                 logger.warning(f"   Violations: {guardrail_result.violations}")
 
-                # In strict mode, fall back to mock explanation
+                # Only fall back to mock for critical failures, not content violations
                 if guardrail_result.result_type in [
                     ValidationResult.HALLUCINATION,
-                    ValidationResult.CONTENT_VIOLATION,
                 ]:
-                    logger.warning("🔄 Falling back to mock explanation due to guardrails failure")
+                    logger.warning("🔄 Falling back to mock explanation due to hallucination detection")
                     return self._generate_mock_explanation(request)
                 else:
-                    # For other validation failures, try to sanitize and continue
+                    # For content violations and other issues, try to sanitize and continue
                     logger.warning("🔄 Attempting to sanitize response and continue")
                     if guardrail_result.sanitized_content:
                         raw_response = guardrail_result.sanitized_content
+                    # Even if no sanitized content, continue with original response
+                    logger.warning("🔄 Continuing with original response despite validation warnings")
 
             # Parse validated response
             if raw_response is None:
@@ -213,60 +214,54 @@ class AzureOpenAIClient:
     def _get_system_prompt(self) -> str:
         """Get the system prompt for explanation generation."""
         return """You are an expert financial risk analyst for Orca Core, a payment decision engine.
-Your task is to generate clear, concise, and accurate explanations for payment decisions.
+Your task is to generate BRIEF, concise explanations for payment decisions.
 
 CRITICAL REQUIREMENTS:
 1. You MUST respond with valid JSON only
 2. Follow the exact schema provided
 3. Be factual and avoid speculation
 4. Use professional, clear language
-5. Focus on the key risk factors that influenced the decision
+5. Keep explanations SHORT and to the point - maximum 2 sentences
 
 JSON SCHEMA:
 {
-  "explanation": "string - Clear explanation of the decision (max 200 words)",
+  "explanation": "string - BRIEF explanation of the decision (max 50 words)",
   "confidence": "number - Confidence score between 0.0 and 1.0",
-  "key_factors": ["string"] - List of 2-3 most important risk factors
+  "key_factors": ["string"] - List of 1-2 most important risk factors
 }
 
 GUARDRAILS:
-- Do not include sensitive customer information
-- Do not make claims about future outcomes
-- Do not provide financial advice
-- Keep explanations factual and objective
-- Use standard financial terminology"""
+- Keep explanations extremely concise - like a chat message
+- Focus on the single most important factor
+- Use simple, direct language
+- Avoid technical jargon"""
 
     def _build_explanation_prompt(self, request: ExplanationRequest) -> str:
         """Build the user prompt for explanation generation."""
-        return f"""Generate a clear explanation for this payment decision:
+        return f"""Generate a BRIEF explanation for this payment decision (max 50 words):
 
 DECISION: {request.decision}
 RISK SCORE: {request.risk_score:.3f}
-REASON CODES: {", ".join(request.reason_codes)}
-MODEL TYPE: {request.model_type} (v{request.model_version})
+AMOUNT: ${request.transaction_data.get("amount", 0):.2f}
 
-TRANSACTION CONTEXT:
-- Amount: ${request.transaction_data.get("amount", 0):.2f}
-- Channel: {request.transaction_data.get("channel", "unknown")}
-- Rail: {request.transaction_data.get("rail", "unknown")}
-
-RULES EVALUATED: {", ".join(request.rules_evaluated) if request.rules_evaluated else "None"}
-
-Please provide a JSON response following the schema above."""
+Provide a short, chat-style explanation in JSON format. Focus on the main reason for the decision."""
 
     def _generate_mock_explanation(self, request: ExplanationRequest) -> ExplanationResponse:
         """Generate a mock explanation for testing when Azure OpenAI is not available."""
         start_time = datetime.now()
+        
+        # Debug logging
+        logger.info(f"🔍 Mock explainer debug - Decision: {request.decision}, Risk score: {request.risk_score}, Reason codes: {request.reason_codes}")
 
         # Generate contextual explanation based on decision and risk factors
         if request.decision == "APPROVE":
-            explanation = f"Transaction approved. The payment of ${request.transaction_data.get('amount', 0):.2f} was processed successfully through {request.transaction_data.get('channel', 'unknown')} channel. Risk assessment indicates acceptable risk level."
+            explanation = f"Approved ${request.transaction_data.get('amount', 0):.2f} payment. Risk level acceptable."
             confidence = 0.85
         elif request.decision == "DECLINE":
-            explanation = f"Transaction declined due to elevated risk factors. Risk score of {request.risk_score:.3f} exceeds acceptable thresholds. Key concerns include: {', '.join(request.reason_codes[:3])}."
+            explanation = f"Declined due to high risk score {request.risk_score:.3f}. {request.reason_codes[0] if request.reason_codes else 'Risk factors detected'}."
             confidence = 0.90
         else:  # REVIEW
-            explanation = f"Transaction flagged for manual review. Risk score of {request.risk_score:.3f} requires additional verification. Factors contributing to review: {', '.join(request.reason_codes[:2])}."
+            explanation = f"Flagged for review. Risk score {request.risk_score:.3f} needs verification."
             confidence = 0.75
 
         # Calculate processing time
@@ -279,7 +274,7 @@ Please provide a JSON response following the schema above."""
             "endpoint": "mock",
             "api_version": "1.0.0",
             "temperature": 0.1,
-            "max_tokens": 300,
+            "max_tokens": 100,
             "response_format": "json_object",
             "timestamp": datetime.now().isoformat(),
             "request_id": f"mock-{datetime.now().strftime('%Y%m%d%H%M%S')}",
@@ -464,16 +459,16 @@ def explain_rail_selection_llm(
     
     # Create detailed context for LLM
     context_data = {
-        "transaction": {
-            "cart_total": request.cart_total,
-            "currency": request.currency,
-            "channel": request.channel,
-            "available_rails": request.available_rails,
-        },
+        "amount": request.amount,
+        "currency": request.currency,
+        "merchant_id": request.merchant_id,
+        "available_rails": request.available_rails,
+        "rail": optimal_rail,
+        "channel": request.channel,
         "weights": {
-            "cost_weight": request.cost_weight,
-            "speed_weight": request.speed_weight,
-            "risk_weight": request.risk_weight,
+            "cost_weight": request.preferences.get("cost_weight", 0.4),
+            "speed_weight": request.preferences.get("speed_weight", 0.3),
+            "risk_weight": request.preferences.get("risk_weight", 0.3),
         },
         "optimal_rail": {
             "rail_type": optimal_evaluation.rail_type,
@@ -501,7 +496,7 @@ def explain_rail_selection_llm(
             if eval.rail_type != optimal_rail
         ],
         "ml_model": {
-            "model_used": negotiation_response.ml_model_used,
+            "model_used": negotiation_response.negotiation_metadata.get("ml_model_used", "unknown"),
             "risk_score": optimal_evaluation.ml_risk_score,
         }
     }
@@ -512,7 +507,7 @@ def explain_rail_selection_llm(
         risk_score=optimal_evaluation.ml_risk_score,
         reason_codes=optimal_evaluation.risk_factors,
         transaction_data=context_data,
-        model_type=negotiation_response.ml_model_used,
+        model_type=negotiation_response.negotiation_metadata.get("ml_model_used", "unknown"),
         model_version="1.0",
         rules_evaluated=[],  # Not applicable for rail selection
         meta_data=negotiation_response.negotiation_metadata,

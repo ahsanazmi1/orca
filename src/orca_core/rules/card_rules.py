@@ -29,7 +29,7 @@ class CardHighTicketRule(Rule):
         if request.rail != "Card":
             return None
 
-        if request.cart_total > self.threshold:
+        if getattr(request, 'cart_total', getattr(request, 'amount', 0)) > self.threshold:
             return RuleResult(
                 decision_hint="DECLINE", reasons=["high_ticket"], actions=["manual_review"]
             )
@@ -104,7 +104,7 @@ class CardChannelRule(Rule):
 
         if request.channel == "online":
             # Online transactions get additional verification
-            if request.cart_total > 1000.0:
+            if getattr(request, 'cart_total', getattr(request, 'amount', 0)) > 1000.0:
                 return RuleResult(
                     decision_hint="REVIEW",
                     reasons=["online_verification"],

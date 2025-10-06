@@ -10,7 +10,7 @@ BLACK := $(VENV_DIR)/bin/black
 PRE_COMMIT := $(VENV_DIR)/bin/pre-commit
 
 APP_MODULE := src/orca_api/main.py
-APP_PATH := orca_api.main:app
+APP_PATH := src.orca_api.main:app
 
 # Default target
 all: setup test

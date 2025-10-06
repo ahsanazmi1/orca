@@ -1,0 +1,33 @@
+{
+  "constraints": [
+    {
+      "constraint_type": "available_balance",
+      "status": "passed",
+      "available_balance": 25000.00,
+      "constraint_value": 150.00,
+      "description": "Sufficient balance available for transaction"
+    },
+    {
+      "constraint_type": "daily_limit",
+      "status": "passed",
+      "available_balance": 100000.00,
+      "constraint_value": 50000.00,
+      "description": "Daily transaction limit not exceeded"
+    },
+    {
+      "constraint_type": "monthly_limit",
+      "status": "passed",
+      "available_balance": 500000.00,
+      "constraint_value": 250000.00,
+      "description": "Monthly transaction limit not exceeded"
+    }
+  ]
+}
+
+
+
+
+
+
+
+

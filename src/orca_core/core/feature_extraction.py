@@ -47,10 +47,10 @@ def extract_features(raw: dict[str, Any]) -> dict[str, float]:
             elif isinstance(value, bool):
                 features[key] = 1.0 if value else 0.0
 
-    # Derive is_high_ticket from cart_total > 500
-    cart_total = raw.get("cart_total", 0.0)
-    if isinstance(cart_total, int | float):
-        features["is_high_ticket"] = 1.0 if cart_total > 500.0 else 0.0
+    # Derive is_high_ticket from amount > 500
+    amount = raw.get("amount", raw.get("cart_total", 0.0))
+    if isinstance(amount, int | float):
+        features["is_high_ticket"] = 1.0 if amount > 500.0 else 0.0
     else:
         features["is_high_ticket"] = 0.0
 

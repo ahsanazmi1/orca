@@ -5,10 +5,23 @@ All notable changes to the Orca Core Decision Engine will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v0.3.0 — Phase 3: Negotiation & Live Fee Bidding
-- New branch: phase-3-bidding
-- Prep for negotiation, bidding, policy DSL, and processor connectors
-- README updated with Phase 3 checklist
+## [0.4.0] - Phase 4
+
+### 🚀 Phase 4 — Payment Instruction & Visibility
+
+This release initiates Phase 4 development, focusing on payment instruction generation, settlement visibility, and comprehensive payment tracking for checkout decisions.
+
+#### Planned Features
+- **Payment Instruction Generation**: Generate standardized payment instructions from checkout decisions
+- **Settlement Visibility**: Real-time tracking and visibility into payment settlement processes
+- **Payment Tracking**: Comprehensive payment tracking across checkout workflows
+- **Instruction Validation**: Enhanced validation for payment instructions and settlement confirmations
+- **CloudEvents Integration**: New event types for payment instruction and settlement visibility
+
+#### Timeline
+- **Status**: Active development on `phase-4-instruction` branch
+- **Timeline**: Weeks 12-16 of OCN development roadmap
+- **Issue Tracker**: [Phase 4 Issues](https://github.com/ocn-ai/orca/issues?q=is%3Aopen+is%3Aissue+label%3Aphase-4)
 
 ## [0.2.0] - 2025-01-25
 

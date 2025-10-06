@@ -1,0 +1,84 @@
+{
+  "trace_id": "trace_fednow_20241201_001",
+  "amount": 2500.00,
+  "currency": "USD",
+  "merchant_id": "merchant_001",
+  "customer_context": {
+    "customer_id": "customer_12345",
+    "prefers_real_time": true,
+    "risk_tolerance": "low",
+    "payment_history": {
+      "avg_transaction": 1500.0,
+      "monthly_volume": 8000.0,
+      "success_rate": 0.98
+    }
+  },
+  "preferred_rails": ["FedNow", "RTP"],
+  "preferred_instruments": ["debit_card", "bank_transfer"],
+  "excluded_rails": ["Crypto", "Wire"],
+  "excluded_instruments": ["cash", "bnpl"],
+  "max_settlement_hours": 2,
+  "max_cost_bps": 50.0,
+  "require_real_time": true,
+  "cross_border": false,
+  "transaction_context": {
+    "merchant_category": "retail",
+    "channel": "mobile",
+    "geography": "US",
+    "time_of_day": "business_hours"
+  },
+  "risk_tolerance": "low",
+  "regulatory_requirements": ["KYC", "AML"],
+  "expected_rail_capability": {
+    "rail_type": "FedNow",
+    "supported_instruments": ["debit_card", "bank_transfer"],
+    "max_amount": 500000.0,
+    "min_amount": 1.0,
+    "settlement_time_hours": 0,
+    "cost_basis_points": 20.0,
+    "availability_24_7": true,
+    "cross_border": false,
+    "real_time": true,
+    "jurisdictions": ["US"]
+  },
+  "expected_instrument_capability": {
+    "instrument_type": "debit_card",
+    "supported_rails": ["Card", "ACH", "RTP", "FedNow", "SEPA"],
+    "max_amount": 10000.0,
+    "min_amount": 0.01,
+    "funding_time_hours": 0,
+    "cost_basis_points": 150.0,
+    "requires_verification": true,
+    "risk_level": "low",
+    "regulatory_requirements": ["PCI_DSS", "EMV"]
+  },
+  "expected_evaluation": {
+    "rail_type": "FedNow",
+    "instrument_type": "debit_card",
+    "combination_id": "FedNow_debit_card_fednow123",
+    "total_score": 0.92,
+    "cost_score": 0.85,
+    "speed_score": 1.0,
+    "risk_score": 0.95,
+    "availability_score": 0.95,
+    "total_cost": 0.50,
+    "effective_cost_bps": 20.0,
+    "settlement_time_hours": 0,
+    "is_available": true,
+    "is_real_time": true,
+    "is_cross_border": false,
+    "risk_level": "low",
+    "compliance_status": "standard_compliance",
+    "requires_kyc": true,
+    "explanation": "FedNow rail with debit card, excellent cost efficiency, real-time processing, low risk level, 24/7 availability.",
+    "confidence": 0.95
+  }
+}
+
+
+
+
+
+
+
+

@@ -98,7 +98,7 @@ EXPLANATION_TEMPLATES: dict[str, dict[str, str]] = {
 }
 
 # Fallback template for unknown reasons
-FALLBACK_TEMPLATE = "We made this decision based on {reasons}. More detail coming soon."
+FALLBACK_TEMPLATE = "Transaction {status} for ${amount:.2f}. Risk score: {risk_score:.3f}. Reasons: {reasons}."
 
 
 def get_explanation_template(reason: str, status: str) -> str:
@@ -159,6 +159,9 @@ def generate_human_explanation(
         "threshold": context.get("threshold", "$5,000"),
         "limit": context.get("limit", "$2,000"),
         "velocity": context.get("velocity_24h", "multiple"),
+        "risk_score": context.get("risk_score", 0.0),
+        "amount": context.get("cart_total", 0.0),
+        "status": status,
     }
 
     explanations = []

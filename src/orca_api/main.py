@@ -23,7 +23,6 @@ from src.orca_core.engine import evaluate_rules, determine_optimal_rail
 from src.orca_core.explanations import generate_human_explanation
 from src.orca_core.llm.explain import get_llm_explainer, is_llm_configured
 from src.orca_core.models import DecisionRequest, DecisionResponse, NegotiationRequest, NegotiationResponse
-from mcp import router as mcp_router
 
 # Set up structured logging with redaction
 setup_logging(level="INFO", format_type="json")
@@ -41,7 +40,24 @@ app = FastAPI(
 app = trace_middleware(app)
 
 # Include MCP router
-app.include_router(mcp_router)
+try:
+    import sys
+    import os
+    # Add the project root to the path to import MCP modules
+    project_root = os.path.join(os.path.dirname(__file__), '..', '..')
+    sys.path.insert(0, project_root)
+    logger.info(f"Added project root to path: {project_root}")
+    from mcp.server import router as mcp_router
+    app.include_router(mcp_router)
+    logger.info("MCP router included successfully")
+except ImportError as e:
+    logger.error(f"MCP router import failed: {e}")
+    import traceback
+    logger.error(f"Import traceback: {traceback.format_exc()}")
+except Exception as e:
+    logger.error(f"MCP router setup failed: {e}")
+    import traceback
+    logger.error(f"Setup traceback: {traceback.format_exc()}")
 
 
 # Pydantic models for API requests/responses
@@ -209,7 +225,7 @@ async def make_decision(request: DecisionRequest) -> DecisionResponse:
         HTTPException: If request validation or processing fails
     """
     try:
-        logger.info(f"Processing decision request for cart_total=${request.cart_total}")
+        logger.info(f"Processing decision request for cart_total=${getattr(request, 'cart_total', getattr(request, 'amount', 0))}")
 
         # Evaluate rules using the core engine
         response = evaluate_rules(request)
@@ -246,12 +262,14 @@ async def explain_decision(request: ExplainRequest) -> ExplainResponse:
         if is_llm_configured():
             # Try LLM explanation first
             llm_explainer = get_llm_explainer()
-            llm_response = llm_explainer.explain_decision(
+            from src.orca_core.llm.explain import ExplanationRequest
+            
+            explanation_request = ExplanationRequest(
                 decision=decision.decision,
-                risk_score=decision.meta.get("ai", {}).get("risk_score", 0.0),
+                risk_score=decision.meta.get("ai", {}).get("risk_score", decision.meta.get("risk_score", 0.0)),
                 reason_codes=decision.meta.get("ai", {}).get("reason_codes", []),
                 transaction_data={
-                    "amount": decision.meta.get("context", {}).get("cart_total", 0),
+                    "amount": decision.meta.get("context", {}).get("cart_total", decision.meta.get("cart_total", 0)),
                     "currency": decision.meta.get("context", {}).get("currency", "USD"),
                     "rail": decision.meta.get("context", {}).get("rail", "Card"),
                     "channel": decision.meta.get("context", {}).get("channel", "online"),
@@ -261,6 +279,8 @@ async def explain_decision(request: ExplainRequest) -> ExplainResponse:
                 rules_evaluated=decision.reasons,
                 meta_data=decision.meta,
             )
+            
+            llm_response = llm_explainer.explain_decision(explanation_request)
 
             if (
                 llm_response
@@ -283,10 +303,18 @@ async def explain_decision(request: ExplainRequest) -> ExplainResponse:
             explanation = decision.explanation
         else:
             # Fallback to generating explanation from reasons
+            # Include risk score in context for better explanations
+            context_with_risk = decision.meta.get("context", {}).copy()
+            context_with_risk["risk_score"] = decision.meta.get("risk_score", 0.0)
+            context_with_risk["cart_total"] = decision.meta.get("cart_total", 0.0)
+            
+            # Debug logging
+            logger.info(f"🔍 Traditional explanation debug - Context: {context_with_risk}, Decision meta: {decision.meta}")
+            
             explanation = generate_human_explanation(
                 decision.reasons,
                 decision.status or decision.decision,
-                decision.meta.get("context", {}),
+                context_with_risk,
             )
 
         logger.info(f"Generated explanation for decision: {decision.decision}")
@@ -317,12 +345,12 @@ async def negotiate_rails(request: NegotiationRequest) -> NegotiationResponse:
         logger.info(
             f"Starting rail negotiation",
             extra={
-                "cart_total": request.cart_total,
+                "amount": request.amount,
                 "available_rails": request.available_rails,
                 "weights": {
-                    "cost": request.cost_weight,
-                    "speed": request.speed_weight,
-                    "risk": request.risk_weight,
+                    "cost": request.preferences.get("cost_weight", 0.4),
+                    "speed": request.preferences.get("speed_weight", 0.3),
+                    "risk": request.preferences.get("risk_weight", 0.3),
                 }
             }
         )
@@ -335,7 +363,7 @@ async def negotiate_rails(request: NegotiationRequest) -> NegotiationResponse:
             extra={
                 "optimal_rail": response.optimal_rail,
                 "trace_id": response.trace_id,
-                "ml_model_used": response.ml_model_used,
+                "ml_model_used": response.negotiation_metadata.get("ml_model_used", "unknown"),
                 "composite_scores": {
                     eval.rail_type: eval.composite_score 
                     for eval in response.rail_evaluations

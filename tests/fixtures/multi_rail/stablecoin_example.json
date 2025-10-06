@@ -1,0 +1,91 @@
+{
+  "trace_id": "trace_stablecoin_20241201_003",
+  "amount": 5000.00,
+  "currency": "USDC",
+  "merchant_id": "merchant_crypto_001",
+  "customer_context": {
+    "customer_id": "customer_crypto_54321",
+    "prefers_real_time": true,
+    "risk_tolerance": "high",
+    "payment_history": {
+      "avg_transaction": 3000.0,
+      "monthly_volume": 15000.0,
+      "success_rate": 0.95,
+      "crypto_transactions": 45,
+      "stablecoin_usage": true
+    }
+  },
+  "preferred_rails": ["Crypto"],
+  "preferred_instruments": ["stablecoin"],
+  "excluded_rails": ["Wire", "ACH"],
+  "excluded_instruments": ["cash", "prepaid_card"],
+  "max_settlement_hours": 2,
+  "max_cost_bps": 15.0,
+  "require_real_time": true,
+  "cross_border": true,
+  "transaction_context": {
+    "merchant_category": "crypto_services",
+    "channel": "mobile",
+    "geography": "Global",
+    "time_of_day": "24_7",
+    "cross_border": true,
+    "source_country": "US",
+    "target_country": "SG",
+    "crypto_network": "Ethereum",
+    "stablecoin_type": "USDC"
+  },
+  "risk_tolerance": "high",
+  "regulatory_requirements": ["KYC", "AML", "CFT"],
+  "expected_rail_capability": {
+    "rail_type": "Crypto",
+    "supported_instruments": ["stablecoin"],
+    "max_amount": 1000000.0,
+    "min_amount": 1.0,
+    "settlement_time_hours": 1,
+    "cost_basis_points": 5.0,
+    "availability_24_7": true,
+    "cross_border": true,
+    "real_time": true,
+    "jurisdictions": ["Global"]
+  },
+  "expected_instrument_capability": {
+    "instrument_type": "stablecoin",
+    "supported_rails": ["Crypto"],
+    "max_amount": 1000000.0,
+    "min_amount": 1.0,
+    "funding_time_hours": 1,
+    "cost_basis_points": 5.0,
+    "requires_verification": true,
+    "risk_level": "medium",
+    "regulatory_requirements": ["KYC", "AML", "CFT"]
+  },
+  "expected_evaluation": {
+    "rail_type": "Crypto",
+    "instrument_type": "stablecoin",
+    "combination_id": "Crypto_stablecoin_crypto789",
+    "total_score": 0.85,
+    "cost_score": 1.0,
+    "speed_score": 0.95,
+    "risk_score": 0.65,
+    "availability_score": 1.0,
+    "total_cost": 0.25,
+    "effective_cost_bps": 5.0,
+    "settlement_time_hours": 1,
+    "is_available": true,
+    "is_real_time": true,
+    "is_cross_border": true,
+    "risk_level": "medium",
+    "compliance_status": "high_compliance",
+    "requires_kyc": true,
+    "explanation": "Crypto rail with stablecoin, excellent cost efficiency, real-time processing, medium risk level, 24/7 availability.",
+    "confidence": 0.85
+  }
+}
+
+
+
+
+
+
+
+

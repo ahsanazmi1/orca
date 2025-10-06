@@ -137,10 +137,10 @@ class RuleRegistry:
 
         # If no rules triggered, provide default approval reasoning
         if not all_reasons:
-            all_reasons.append(f"Cart total ${request.cart_total:.2f} within approved threshold")
+            all_reasons.append(f"Cart total ${getattr(request, 'cart_total', getattr(request, 'amount', 0)):.2f} within approved threshold")
             all_actions.append("Process payment")
             all_actions.append("Send confirmation")
-            meta["approved_amount"] = request.cart_total
+            meta["approved_amount"] = getattr(request, 'cart_total', getattr(request, 'amount', 0))
 
         return DecisionResponse(
             decision=final_decision,

@@ -5,6 +5,7 @@ MCP (Model Context Protocol) server implementation for Orca.
 from typing import Any, Dict
 from fastapi import APIRouter
 from pydantic import BaseModel
+from datetime import datetime
 import sys
 import os
 
@@ -74,15 +75,14 @@ async def invoke_mcp(request: MCPRequest) -> MCPResponse:
             
             # Create negotiation request
             negotiation_request = NegotiationRequest(
-                cart_total=cart_total,
+                amount=cart_total,
                 currency=currency,
+                merchant_id=context.get("merchant_id", "demo_merchant_001"),
                 channel=channel,
-                features=features,
-                context={**context, "deterministic_seed": deterministic_seed},
                 available_rails=available_rails,
-                cost_weight=0.4,  # Overridden in determine_optimal_rail
-                speed_weight=0.3,  # Overridden in determine_optimal_rail
-                risk_weight=0.3,   # Overridden in determine_optimal_rail
+                customer_context={**context, "deterministic_seed": deterministic_seed},
+                preferences=features,
+                trace_id=f"mcp_trace_{deterministic_seed}"
             )
             
             # Perform negotiation
@@ -106,8 +106,8 @@ async def invoke_mcp(request: MCPRequest) -> MCPResponse:
                 ],
                 "rationale": negotiation_response.explanation,
                 "trace_id": negotiation_response.trace_id,
-                "timestamp": negotiation_response.timestamp.isoformat(),
-                "ml_model_used": negotiation_response.ml_model_used,
+                "timestamp": datetime.now().isoformat(),
+                "ml_model_used": "orca_negotiation_v1",
                 "negotiation_metadata": negotiation_response.negotiation_metadata,
             }
             

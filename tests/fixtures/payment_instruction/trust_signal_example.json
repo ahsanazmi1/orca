@@ -1,0 +1,35 @@
+{
+  "trust_score": 0.85,
+  "risk_level": "low",
+  "signals": [
+    {
+      "type": "device_fingerprint",
+      "score": 0.9,
+      "description": "Device fingerprint matches known customer devices"
+    },
+    {
+      "type": "payment_history",
+      "score": 0.8,
+      "description": "Strong payment history with low chargeback rate"
+    },
+    {
+      "type": "geolocation",
+      "score": 0.7,
+      "description": "Transaction location matches customer's usual locations"
+    },
+    {
+      "type": "velocity_check",
+      "score": 0.9,
+      "description": "Transaction velocity within normal patterns"
+    }
+  ],
+  "confidence": 0.88
+}
+
+
+
+
+
+
+
+

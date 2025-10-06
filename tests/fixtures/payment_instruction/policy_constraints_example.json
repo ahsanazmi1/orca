@@ -1,0 +1,30 @@
+{
+  "constraints": [
+    {
+      "policy_type": "max_transaction_cost",
+      "constraint_value": 5.00,
+      "weight": 0.8,
+      "description": "Maximum cost per transaction cannot exceed $5.00"
+    },
+    {
+      "policy_type": "min_trust_score",
+      "constraint_value": 0.7,
+      "weight": 0.6,
+      "description": "Minimum trust score requirement of 0.7"
+    },
+    {
+      "policy_type": "max_settlement_time",
+      "constraint_value": 48,
+      "weight": 0.4,
+      "description": "Maximum settlement time of 48 hours"
+    }
+  ]
+}
+
+
+
+
+
+
+
+

@@ -25,7 +25,8 @@ from .llm.explain import get_llm_configuration_status
 from .ml.model import get_model_info
 from .ml.plotting import plot_xgb_model_evaluation
 from .ml.train_xgb import XGBoostTrainer
-from .models import DecisionRequest
+from .models import DecisionRequest, NegotiationRequest, PolicyConstraint, TrustSignal, TreasuryConstraint
+from .payment_instruction import PaymentInstructionFinalizer
 
 app = typer.Typer(help="Orca Core Decision Engine CLI")
 console = Console()
@@ -872,6 +873,154 @@ def _convert_response_to_ap2_format(response: Any) -> dict[str, Any]:
         },
         "signing": {"vc_proof": None, "receipt_hash": response.meta.get("receipt_hash", "")},
     }
+
+
+@app.command()
+def payment_instruction(
+    negotiation_file: str = typer.Argument(..., help="Path to negotiation results JSON file"),
+    policy_file: str = typer.Option(None, help="Path to policy constraints JSON file"),
+    trust_file: str = typer.Option(None, help="Path to trust signal JSON file"),
+    treasury_file: str = typer.Option(None, help="Path to treasury constraints JSON file"),
+    output_file: str = typer.Option(None, help="Path to output payment instruction JSON file"),
+    model_dir: str = typer.Option("models", help="Path to ML model directory"),
+    trace_id: str = typer.Option(None, help="Transaction trace ID"),
+) -> None:
+    """Generate final payment instruction from negotiation results and constraints."""
+    
+    try:
+        # Load negotiation results
+        with open(negotiation_file, "r") as f:
+            negotiation_data = json.load(f)
+        
+        negotiation_response = NegotiationRequest(**negotiation_data)
+        
+        # Load policy constraints (optional)
+        policy_constraints = []
+        if policy_file and os.path.exists(policy_file):
+            with open(policy_file, "r") as f:
+                policy_data = json.load(f)
+            policy_constraints = [PolicyConstraint(**p) for p in policy_data.get("constraints", [])]
+        
+        # Load trust signal (optional)
+        trust_signal = None
+        if trust_file and os.path.exists(trust_file):
+            with open(trust_file, "r") as f:
+                trust_data = json.load(f)
+            trust_signal = TrustSignal(**trust_data)
+        else:
+            # Default trust signal
+            trust_signal = TrustSignal(
+                trust_score=0.8,
+                risk_level="low",
+                confidence=0.9
+            )
+        
+        # Load treasury constraints (optional)
+        treasury_constraints = []
+        if treasury_file and os.path.exists(treasury_file):
+            with open(treasury_file, "r") as f:
+                treasury_data = json.load(f)
+            treasury_constraints = [TreasuryConstraint(**t) for t in treasury_data.get("constraints", [])]
+        
+        # Generate payment instruction
+        finalizer = PaymentInstructionFinalizer(model_dir)
+        instruction = finalizer.finalize_payment_instruction(
+            negotiation_response=negotiation_response,
+            policy_constraints=policy_constraints,
+            trust_signal=trust_signal,
+            treasury_constraints=treasury_constraints,
+            trace_id=trace_id
+        )
+        
+        # Output results
+        instruction_dict = instruction.dict()
+        
+        if output_file:
+            with open(output_file, "w") as f:
+                json.dump(instruction_dict, f, indent=2, default=str)
+            console.print(f"[green]✅ Payment instruction saved to: {output_file}[/green]")
+        else:
+            console.print("[bold blue]Payment Instruction Generated[/bold blue]")
+            console.print("=" * 50)
+            console.print(json.dumps(instruction_dict, indent=2, default=str))
+        
+        # Display summary
+        table = Table(title="Payment Instruction Summary")
+        table.add_column("Field", style="cyan")
+        table.add_column("Value", style="green")
+        
+        table.add_row("Instruction ID", instruction.instruction_id)
+        table.add_row("Selected Rail", instruction.selected_rail)
+        table.add_row("Selected Processor", instruction.selected_processor)
+        table.add_row("Selected Instrument", instruction.selected_instrument)
+        table.add_row("Amount", f"${instruction.amount:.2f}")
+        table.add_row("Effective Cost", f"${instruction.effective_cost:.2f}")
+        table.add_row("Settlement Time", f"{instruction.settlement_time_hours} hours")
+        table.add_row("Confidence", f"{instruction.confidence:.3f}")
+        table.add_row("Alternatives", str(len(instruction.alternatives)))
+        
+        console.print(table)
+        
+    except Exception as e:
+        console.print(f"[red]❌ Error generating payment instruction: {e}[/red]")
+        raise typer.Exit(1)
+
+
+@app.command()
+def explain_payment_instruction(
+    instruction_file: str = typer.Argument(..., help="Path to payment instruction JSON file"),
+    detailed: bool = typer.Option(False, "--detailed", "-d", help="Show detailed explanation"),
+) -> None:
+    """Explain a payment instruction with human-readable output."""
+    
+    try:
+        with open(instruction_file, "r") as f:
+            instruction_data = json.load(f)
+        
+        console.print("[bold blue]Payment Instruction Explanation[/bold blue]")
+        console.print("=" * 50)
+        
+        # Basic explanation
+        explanation = instruction_data.get("explanation", "No explanation available")
+        console.print(f"\n[bold]Explanation:[/bold] {explanation}")
+        
+        # Decision factors
+        metadata = instruction_data.get("metadata", {})
+        trust_score = metadata.get("trust_score", "N/A")
+        risk_level = metadata.get("risk_level", "N/A")
+        
+        console.print(f"\n[bold]Trust Assessment:[/bold] Score {trust_score}, Risk Level: {risk_level}")
+        
+        # Constraints applied
+        constraints = instruction_data.get("constraints_applied", [])
+        if constraints:
+            console.print(f"\n[bold]Constraints Applied ({len(constraints)}):[/bold]")
+            for i, constraint in enumerate(constraints, 1):
+                constraint_type = constraint.get("type", "unknown")
+                constraint_name = constraint.get("name", "unnamed")
+                constraint_desc = constraint.get("description", "No description")
+                console.print(f"  {i}. [{constraint_type}] {constraint_name}: {constraint_desc}")
+        
+        # Alternatives
+        alternatives = instruction_data.get("alternatives", [])
+        if alternatives:
+            console.print(f"\n[bold]Alternative Options ({len(alternatives)}):[/bold]")
+            for i, alt in enumerate(alternatives, 1):
+                rail_type = alt.get("rail_type", "unknown")
+                cost = alt.get("cost", 0)
+                time_hours = alt.get("settlement_time_hours", 0)
+                score = alt.get("score", 0)
+                why_not = alt.get("why_not_selected", "No reason provided")
+                console.print(f"  {i}. {rail_type}: ${cost:.2f}, {time_hours}h, score {score:.3f}")
+                console.print(f"     Why not selected: {why_not}")
+        
+        if detailed:
+            console.print("\n[bold]Detailed Metadata:[/bold]")
+            console.print(json.dumps(metadata, indent=2, default=str))
+        
+    except Exception as e:
+        console.print(f"[red]❌ Error explaining payment instruction: {e}[/red]")
+        raise typer.Exit(1)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,26 @@
+{
+  "amount": 150.00,
+  "currency": "USD",
+  "merchant_id": "merchant_demo_123",
+  "customer_context": {
+    "customer_id": "cust_demo_456",
+    "customer_tier": "premium",
+    "payment_history_score": 0.9,
+    "device_fingerprint": "device_abc123"
+  },
+  "available_rails": ["Card", "ACH"],
+  "preferences": {
+    "prefer_fast_settlement": true,
+    "max_cost_threshold": 5.00,
+    "risk_tolerance": "medium"
+  },
+  "trace_id": "txn_negotiation_demo_789"
+}
+
+
+
+
+
+
+
+

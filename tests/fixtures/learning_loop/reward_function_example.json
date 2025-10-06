@@ -1,0 +1,68 @@
+{
+  "payment_instruction": {
+    "instruction_id": "test_instruction_001",
+    "trace_id": "test_trace_001",
+    "selected_rail": "ACH",
+    "selected_processor": "carat",
+    "selected_instrument": "bank_transfer",
+    "amount": 1000.0,
+    "currency": "USD",
+    "effective_cost": 15.0,
+    "settlement_time_hours": 24,
+    "confidence": 0.95,
+    "explanation": "Selected ACH rail for optimal cost efficiency and reliable settlement",
+    "alternatives": [
+      {
+        "rail_type": "Card",
+        "cost": 25.0,
+        "settlement_time_hours": 48
+      }
+    ],
+    "constraints_applied": [
+      {
+        "type": "cost_constraint",
+        "severity": "high",
+        "description": "Cost must be under $20"
+      }
+    ],
+    "metadata": {
+      "risk_score": 0.3,
+      "merchant_id": "merchant_001",
+      "customer_data": {
+        "customer_id": "customer_001"
+      }
+    }
+  },
+  "outcome_data": {
+    "actual_cost": 14.5,
+    "settlement_time_hours": 22,
+    "approval_status": "approved",
+    "customer_rating": 0.9,
+    "risk_events": 0,
+    "processor_fee": 14.5,
+    "settlement_reference": "ACH_SETTLE_001"
+  },
+  "baseline_performance": {
+    "avg_cost": 25.0,
+    "avg_settlement_time": 36.0,
+    "avg_approval_rate": 0.95,
+    "avg_customer_rating": 0.8,
+    "avg_risk_events": 0.1
+  },
+  "expected_reward_components": {
+    "cost_efficiency": 0.8,
+    "settlement_speed": 0.7,
+    "approval_rate": 1.0,
+    "customer_satisfaction": 0.9,
+    "risk_mitigation": 1.0
+  },
+  "expected_total_reward": 0.85
+}
+
+
+
+
+
+
+
+

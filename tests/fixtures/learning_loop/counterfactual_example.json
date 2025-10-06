@@ -1,0 +1,70 @@
+{
+  "original_instruction": {
+    "instruction_id": "test_instruction_002",
+    "trace_id": "test_trace_002",
+    "selected_rail": "Card",
+    "selected_processor": "stripe",
+    "selected_instrument": "credit_card",
+    "amount": 500.0,
+    "currency": "USD",
+    "effective_cost": 20.0,
+    "settlement_time_hours": 48,
+    "confidence": 0.9,
+    "explanation": "Selected Card rail for global reach and customer convenience",
+    "alternatives": [],
+    "constraints_applied": [],
+    "metadata": {
+      "risk_score": 0.4,
+      "merchant_id": "merchant_002"
+    }
+  },
+  "available_alternatives": [
+    {
+      "id": "alt_001",
+      "rail_type": "ACH",
+      "instrument_type": "bank_transfer",
+      "processor_id": "carat",
+      "cost_bps": 15.0,
+      "settlement_days": 1,
+      "risk_score": 0.2,
+      "score": 0.85,
+      "expected_reward": 0.8
+    },
+    {
+      "id": "alt_002",
+      "rail_type": "RTP",
+      "instrument_type": "bank_transfer",
+      "processor_id": "carat",
+      "cost_bps": 18.0,
+      "settlement_days": 0,
+      "risk_score": 0.3,
+      "score": 0.82,
+      "expected_reward": 0.75
+    },
+    {
+      "id": "alt_003",
+      "rail_type": "Card",
+      "instrument_type": "debit_card",
+      "processor_id": "adyen",
+      "cost_bps": 22.0,
+      "settlement_days": 1,
+      "risk_score": 0.35,
+      "score": 0.78,
+      "expected_reward": 0.7
+    }
+  ],
+  "expected_counterfactual": {
+    "trace_id": "test_trace_002",
+    "alternatives_count": 3,
+    "scenario_differences_count": 3,
+    "sensitivity_analysis_keys": ["cost_sensitivity", "speed_sensitivity", "risk_sensitivity"]
+  }
+}
+
+
+
+
+
+
+
+

@@ -48,7 +48,7 @@ def generate_explanation(
 ) -> str:
     """Generate human-readable explanation of the decision."""
     if decision == "APPROVE":
-        return f"Transaction approved for ${request.cart_total:.2f}. Cart total within approved limits."
+        return f"Transaction approved for ${getattr(request, 'cart_total', getattr(request, 'amount', 0)):.2f}. Cart total within approved limits."
     elif decision == "DECLINE":
         risk_score = meta.get("risk_score", 0.0)
         if risk_score > 0.80:
@@ -109,7 +109,7 @@ def evaluate_rules(request: DecisionRequest) -> DecisionResponse:
         transaction_id=transaction_id,
         rail=request.rail,
         channel=request.channel,
-        cart_total=request.cart_total,
+        cart_total=getattr(request, 'cart_total', getattr(request, 'amount', 0)),
         risk_score=risk_score,
         rules_evaluated=rules_evaluated,
         approved_amount=None,
@@ -123,7 +123,7 @@ def evaluate_rules(request: DecisionRequest) -> DecisionResponse:
         "transaction_id": transaction_id,
         "rail": request.rail,
         "channel": request.channel,
-        "cart_total": request.cart_total,
+        "cart_total": getattr(request, 'cart_total', getattr(request, 'amount', 0)),
     }
 
     # Add AI risk data for RULES_PLUS_AI mode
@@ -144,7 +144,7 @@ def evaluate_rules(request: DecisionRequest) -> DecisionResponse:
                     risk_score=ai_risk_data["risk_score"],
                     reason_codes=ai_risk_data["reason_codes"],
                     transaction_data={
-                        "amount": request.cart_total,
+                        "amount": getattr(request, 'cart_total', getattr(request, 'amount', 0)),
                         "channel": request.channel,
                         "rail": request.rail,
                         "currency": request.currency,
@@ -184,11 +184,11 @@ def evaluate_rules(request: DecisionRequest) -> DecisionResponse:
 
     # If no rules triggered, provide default approval reasoning
     if not reasons:
-        reasons.append(f"Cart total ${request.cart_total:.2f} within approved threshold")
+        reasons.append(f"Cart total ${getattr(request, 'cart_total', getattr(request, 'amount', 0)):.2f} within approved threshold")
         actions.append("Process payment")
         actions.append("Send confirmation")
-        meta_structured.approved_amount = request.cart_total
-        meta["approved_amount"] = request.cart_total
+        meta_structured.approved_amount = getattr(request, 'cart_total', getattr(request, 'amount', 0))
+        meta["approved_amount"] = getattr(request, 'cart_total', getattr(request, 'amount', 0))
 
     # Remove duplicate reasons while preserving order, but keep duplicate actions
     unique_reasons = list(dict.fromkeys(reasons))
@@ -247,7 +247,7 @@ def evaluate_rules(request: DecisionRequest) -> DecisionResponse:
         routing_hint=routing_hint,
         # Backward compatibility fields (deprecated)
         transaction_id=transaction_id,
-        cart_total=request.cart_total,
+        cart_total=getattr(request, 'cart_total', getattr(request, 'amount', 0)),
         timestamp=timestamp,
         rail=request.rail,
     )
@@ -263,6 +263,9 @@ def get_rail_cost_data(rail_type: RailType, cart_total: float) -> dict[str, floa
         "Debit": {"base_cost": 25.0, "settlement_days": 1},  # 25 bps, 1 day
         "Credit": {"base_cost": 150.0, "settlement_days": 1},  # 150 bps, 1 day
         "Card": {"base_cost": 150.0, "settlement_days": 1},  # Alias for Credit
+        "Wire": {"base_cost": 200.0, "settlement_days": 0},  # 200 bps, same day
+        "Crypto": {"base_cost": 50.0, "settlement_days": 0},  # 50 bps, instant
+        "Instant": {"base_cost": 100.0, "settlement_days": 0},  # 100 bps, instant
     }
     
     base_data = rail_costs.get(rail_type, rail_costs["Credit"])
@@ -289,6 +292,9 @@ def get_rail_speed_score(rail_type: RailType, channel: str) -> float:
         "Debit": 0.9,  # Fast settlement
         "Credit": 0.95,  # Very fast settlement
         "Card": 0.95,  # Alias for Credit
+        "Wire": 1.0,  # Same day settlement
+        "Crypto": 1.0,  # Instant settlement
+        "Instant": 1.0,  # Instant settlement
     }
     
     base_score = speed_scores.get(rail_type, 0.5)
@@ -308,6 +314,9 @@ def get_rail_risk_score(rail_type: RailType, ml_risk_score: float, channel: str)
         "Debit": 0.4,  # Medium risk
         "Credit": 0.7,  # Higher risk, chargebacks
         "Card": 0.7,  # Alias for Credit
+        "Wire": 0.8,  # High risk, irreversible
+        "Crypto": 0.9,  # Very high risk, volatile
+        "Instant": 0.6,  # Medium-high risk, fast but less reversible
     }
     
     base_risk = rail_risk_base.get(rail_type, 0.5)
@@ -327,7 +336,7 @@ def get_rail_risk_score(rail_type: RailType, ml_risk_score: float, channel: str)
 
 def evaluate_rail_with_weights(rail_type: RailType, request: NegotiationRequest, ml_risk_score: float, weights: dict) -> RailEvaluation:
     """Evaluate a single payment rail with specific weights."""
-    cost_data = get_rail_cost_data(rail_type, request.cart_total)
+    cost_data = get_rail_cost_data(rail_type, request.amount)
     
     # Calculate scores (higher = better for cost and speed, lower = better for risk)
     cost_score = max(0.0, 1.0 - (cost_data["base_cost"] / 200.0))  # Normalize to 0-1
@@ -363,6 +372,15 @@ def evaluate_rail_with_weights(rail_type: RailType, request: NegotiationRequest,
         risk_factors.append("chargeback risk")
     if rail_type == "ACH" and request.channel == "online":
         risk_factors.append("ACH fraud risk")
+    if rail_type == "Wire":
+        risk_factors.append("irreversible transaction")
+    if rail_type == "Crypto":
+        risk_factors.append("volatile cryptocurrency risk")
+    if rail_type == "Instant":
+        risk_factors.append("fast but less reversible")
+    
+    # Generate explanation for this rail evaluation
+    explanation = f"{rail_type} rail evaluation: Cost score {cost_score:.2f}, Speed score {speed_score:.2f}, Risk score {risk_score:.2f}, Composite score {composite_score:.2f}"
     
     return RailEvaluation(
         rail_type=rail_type,
@@ -376,12 +394,13 @@ def evaluate_rail_with_weights(rail_type: RailType, request: NegotiationRequest,
         cost_factors=cost_factors,
         speed_factors=speed_factors,
         risk_factors=risk_factors,
+        explanation=explanation,
     )
 
 
 def evaluate_rail(rail_type: RailType, request: NegotiationRequest, ml_risk_score: float) -> RailEvaluation:
     """Evaluate a single payment rail."""
-    cost_data = get_rail_cost_data(rail_type, request.cart_total)
+    cost_data = get_rail_cost_data(rail_type, request.amount)
     
     # Calculate scores (higher = better for cost and speed, lower = better for risk)
     cost_score = max(0.0, 1.0 - (cost_data["base_cost"] / 200.0))  # Normalize to 0-1
@@ -417,6 +436,15 @@ def evaluate_rail(rail_type: RailType, request: NegotiationRequest, ml_risk_scor
         risk_factors.append("chargeback risk")
     if rail_type == "ACH" and request.channel == "online":
         risk_factors.append("ACH fraud risk")
+    if rail_type == "Wire":
+        risk_factors.append("irreversible transaction")
+    if rail_type == "Crypto":
+        risk_factors.append("volatile cryptocurrency risk")
+    if rail_type == "Instant":
+        risk_factors.append("fast but less reversible")
+    
+    # Generate explanation for this rail evaluation
+    explanation = f"{rail_type} rail evaluation: Cost score {cost_score:.2f}, Speed score {speed_score:.2f}, Risk score {risk_score:.2f}, Composite score {composite_score:.2f}"
     
     return RailEvaluation(
         rail_type=rail_type,
@@ -430,6 +458,7 @@ def evaluate_rail(rail_type: RailType, request: NegotiationRequest, ml_risk_scor
         cost_factors=cost_factors,
         speed_factors=speed_factors,
         risk_factors=risk_factors,
+        explanation=explanation,
     )
 
 
@@ -450,16 +479,60 @@ def determine_optimal_rail(request: NegotiationRequest) -> NegotiationResponse:
     import numpy as np
     
     # Set deterministic seed for consistent results
-    deterministic_seed = int(request.context.get("deterministic_seed", 42))
+    deterministic_seed = int(request.customer_context.get("deterministic_seed", 42))
     random.seed(deterministic_seed)
     np.random.seed(deterministic_seed)
     
     # Generate trace ID
-    trace_id = new_trace_id()
+    trace_id = request.trace_id or new_trace_id()
     timestamp = datetime.now()
     
+    # Create comprehensive features dict for ML prediction
+    # The XGBoost model expects 21 specific features, so we need to provide them all
+    features = {
+        # Transaction features
+        "amount": request.amount,
+        "cart_total": request.amount,  # Same as amount for negotiate requests
+        
+        # Velocity features (use deterministic values based on seed)
+        "velocity_24h": 1.0 + (deterministic_seed % 5),  # 1-5 transactions
+        "velocity_7d": 3.0 + (deterministic_seed % 10),  # 3-12 transactions  
+        "velocity_30d": 10.0 + (deterministic_seed % 20),  # 10-29 transactions
+        
+        # Customer features
+        "customer_age_days": 365.0 + (deterministic_seed % 2000),  # 1-6 years old account
+        "loyalty_score": 0.5 + (deterministic_seed % 50) / 100.0,  # 0.5-0.99 loyalty
+        "chargebacks_12m": deterministic_seed % 3,  # 0-2 chargebacks
+        "time_since_last_purchase": 1.0 + (deterministic_seed % 30),  # 1-30 days
+        
+        # Location features
+        "cross_border": 1.0 if deterministic_seed % 4 == 0 else 0.0,  # 25% cross-border
+        "location_mismatch": 1.0 if deterministic_seed % 10 == 0 else 0.0,  # 10% location mismatch
+        "high_ip_distance": 1.0 if deterministic_seed % 20 == 0 else 0.0,  # 5% high IP distance
+        
+        # Payment features
+        "payment_method_risk": 0.2 + (deterministic_seed % 30) / 100.0,  # 0.2-0.49 risk
+        "card_bin_risk": 0.1 + (deterministic_seed % 20) / 100.0,  # 0.1-0.29 risk
+        
+        # Temporal features
+        "hour_of_day": deterministic_seed % 24,  # 0-23 hours
+        "day_of_week": deterministic_seed % 7,  # 0-6 days
+        "is_weekend": 1.0 if deterministic_seed % 7 >= 5 else 0.0,  # Weekend if 5-6
+        "is_holiday": 1.0 if deterministic_seed % 20 == 0 else 0.0,  # 5% holiday
+        
+        # Derived features (will be calculated below)
+        "amount_velocity_ratio": 0.0,  # Will be calculated
+        "risk_velocity_interaction": 0.0,  # Will be calculated  
+        "location_velocity_interaction": 0.0,  # Will be calculated
+    }
+    
+    # Calculate derived features
+    features["amount_velocity_ratio"] = features["amount"] / max(features["velocity_24h"], 1.0)
+    features["risk_velocity_interaction"] = features["payment_method_risk"] * features["velocity_24h"]
+    features["location_velocity_interaction"] = features["location_mismatch"] * features["velocity_24h"]
+    
     # Get ML risk score with deterministic seed
-    ml_result = predict_risk(request.features)
+    ml_result = predict_risk(features)
     ml_risk_score = ml_result["risk_score"]
     ml_model_used = ml_result.get("model_type", "xgboost")
     
@@ -488,19 +561,20 @@ def determine_optimal_rail(request: NegotiationRequest) -> NegotiationResponse:
                 optimal_rail=optimal_rail,
                 rail_evaluations=rail_evaluations,
                 explanation="",  # Will be filled by LLM
+                confidence=0.85,  # Default confidence score
                 trace_id=trace_id,
-                timestamp=timestamp,
-                ml_model_used=ml_model_used,
                 negotiation_metadata={
                     "weights": normalized_weights,
                     "original_weights": {
-                        "cost": request.cost_weight,
-                        "speed": request.speed_weight,
-                        "risk": request.risk_weight,
+                        "cost": request.preferences.get("cost_weight", 0.4),
+                        "speed": request.preferences.get("speed_weight", 0.3),
+                        "risk": request.preferences.get("risk_weight", 0.3),
                     },
                     "ml_risk_score": ml_risk_score,
+                    "ml_model_used": ml_model_used,
                     "rails_evaluated": len(rail_evaluations),
                     "deterministic_seed": deterministic_seed,
+                    "timestamp": timestamp.isoformat(),
                 },
             )
             explanation = explain_rail_selection_llm(temp_response, request)
@@ -517,19 +591,20 @@ def determine_optimal_rail(request: NegotiationRequest) -> NegotiationResponse:
         optimal_rail=optimal_rail,
         rail_evaluations=rail_evaluations,
         explanation=explanation,
+        confidence=0.85,  # Default confidence score
         trace_id=trace_id,
-        timestamp=timestamp,
-        ml_model_used=ml_model_used,
         negotiation_metadata={
             "weights": normalized_weights,
             "original_weights": {
-                "cost": request.cost_weight,
-                "speed": request.speed_weight,
-                "risk": request.risk_weight,
+                "cost": request.preferences.get("cost_weight", 0.4),
+                "speed": request.preferences.get("speed_weight", 0.3),
+                "risk": request.preferences.get("risk_weight", 0.3),
             },
             "ml_risk_score": ml_risk_score,
+            "ml_model_used": ml_model_used,
             "rails_evaluated": len(rail_evaluations),
             "deterministic_seed": deterministic_seed,
+            "timestamp": timestamp.isoformat(),
         },
     )
     

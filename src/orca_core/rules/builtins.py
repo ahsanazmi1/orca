@@ -26,9 +26,9 @@ class HighTicketRule(Rule):
         Returns:
             RuleResult if cart_total > threshold, None otherwise
         """
-        if request.cart_total > self.threshold:
+        if getattr(request, 'cart_total', getattr(request, 'amount', 0)) > self.threshold:
             reasons = [
-                f"HIGH_TICKET: Cart total ${request.cart_total:.2f} exceeds ${self.threshold:.2f} threshold"
+                f"HIGH_TICKET: Cart total ${getattr(request, 'cart_total', getattr(request, 'amount', 0)):.2f} exceeds ${self.threshold:.2f} threshold"
             ]
             actions = ["ROUTE_TO_REVIEW"]
             return RuleResult(decision_hint="REVIEW", reasons=reasons, actions=actions)

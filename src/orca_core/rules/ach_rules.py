@@ -29,7 +29,7 @@ class ACHLimitRule(Rule):
         if request.rail != "ACH":
             return None
 
-        if request.cart_total > self.limit:
+        if getattr(request, 'cart_total', getattr(request, 'amount', 0)) > self.limit:
             return RuleResult(
                 decision_hint="DECLINE", reasons=["ach_limit_exceeded"], actions=["fallback_card"]
             )
@@ -102,7 +102,7 @@ class ACHChannelRule(Rule):
 
         if request.channel == "online":
             # Online ACH transactions require additional verification
-            if request.cart_total > 500.0:
+            if getattr(request, 'cart_total', getattr(request, 'amount', 0)) > 500.0:
                 return RuleResult(
                     decision_hint="REVIEW",
                     reasons=["ach_online_verification"],

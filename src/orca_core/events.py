@@ -1,8 +1,9 @@
 """
-CloudEvent emission for Orca Core Phase 3 - Negotiation & Live Fee Bidding
+CloudEvent emission for Orca Core Phase 3 & 4 - Negotiation & Payment Instructions
 
-This module handles the emission of CloudEvents for rail negotiation explanations
-and decision reasoning as part of the OCN Phase 3 negotiation system.
+This module handles the emission of CloudEvents for rail negotiation explanations,
+decision reasoning, payment instruction explanations, and counterfactual analysis
+as part of the OCN Phase 3 & 4 negotiation and payment instruction system.
 """
 
 import json
@@ -247,3 +248,147 @@ def get_event_schema_validation(event_dict: Dict[str, Any]) -> bool:
     
     logger.info("CloudEvent validation passed")
     return True
+
+
+def emit_payment_explanation_event(
+    payment_instruction,
+    trace_id: str,
+    source: str = "https://orca.ocn.ai/payment-instruction"
+) -> Dict[str, Any]:
+    """
+    Emit a CloudEvent for payment instruction explanation.
+    
+    Args:
+        payment_instruction: PaymentInstruction object
+        trace_id: Transaction trace ID
+        source: Event source URI
+        
+    Returns:
+        Dict containing the CloudEvent data
+    """
+    if not CLOUDEVENTS_AVAILABLE:
+        logger.warning("CloudEvents library not available, skipping event emission")
+        return {}
+    
+    try:
+        event_data = {
+            "specversion": "1.0",
+            "id": f"evt_payment_explanation_{uuid4().hex[:8]}",
+            "source": source,
+            "type": "ocn.orca.explanation.v1",
+            "subject": trace_id,
+            "time": datetime.utcnow().isoformat() + "Z",
+            "datacontenttype": "application/vnd.ocn.ap2+json; version=1",
+            "dataschema": "https://schemas.ocn.ai/events/v1/orca.explanation.v1.schema.json",
+            "data": {
+                "explanation_version": "0.1.0",
+                "trace_id": trace_id,
+                "instruction_id": payment_instruction.instruction_id,
+                "explanation_type": "payment_instruction",
+                "explanation_result": {
+                    "selected_rail": payment_instruction.selected_rail,
+                    "selected_processor": payment_instruction.selected_processor,
+                    "selected_instrument": payment_instruction.selected_instrument,
+                    "effective_cost": payment_instruction.effective_cost,
+                    "settlement_time_hours": payment_instruction.settlement_time_hours,
+                    "confidence": payment_instruction.confidence,
+                    "explanation": payment_instruction.explanation,
+                    "decision_factors": {
+                        "cost_weight": 0.4,
+                        "speed_weight": 0.3,
+                        "risk_weight": 0.3,
+                        "trust_score": payment_instruction.metadata.get("trust_score", 0.5),
+                        "risk_level": payment_instruction.metadata.get("risk_level", "medium")
+                    },
+                    "constraints_applied": payment_instruction.constraints_applied
+                },
+                "metadata": payment_instruction.metadata
+            }
+        }
+        
+        # Create CloudEvent
+        event = CloudEvent(**event_data)
+        
+        # Log the event
+        logger.info(f"Emitting payment explanation event: {event_data['id']} for trace_id: {trace_id}")
+        
+        # In a real implementation, you would emit this to an event bus
+        # For now, we'll just log it
+        if os.getenv("OCN_EMIT_EVENTS", "false").lower() == "true":
+            logger.info(f"Payment explanation event data: {json.dumps(event.to_dict(), indent=2)}")
+        
+        return event.to_dict()
+        
+    except Exception as e:
+        logger.error(f"Failed to emit payment explanation event: {e}")
+        return {}
+
+
+def emit_counterfactual_event(
+    counterfactual_analysis,
+    trace_id: str,
+    source: str = "https://orca.ocn.ai/counterfactual"
+) -> Dict[str, Any]:
+    """
+    Emit a CloudEvent for counterfactual analysis.
+    
+    Args:
+        counterfactual_analysis: CounterfactualAnalysis object
+        trace_id: Transaction trace ID
+        source: Event source URI
+        
+    Returns:
+        Dict containing the CloudEvent data
+    """
+    if not CLOUDEVENTS_AVAILABLE:
+        logger.warning("CloudEvents library not available, skipping event emission")
+        return {}
+    
+    try:
+        event_data = {
+            "specversion": "1.0",
+            "id": f"evt_counterfactual_{uuid4().hex[:8]}",
+            "source": source,
+            "type": "ocn.orca.counterfactual.v1",
+            "subject": trace_id,
+            "time": datetime.utcnow().isoformat() + "Z",
+            "datacontenttype": "application/vnd.ocn.ap2+json; version=1",
+            "dataschema": "https://schemas.ocn.ai/events/v1/orca.counterfactual.v1.schema.json",
+            "data": {
+                "counterfactual_version": "0.1.0",
+                "trace_id": trace_id,
+                "original_instruction": {
+                    "instruction_id": counterfactual_analysis.original_instruction.instruction_id,
+                    "selected_rail": counterfactual_analysis.original_instruction.selected_rail,
+                    "selected_processor": counterfactual_analysis.original_instruction.selected_processor,
+                    "effective_cost": counterfactual_analysis.original_instruction.effective_cost,
+                    "confidence": counterfactual_analysis.original_instruction.confidence
+                },
+                "alternatives": counterfactual_analysis.alternatives,
+                "scenario_differences": counterfactual_analysis.scenario_differences,
+                "sensitivity_analysis": counterfactual_analysis.sensitivity_analysis,
+                "metadata": {
+                    "analysis_timestamp": datetime.utcnow().isoformat(),
+                    "total_alternatives": len(counterfactual_analysis.alternatives),
+                    "analysis_type": "payment_instruction_counterfactual"
+                }
+            }
+        }
+        
+        # Create CloudEvent
+        event = CloudEvent(**event_data)
+        
+        # Log the event
+        logger.info(f"Emitting counterfactual event: {event_data['id']} for trace_id: {trace_id}")
+        
+        # In a real implementation, you would emit this to an event bus
+        # For now, we'll just log it
+        if os.getenv("OCN_EMIT_EVENTS", "false").lower() == "true":
+            logger.info(f"Counterfactual event data: {json.dumps(event.to_dict(), indent=2)}")
+        
+        return event.to_dict()
+        
+    except Exception as e:
+        logger.error(f"Failed to emit counterfactual event: {e}")
+        return {}
+
